@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Vainyala Samal",
+      "email": "samal@nutantek.com",
+      "role": "employee",
+      "department": "Mobile Development",
+      "projects": ["p1", "p2"]
+    },
+    {
+      "id": "2",
+      "name": "Raj Sharma",
+      "email": "raj@nutantek.com",
+      "role": "manager",
+      "department": "Management"
+    }
+  ],
+
+  "attendance": [
+    { "userId": "1", "date": "2025-12-09", "checkIn": "09:15", "checkOut": "18:30", "status": "present" },
+    { "userId": "1", "date": "2025-12-08", "checkIn": "09:45", "checkOut": null, "status": "late" },
+    { "userId": "1", "date": "2025-12-07", "checkIn": null, "checkOut": null, "status": "absent" }
+  ],
+
+  "projects": [
+    {
+      "id": "p1",
+      "name": "Nutantek Office App",
+      "site": "Nutantek Office",
+      "shift": "Morning",
+      "managerName": "Raj Sharma"
+    },
+    {
+      "id": "p2",
+      "name": "E-Commerce Platform",
+      "site": "Client Site",
+      "shift": "Evening",
+      "managerName": "Raj Sharma"
+    }
+  ]
+}
