@@ -21,16 +21,24 @@ RegularisationModel _$RegularisationModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RegularisationModel {
-  String get id => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  DateTime get date => throw _privateConstructorUsedError;
-  RegularisationType get type => throw _privateConstructorUsedError;
-  RegularisationStatus get status => throw _privateConstructorUsedError;
-  String get reason => throw _privateConstructorUsedError;
-  String? get managerRemarks => throw _privateConstructorUsedError;
-  List<String> get supportingDocs => throw _privateConstructorUsedError;
-  DateTime? get requestedDate => throw _privateConstructorUsedError;
-  DateTime? get approvedDate => throw _privateConstructorUsedError;
+  String get regId => throw _privateConstructorUsedError; // reg_id
+  String get empId => throw _privateConstructorUsedError; // emp_id
+  DateTime get appliedForDate =>
+      throw _privateConstructorUsedError; // reg_applied_for_date
+  DateTime get appliedDate =>
+      throw _privateConstructorUsedError; // reg_date_applied
+  RegularisationType get type =>
+      throw _privateConstructorUsedError; // reg_type - Full Day / Check-in Only etc.
+  String get justification =>
+      throw _privateConstructorUsedError; // reg_justification
+  RegularisationStatus get status =>
+      throw _privateConstructorUsedError; // reg_approval_status
+  String? get managerRemarks =>
+      throw _privateConstructorUsedError; // manager comments on approve/reject
+  List<String> get supportingDocs =>
+      throw _privateConstructorUsedError; // future documents
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this RegularisationModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -50,16 +58,17 @@ abstract class $RegularisationModelCopyWith<$Res> {
   ) = _$RegularisationModelCopyWithImpl<$Res, RegularisationModel>;
   @useResult
   $Res call({
-    String id,
-    String userId,
-    DateTime date,
+    String regId,
+    String empId,
+    DateTime appliedForDate,
+    DateTime appliedDate,
     RegularisationType type,
+    String justification,
     RegularisationStatus status,
-    String reason,
     String? managerRemarks,
     List<String> supportingDocs,
-    DateTime? requestedDate,
-    DateTime? approvedDate,
+    DateTime createdAt,
+    DateTime updatedAt,
   });
 }
 
@@ -78,43 +87,48 @@ class _$RegularisationModelCopyWithImpl<$Res, $Val extends RegularisationModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? date = null,
+    Object? regId = null,
+    Object? empId = null,
+    Object? appliedForDate = null,
+    Object? appliedDate = null,
     Object? type = null,
+    Object? justification = null,
     Object? status = null,
-    Object? reason = null,
     Object? managerRemarks = freezed,
     Object? supportingDocs = null,
-    Object? requestedDate = freezed,
-    Object? approvedDate = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
+            regId: null == regId
+                ? _value.regId
+                : regId // ignore: cast_nullable_to_non_nullable
                       as String,
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
+            empId: null == empId
+                ? _value.empId
+                : empId // ignore: cast_nullable_to_non_nullable
                       as String,
-            date: null == date
-                ? _value.date
-                : date // ignore: cast_nullable_to_non_nullable
+            appliedForDate: null == appliedForDate
+                ? _value.appliedForDate
+                : appliedForDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            appliedDate: null == appliedDate
+                ? _value.appliedDate
+                : appliedDate // ignore: cast_nullable_to_non_nullable
                       as DateTime,
             type: null == type
                 ? _value.type
                 : type // ignore: cast_nullable_to_non_nullable
                       as RegularisationType,
+            justification: null == justification
+                ? _value.justification
+                : justification // ignore: cast_nullable_to_non_nullable
+                      as String,
             status: null == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as RegularisationStatus,
-            reason: null == reason
-                ? _value.reason
-                : reason // ignore: cast_nullable_to_non_nullable
-                      as String,
             managerRemarks: freezed == managerRemarks
                 ? _value.managerRemarks
                 : managerRemarks // ignore: cast_nullable_to_non_nullable
@@ -123,14 +137,14 @@ class _$RegularisationModelCopyWithImpl<$Res, $Val extends RegularisationModel>
                 ? _value.supportingDocs
                 : supportingDocs // ignore: cast_nullable_to_non_nullable
                       as List<String>,
-            requestedDate: freezed == requestedDate
-                ? _value.requestedDate
-                : requestedDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            approvedDate: freezed == approvedDate
-                ? _value.approvedDate
-                : approvedDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
+            createdAt: null == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            updatedAt: null == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
           )
           as $Val,
     );
@@ -147,16 +161,17 @@ abstract class _$$RegularisationModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
-    String userId,
-    DateTime date,
+    String regId,
+    String empId,
+    DateTime appliedForDate,
+    DateTime appliedDate,
     RegularisationType type,
+    String justification,
     RegularisationStatus status,
-    String reason,
     String? managerRemarks,
     List<String> supportingDocs,
-    DateTime? requestedDate,
-    DateTime? approvedDate,
+    DateTime createdAt,
+    DateTime updatedAt,
   });
 }
 
@@ -174,43 +189,48 @@ class __$$RegularisationModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? date = null,
+    Object? regId = null,
+    Object? empId = null,
+    Object? appliedForDate = null,
+    Object? appliedDate = null,
     Object? type = null,
+    Object? justification = null,
     Object? status = null,
-    Object? reason = null,
     Object? managerRemarks = freezed,
     Object? supportingDocs = null,
-    Object? requestedDate = freezed,
-    Object? approvedDate = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(
       _$RegularisationModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
+        regId: null == regId
+            ? _value.regId
+            : regId // ignore: cast_nullable_to_non_nullable
                   as String,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
+        empId: null == empId
+            ? _value.empId
+            : empId // ignore: cast_nullable_to_non_nullable
                   as String,
-        date: null == date
-            ? _value.date
-            : date // ignore: cast_nullable_to_non_nullable
+        appliedForDate: null == appliedForDate
+            ? _value.appliedForDate
+            : appliedForDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        appliedDate: null == appliedDate
+            ? _value.appliedDate
+            : appliedDate // ignore: cast_nullable_to_non_nullable
                   as DateTime,
         type: null == type
             ? _value.type
             : type // ignore: cast_nullable_to_non_nullable
                   as RegularisationType,
+        justification: null == justification
+            ? _value.justification
+            : justification // ignore: cast_nullable_to_non_nullable
+                  as String,
         status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as RegularisationStatus,
-        reason: null == reason
-            ? _value.reason
-            : reason // ignore: cast_nullable_to_non_nullable
-                  as String,
         managerRemarks: freezed == managerRemarks
             ? _value.managerRemarks
             : managerRemarks // ignore: cast_nullable_to_non_nullable
@@ -219,14 +239,14 @@ class __$$RegularisationModelImplCopyWithImpl<$Res>
             ? _value._supportingDocs
             : supportingDocs // ignore: cast_nullable_to_non_nullable
                   as List<String>,
-        requestedDate: freezed == requestedDate
-            ? _value.requestedDate
-            : requestedDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        approvedDate: freezed == approvedDate
-            ? _value.approvedDate
-            : approvedDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+        createdAt: null == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        updatedAt: null == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
       ),
     );
   }
@@ -236,16 +256,17 @@ class __$$RegularisationModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$RegularisationModelImpl extends _RegularisationModel {
   const _$RegularisationModelImpl({
-    required this.id,
-    required this.userId,
-    required this.date,
+    required this.regId,
+    required this.empId,
+    required this.appliedForDate,
+    required this.appliedDate,
     required this.type,
+    required this.justification,
     required this.status,
-    required this.reason,
     this.managerRemarks,
     final List<String> supportingDocs = const [],
-    this.requestedDate,
-    this.approvedDate,
+    required this.createdAt,
+    required this.updatedAt,
   }) : _supportingDocs = supportingDocs,
        super._();
 
@@ -253,20 +274,31 @@ class _$RegularisationModelImpl extends _RegularisationModel {
       _$$RegularisationModelImplFromJson(json);
 
   @override
-  final String id;
+  final String regId;
+  // reg_id
   @override
-  final String userId;
+  final String empId;
+  // emp_id
   @override
-  final DateTime date;
+  final DateTime appliedForDate;
+  // reg_applied_for_date
+  @override
+  final DateTime appliedDate;
+  // reg_date_applied
   @override
   final RegularisationType type;
+  // reg_type - Full Day / Check-in Only etc.
+  @override
+  final String justification;
+  // reg_justification
   @override
   final RegularisationStatus status;
-  @override
-  final String reason;
+  // reg_approval_status
   @override
   final String? managerRemarks;
+  // manager comments on approve/reject
   final List<String> _supportingDocs;
+  // manager comments on approve/reject
   @override
   @JsonKey()
   List<String> get supportingDocs {
@@ -275,14 +307,15 @@ class _$RegularisationModelImpl extends _RegularisationModel {
     return EqualUnmodifiableListView(_supportingDocs);
   }
 
+  // future documents
   @override
-  final DateTime? requestedDate;
+  final DateTime createdAt;
   @override
-  final DateTime? approvedDate;
+  final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'RegularisationModel(id: $id, userId: $userId, date: $date, type: $type, status: $status, reason: $reason, managerRemarks: $managerRemarks, supportingDocs: $supportingDocs, requestedDate: $requestedDate, approvedDate: $approvedDate)';
+    return 'RegularisationModel(regId: $regId, empId: $empId, appliedForDate: $appliedForDate, appliedDate: $appliedDate, type: $type, justification: $justification, status: $status, managerRemarks: $managerRemarks, supportingDocs: $supportingDocs, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -290,38 +323,43 @@ class _$RegularisationModelImpl extends _RegularisationModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$RegularisationModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.regId, regId) || other.regId == regId) &&
+            (identical(other.empId, empId) || other.empId == empId) &&
+            (identical(other.appliedForDate, appliedForDate) ||
+                other.appliedForDate == appliedForDate) &&
+            (identical(other.appliedDate, appliedDate) ||
+                other.appliedDate == appliedDate) &&
             (identical(other.type, type) || other.type == type) &&
+            (identical(other.justification, justification) ||
+                other.justification == justification) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.reason, reason) || other.reason == reason) &&
             (identical(other.managerRemarks, managerRemarks) ||
                 other.managerRemarks == managerRemarks) &&
             const DeepCollectionEquality().equals(
               other._supportingDocs,
               _supportingDocs,
             ) &&
-            (identical(other.requestedDate, requestedDate) ||
-                other.requestedDate == requestedDate) &&
-            (identical(other.approvedDate, approvedDate) ||
-                other.approvedDate == approvedDate));
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    id,
-    userId,
-    date,
+    regId,
+    empId,
+    appliedForDate,
+    appliedDate,
     type,
+    justification,
     status,
-    reason,
     managerRemarks,
     const DeepCollectionEquality().hash(_supportingDocs),
-    requestedDate,
-    approvedDate,
+    createdAt,
+    updatedAt,
   );
 
   /// Create a copy of RegularisationModel
@@ -343,16 +381,17 @@ class _$RegularisationModelImpl extends _RegularisationModel {
 
 abstract class _RegularisationModel extends RegularisationModel {
   const factory _RegularisationModel({
-    required final String id,
-    required final String userId,
-    required final DateTime date,
+    required final String regId,
+    required final String empId,
+    required final DateTime appliedForDate,
+    required final DateTime appliedDate,
     required final RegularisationType type,
+    required final String justification,
     required final RegularisationStatus status,
-    required final String reason,
     final String? managerRemarks,
     final List<String> supportingDocs,
-    final DateTime? requestedDate,
-    final DateTime? approvedDate,
+    required final DateTime createdAt,
+    required final DateTime updatedAt,
   }) = _$RegularisationModelImpl;
   const _RegularisationModel._() : super._();
 
@@ -360,25 +399,27 @@ abstract class _RegularisationModel extends RegularisationModel {
       _$RegularisationModelImpl.fromJson;
 
   @override
-  String get id;
+  String get regId; // reg_id
   @override
-  String get userId;
+  String get empId; // emp_id
   @override
-  DateTime get date;
+  DateTime get appliedForDate; // reg_applied_for_date
   @override
-  RegularisationType get type;
+  DateTime get appliedDate; // reg_date_applied
   @override
-  RegularisationStatus get status;
+  RegularisationType get type; // reg_type - Full Day / Check-in Only etc.
   @override
-  String get reason;
+  String get justification; // reg_justification
   @override
-  String? get managerRemarks;
+  RegularisationStatus get status; // reg_approval_status
   @override
-  List<String> get supportingDocs;
+  String? get managerRemarks; // manager comments on approve/reject
   @override
-  DateTime? get requestedDate;
+  List<String> get supportingDocs; // future documents
   @override
-  DateTime? get approvedDate;
+  DateTime get createdAt;
+  @override
+  DateTime get updatedAt;
 
   /// Create a copy of RegularisationModel
   /// with the given fields replaced by the non-null parameter values.

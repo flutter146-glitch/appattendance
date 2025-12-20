@@ -3,15 +3,26 @@
 import 'dart:async';
 
 import 'package:appattendance/core/database/db_helper.dart';
+import 'package:appattendance/core/providers/bottom_nav_providers.dart';
+import 'package:appattendance/core/providers/view_mode_provider.dart';
+import 'package:appattendance/core/theme/app_gradients.dart';
+import 'package:appattendance/core/theme/bottom_navigation.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
-import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/metrics_counter.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/common/metrics_counter.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/common/attendance_breakdown_section.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/check_in_out.dart';
 import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
 import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_quick_actions.dart';
+import 'package:appattendance/features/projects/presentation/widgets/projectwidgets/mapped_projects_widget.dart';
+import 'package:appattendance/features/regularisation/presentation/screens/regularisation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -23,11 +34,15 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   String _currentTime = '';
   Timer? _timer;
+  Map<String, dynamic>? dashboardData;
+  bool isLoading = true;
+  bool geofenceEnabled = true;
 
   @override
   void initState() {
     super.initState();
     _startClock();
+    _loadDashboardData();
   }
 
   void _startClock() {
@@ -42,6 +57,98 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     });
   }
 
+  Future<void> _loadDashboardData() async {
+    setState(() => isLoading = true);
+
+    try {
+      final currentUser = ref.read(authProvider).value;
+      if (currentUser == null) {
+        Navigator.pushReplacementNamed(context, '/login');
+        return;
+      }
+
+      final db = await DBHelper.instance.database;
+
+      final role = (currentUser['emp_role'] ?? '').toLowerCase();
+      final isManager = role.contains('manager') || role.contains('admin');
+
+      List<Map<String, dynamic>> projects = [];
+
+      if (isManager) {
+        final teamMembers = await db.query('employee_master');
+
+        Set<String> teamProjectIds = {};
+
+        for (var member in teamMembers) {
+          final memberMapped = await db.query(
+            'employee_mapped_projects',
+            where: 'emp_id = ? AND mapping_status = ?',
+            whereArgs: [member['emp_id'], 'active'],
+          );
+          teamProjectIds.addAll(
+            memberMapped.map((m) => m['project_id'] as String),
+          );
+        }
+
+        if (teamProjectIds.isNotEmpty) {
+          projects = await db.query(
+            'project_master',
+            where:
+                'project_id IN (${List.filled(teamProjectIds.length, '?').join(',')})',
+            whereArgs: teamProjectIds.toList(),
+          );
+        }
+      } else {
+        final mapped = await db.query(
+          'employee_mapped_projects',
+          where: 'emp_id = ? AND mapping_status = ?',
+          whereArgs: [currentUser['emp_id'], 'active'],
+        );
+
+        if (mapped.isNotEmpty) {
+          final projectIds = mapped
+              .map((m) => m['project_id'] as String)
+              .toList();
+          projects = await db.query(
+            'project_master',
+            where:
+                'project_id IN (${List.filled(projectIds.length, '?').join(',')})',
+            whereArgs: projectIds,
+          );
+        }
+      }
+
+      final attendance = await db.query(
+        'employee_attendance',
+        where: 'emp_id = ?',
+        whereArgs: [currentUser['emp_id']],
+        orderBy: 'att_date DESC',
+      );
+
+      final pendingLeaves =
+          Sqflite.firstIntValue(
+            await db.rawQuery(
+              'SELECT COUNT(*) FROM employee_leaves WHERE leave_approval_status = ?',
+              ['pending'],
+            ),
+          ) ??
+          0;
+
+      dashboardData = {
+        'user': currentUser,
+        'projects': projects,
+        'attendance': attendance,
+        'pending_leaves': pendingLeaves,
+        'is_manager': isManager,
+      };
+
+      setState(() => isLoading = false);
+    } catch (e) {
+      debugPrint("Dashboard load error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -52,14 +159,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).value;
 
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, '/login');
-      });
+    if (user == null || isLoading || dashboardData == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final isManager = (user['emp_role'] ?? '').toLowerCase() == 'manager';
+    final role = (user['emp_role'] ?? '').toLowerCase();
+    final isManager = role.contains('manager') || role.contains('admin');
+
+    final attendance = dashboardData?['attendance'] as List<dynamic>? ?? [];
+    final today = DateTime.now().toString().substring(0, 10);
+    final hasCheckedInToday = attendance.any(
+      (rec) => rec['att_date'] == today && rec['att_status'] == 'checkin',
+    );
+
+    final projects =
+        dashboardData?['projects'] as List<Map<String, dynamic>>? ?? [];
+
+    final viewMode = ref.watch(viewModeProvider);
+    final effectiveIsManager = isManager && viewMode == ViewMode.manager;
+
+    final effectiveRole = effectiveIsManager ? "Manager" : "Employee";
+    final currentIndex = ref.watch(bottomNavIndexProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -67,33 +187,47 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+          builder: (ctx) => IconButton(
+            icon: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white.withOpacity(0.2),
+              child: Icon(Icons.person, color: Colors.white, size: 24),
+            ),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Welcome back,",
+              "Welcome${isManager ? '' : ' back'},",
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             Text(
-              user['emp_name'],
+              user['emp_name'] ?? 'User',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // Text(
-            //   user['emp_email'],
-            //   style: TextStyle(color: Colors.white70, fontSize: 12),
-            // ),
+            Text(
+              // "${user['emp_role'] ?? ''} • ${user['emp_department'] ?? ''}",
+              user['emp_department'] ?? '',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
           ],
         ),
         actions: [
+          if (!effectiveIsManager)
+            IconButton(
+              icon: Icon(
+                geofenceEnabled ? Icons.location_on : Icons.location_off,
+                color: Colors.white,
+              ),
+              onPressed: () =>
+                  setState(() => geofenceEnabled = !geofenceEnabled),
+            ),
           Stack(
             children: [
               IconButton(
@@ -119,135 +253,1916 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
           IconButton(
             icon: Icon(Icons.refresh, color: Colors.white),
-            onPressed: () {},
+            onPressed: _loadDashboardData,
           ),
         ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[800]!, Colors.blue[600]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      ),
+      drawer: AppDrawer(
+        user: user,
+        // onLogout: () async {
+        //   await DBHelper.instance.clearCurrentUser();
+        //   ref.read(authProvider.notifier).logout();
+        //   Navigator.pushReplacementNamed(context, '/login');
+        // },
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppGradients.dashboard(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            // padding: EdgeInsets.fromLTRB(0, 0, 16, 20),
+            child: Column(
+              children: [
+                // Live Time Card
+                Card(
+                  color: Colors.transparent,
+                  elevation: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DateFormat(
+                                'EEEE, d MMMM yyyy',
+                              ).format(DateTime.now()),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              _currentTime,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.cyan.shade400.withOpacity(0.3),
+                                Colors.blue.shade400.withOpacity(0.2),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Text(
+                            user['emp_role'] ?? '',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // SizedBox(height: 1),
+
+                // Check-in/Check-out — Sirf Employee ko
+                if (!effectiveIsManager)
+                  CheckInOutWidget(
+                    hasCheckedInToday: hasCheckedInToday,
+                    isInGeofence: geofenceEnabled,
+                    onCheckIn: () => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Check-in successful!")),
+                    ),
+                    onCheckOut: () =>
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Check-out successful!")),
+                        ),
+                  ),
+
+                // SizedBox(height: 30),
+
+                // // Role-based main content — Safe pass
+                // isManager
+                //     ? ManagerDashboardContent(data: dashboardData)
+                //     : EmployeeDashboardContent(data: dashboardData),
+                // SizedBox(height: 1),
+                PresentDashboardCardSection(
+                  dashboardData: dashboardData,
+                  isManager: effectiveIsManager,
+                ),
+
+                // SizedBox(height: 30),
+                if (!effectiveIsManager)
+                  AttendanceBreakdownSection(
+                    present: 9,
+                    leave: 2,
+                    absent: 1,
+                    onTime: 6,
+                    late: 3,
+                    dailyAvg: 9.0,
+                    monthlyAvg: 63.0,
+                  ),
+
+                // dashboard_screen.dart ke Column children mein
+                // SizedBox(height: 30),
+
+                // Metrics Counter — Sirf Manager ko dikhao
+                if (effectiveIsManager)
+                  MetricsCounter(
+                    projectsCount: projects.length,
+                    teamSize: 12, // Real mein teamMembers.length se
+                    presentToday:
+                        9, // Real mein today present count karna padega
+                    timesheetPeriod: "Q4 2025",
+                  ),
+
+                // SizedBox(height: 30),
+
+                // SizedBox(height: 30),
+                MappedProjectsWidget(
+                  projects: projects,
+                  isManager: effectiveIsManager,
+                  userRole: user['emp_role'] ?? '',
+                ),
+                // SizedBox(height: 4,),
+                if (effectiveIsManager)
+                  ManagerQuickActions(
+                    onAttendanceTap: () {
+                      // Navigate to Team Attendance Screen
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (_) => TeamAttendanceScreen(),
+                      //   ),
+                      // );
+                    },
+                    onEmployeesTap: () {
+                      // Navigate to Team Members Screen
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (_) => TeamMembersScreen()),
+                      // );
+                    },
+                  ),
+
+                SizedBox(height: 100),
+              ],
             ),
           ),
         ),
       ),
-      drawer: AppDrawer(
-        user: user,
-        onLogout: () async {
-          await DBHelper.instance.clearCurrentUser();
-          ref.read(authProvider.notifier).logout();
-          Navigator.pushReplacementNamed(context, '/login');
+
+      bottomNavigationBar: BottomNavigation(
+        currentIndex: currentIndex,
+        onTabChanged: (index) {
+          ref.read(bottomNavIndexProvider.notifier).state = index;
+
+          if (index != 0) {
+            final screens = [
+              null,
+              RegularisationScreen(),
+              // LeaveScreen(),
+              // TimesheetScreen(),
+            ];
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => screens[index]!),
+            );
+          }
         },
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.blue[50]!, Colors.purple[50]!],
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20, 140, 20, 20),
-          child: Column(
-            children: [
-              // Live Time Card
-              // Card(
-              //   elevation: 8,
-              //   shape: RoundedRectangleBorder(
-              //     borderRadius: BorderRadius.circular(20),
-              //   ),
-              //   child: Padding(
-              //     padding: EdgeInsets.all(20),
-              //     child: Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         Column(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             Text(
-              //               DateFormat(
-              //                 'EEEE, d MMMM yyyy',
-              //               ).format(DateTime.now()),
-              //               style: TextStyle(
-              //                 fontSize: 18,
-              //                 fontWeight: FontWeight.bold,
-              //               ),
-              //             ),
-              //             Text(
-              //               _currentTime,
-              //               style: TextStyle(
-              //                 fontSize: 32,
-              //                 fontWeight: FontWeight.bold,
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //         Container(
-              //           padding: EdgeInsets.symmetric(
-              //             horizontal: 16,
-              //             vertical: 8,
-              //           ),
-              //           decoration: BoxDecoration(
-              //             color: Colors.green[100],
-              //             borderRadius: BorderRadius.circular(20),
-              //           ),
-              //           child: Text(
-              //             "LIVE",
-              //             style: TextStyle(
-              //               color: Colors.green[800],
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-
-              // SizedBox(height: 30),
-
-              // Role-based Content
-              isManager
-                  ? ManagerDashboardContent(
-                      data: {'user': user},
-                    ) // MetricsCounter yahan call hoga
-                  : EmployeeDashboardContent(
-                      data: {'user': user},
-                    ), // Simple employee view
-
-              SizedBox(height: 100),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit_calendar),
-            label: "Regularization",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.beach_access),
-            label: "Leave",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: "Timesheet",
-          ),
-        ],
       ),
     );
   }
 }
+
+// // lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/theme/app_gradients.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/attendance_breakdown_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/check_in_out.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+// import 'package:appattendance/features/projects/presentation/widgets/projectwidgets/mapped_projects_widget.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+// import 'package:sqflite/sqflite.dart';
+
+// class DashboardScreen extends ConsumerStatefulWidget {
+//   const DashboardScreen({super.key});
+
+//   @override
+//   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+// }
+
+// class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+//   String _currentTime = '';
+//   Timer? _timer;
+//   Map<String, dynamic>? dashboardData;
+//   bool isLoading = true;
+//   bool geofenceEnabled = true;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startClock();
+//     _loadDashboardData();
+//   }
+
+//   void _startClock() {
+//     _updateTime();
+//     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+//   }
+
+//   void _updateTime() {
+//     final now = DateTime.now();
+//     setState(() {
+//       _currentTime = DateFormat('HH:mm:ss').format(now);
+//     });
+//   }
+
+//   Future<void> _loadDashboardData() async {
+//     setState(() => isLoading = true);
+
+//     try {
+//       final currentUser = ref.read(authProvider).value;
+//       if (currentUser == null) {
+//         Navigator.pushReplacementNamed(context, '/login');
+//         return;
+//       }
+
+//       final db = await DBHelper.instance.database;
+
+//       final role = (currentUser['emp_role'] ?? '').toLowerCase();
+//       final isManager = role.contains('manager') || role.contains('admin');
+
+//       List<Map<String, dynamic>> projects = [];
+
+//       if (isManager) {
+//         final teamMembers = await db.query(
+//           'employee_master',
+//           where: 'emp_reporting_manager = ? OR manager_emp_id = ?',
+//           whereArgs: [currentUser['emp_id'], currentUser['emp_id']],
+//         );
+
+//         Set<String> teamProjectIds = {};
+
+//         for (var member in teamMembers) {
+//           final memberMapped = await db.query(
+//             'employee_mapped_projects',
+//             where: 'emp_id = ? AND mapping_status = ?',
+//             whereArgs: [member['emp_id'], 'active'],
+//           );
+//           for (var m in memberMapped) {
+//             teamProjectIds.add(m['project_id'] as String);
+//           }
+//         }
+
+//         if (teamProjectIds.isNotEmpty) {
+//           projects = await db.query(
+//             'project_master',
+//             where:
+//                 'project_id IN (${List.filled(teamProjectIds.length, '?').join(',')})',
+//             whereArgs: teamProjectIds.toList(),
+//           );
+
+//           for (var project in projects) {
+//             final mapping = await db.query(
+//               'employee_mapped_projects',
+//               where: 'project_id = ? AND mapping_status = ?',
+//               whereArgs: [project['project_id'], 'active'],
+//               limit: 1,
+//             );
+//             if (mapping.isNotEmpty) {
+//               final empId = mapping.first['emp_id'];
+//               final emp = await db.query(
+//                 'employee_master',
+//                 where: 'emp_id = ?',
+//                 whereArgs: [empId],
+//               );
+//               if (emp.isNotEmpty) {
+//                 project['assigned_emp_name'] = emp.first['emp_name'];
+//                 project['assigned_emp_id'] = emp.first['emp_id'];
+//               }
+//             }
+//           }
+//         }
+//       } else {
+//         final mapped = await db.query(
+//           'employee_mapped_projects',
+//           where: 'emp_id = ? AND mapping_status = ?',
+//           whereArgs: [currentUser['emp_id'], 'active'],
+//         );
+
+//         if (mapped.isNotEmpty) {
+//           final projectIds = mapped
+//               .map((m) => m['project_id'] as String)
+//               .toList();
+//           projects = await db.query(
+//             'project_master',
+//             where:
+//                 'project_id IN (${List.filled(projectIds.length, '?').join(',')})',
+//             whereArgs: projectIds,
+//           );
+//         }
+//       }
+
+//       final attendance = await db.query(
+//         'employee_attendance',
+//         where: 'emp_id = ?',
+//         whereArgs: [currentUser['emp_id']],
+//         orderBy: 'att_date DESC',
+//       );
+
+//       final pendingLeaves =
+//           Sqflite.firstIntValue(
+//             await db.rawQuery(
+//               'SELECT COUNT(*) FROM employee_leaves WHERE leave_approval_status = ?',
+//               ['pending'],
+//             ),
+//           ) ??
+//           0;
+
+//       dashboardData = {
+//         'user': currentUser,
+//         'projects': projects,
+//         'attendance': attendance,
+//         'pending_leaves': pendingLeaves,
+//         'is_manager': isManager,
+//       };
+
+//       setState(() => isLoading = false);
+//     } catch (e) {
+//       debugPrint("Dashboard load error: $e");
+//       setState(() => isLoading = false);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _timer?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = ref.watch(authProvider).value;
+
+//     if (user == null || isLoading || dashboardData == null) {
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     final role = (user['emp_role'] ?? '').toLowerCase();
+//     final isManager = role.contains('manager') || role.contains('admin');
+
+//     final attendance = dashboardData?['attendance'] as List<dynamic>? ?? [];
+//     final today = DateTime.now().toString().substring(0, 10);
+//     final hasCheckedInToday = attendance.any(
+//       (rec) => rec['att_date'] == today && rec['att_status'] == 'checkin',
+//     );
+
+//     final projects =
+//         dashboardData?['projects'] as List<Map<String, dynamic>>? ?? [];
+
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: Builder(
+//           builder: (ctx) => IconButton(
+//             icon: CircleAvatar(
+//               radius: 18,
+//               backgroundColor: Colors.white.withOpacity(0.2),
+//               child: Icon(Icons.person, color: Colors.white, size: 24),
+//             ),
+//             onPressed: () => Scaffold.of(ctx).openDrawer(),
+//           ),
+//         ),
+//         title: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Welcome${isManager ? '' : ' back'},",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//             Text(
+//               user['emp_name'] ?? 'User',
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 20,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             Text(
+//               "${user['emp_role'] ?? ''} • ${user['emp_department'] ?? ''}",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//           ],
+//         ),
+//         actions: [
+//           if (!isManager)
+//             IconButton(
+//               icon: Icon(
+//                 geofenceEnabled ? Icons.location_on : Icons.location_off,
+//                 color: Colors.white,
+//               ),
+//               onPressed: () =>
+//                   setState(() => geofenceEnabled = !geofenceEnabled),
+//             ),
+//           Stack(
+//             children: [
+//               IconButton(
+//                 icon: Icon(Icons.notifications, color: Colors.white),
+//                 onPressed: () {},
+//               ),
+//               Positioned(
+//                 right: 8,
+//                 top: 8,
+//                 child: Container(
+//                   padding: EdgeInsets.all(4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.red,
+//                     shape: BoxShape.circle,
+//                   ),
+//                   child: Text(
+//                     "3",
+//                     style: TextStyle(color: Colors.white, fontSize: 10),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.refresh, color: Colors.white),
+//             onPressed: _loadDashboardData,
+//           ),
+//         ],
+//       ),
+//       drawer: AppDrawer(
+//         user: user,
+//         onLogout: () async {
+//           await DBHelper.instance.clearCurrentUser();
+//           ref.read(authProvider.notifier).logout();
+//           Navigator.pushReplacementNamed(context, '/login');
+//         },
+//       ),
+//       body: Stack(
+//         children: [
+//           Container(
+//             decoration: BoxDecoration(
+//               gradient: AppGradients.dashboard(
+//                 Theme.of(context).brightness == Brightness.dark,
+//               ),
+//             ),
+//           ),
+//           SafeArea(
+//             child: SingleChildScrollView(
+//               child: Column(
+//                 children: [
+//                   Card(
+//                     child: Padding(
+//                       padding: EdgeInsets.all(24),
+//                       child: Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               Text(
+//                                 DateFormat(
+//                                   'EEEE, d MMMM yyyy',
+//                                 ).format(DateTime.now()),
+//                                 style: TextStyle(
+//                                   fontSize: 18,
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                               Text(
+//                                 _currentTime,
+//                                 style: TextStyle(
+//                                   fontSize: 36,
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                           Container(
+//                             padding: EdgeInsets.symmetric(
+//                               horizontal: 20,
+//                               vertical: 10,
+//                             ),
+//                             decoration: BoxDecoration(
+//                               color: Colors.green[100],
+//                               borderRadius: BorderRadius.circular(30),
+//                             ),
+//                             child: Text(
+//                               user['emp_role'] ?? '',
+//                               style: TextStyle(
+//                                 color: Colors.green[800],
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 10,
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+
+//                   SizedBox(height: 5),
+
+//                   if (!isManager)
+//                     CheckInOutWidget(
+//                       hasCheckedInToday: hasCheckedInToday,
+//                       isInGeofence: geofenceEnabled,
+//                       onCheckIn: () =>
+//                           ScaffoldMessenger.of(context).showSnackBar(
+//                             SnackBar(content: Text("Check-in successful!")),
+//                           ),
+//                       onCheckOut: () =>
+//                           ScaffoldMessenger.of(context).showSnackBar(
+//                             SnackBar(content: Text("Check-out successful!")),
+//                           ),
+//                     ),
+
+//                   SizedBox(height: 5),
+
+//                   // isManager
+//                   //     ? ManagerDashboardContent(data: dashboardData)
+//                   //     : EmployeeDashboardContent(data: dashboardData),
+
+//                   // SizedBox(height: 5),
+//                   PresentDashboardCardSection(
+//                     dashboardData: dashboardData,
+//                     isManager: isManager,
+//                   ),
+
+//                   SizedBox(height: 5),
+
+//                   if (!isManager)
+//                     AttendanceBreakdownSection(
+//                       present: 9,
+//                       leave: 2,
+//                       absent: 1,
+//                       onTime: 6,
+//                       late: 3,
+//                       dailyAvg: 9.0,
+//                       monthlyAvg: 63.0,
+//                     ),
+
+//                   SizedBox(height: 5),
+
+//                   MappedProjectsWidget(
+//                     projects: projects,
+//                     isManager: isManager,
+//                     userRole: user['emp_role'] ?? '',
+//                   ),
+
+//                   SizedBox(height: 100),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: Colors.blue,
+//         unselectedItemColor: Colors.grey,
+//         items: const [
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.dashboard),
+//             label: "Dashboard",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.edit_calendar),
+//             label: "Regularization",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.beach_access),
+//             label: "Leave",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.pie_chart),
+//             label: "Timesheet",
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// // lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/attendance_breakdown_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/check_in_out.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+// import 'package:sqflite/sqflite.dart';
+
+// class DashboardScreen extends ConsumerStatefulWidget {
+//   const DashboardScreen({super.key});
+
+//   @override
+//   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+// }
+
+// class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+//   String _currentTime = '';
+//   Timer? _timer;
+//   Map<String, dynamic>? dashboardData;
+//   bool isLoading = true;
+//   bool geofenceEnabled = true;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startClock();
+//     _loadDashboardData();
+//   }
+
+//   void _startClock() {
+//     _updateTime();
+//     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+//   }
+
+//   void _updateTime() {
+//     final now = DateTime.now();
+//     setState(() {
+//       _currentTime = DateFormat('HH:mm:ss').format(now);
+//     });
+//   }
+
+//   Future<void> _loadDashboardData() async {
+//     setState(() => isLoading = true);
+
+//     try {
+//       final currentUser = ref.read(authProvider).value;
+//       if (currentUser == null) {
+//         Navigator.pushReplacementNamed(context, '/login');
+//         return;
+//       }
+
+//       final db = await DBHelper.instance.database;
+
+//       // Mapped projects
+//       final mapped = await db.query(
+//         'employee_mapped_projects',
+//         where: 'emp_id = ? AND mapping_status = ?',
+//         whereArgs: [currentUser['emp_id'], 'active'],
+//       );
+
+//       List<Map<String, dynamic>> projects = [];
+//       if (mapped.isNotEmpty) {
+//         final projectIds = mapped
+//             .map((m) => m['project_id'] as String)
+//             .toList();
+//         projects = await db.query(
+//           'project_master',
+//           where:
+//               'project_id IN (${List.filled(projectIds.length, '?').join(',')})',
+//           whereArgs: projectIds,
+//         );
+//       }
+
+//       // Attendance
+//       final attendance = await db.query(
+//         'employee_attendance',
+//         where: 'emp_id = ?',
+//         whereArgs: [currentUser['emp_id']],
+//         orderBy: 'att_date DESC',
+//       );
+
+//       // Pending leaves
+//       final pendingLeaves =
+//           Sqflite.firstIntValue(
+//             await db.rawQuery(
+//               'SELECT COUNT(*) FROM employee_leaves WHERE leave_approval_status = ?',
+//               ['pending'],
+//             ),
+//           ) ??
+//           0;
+
+//       dashboardData = {
+//         'user': currentUser,
+//         'projects': projects,
+//         'attendance': attendance,
+//         'pending_leaves': pendingLeaves,
+//       };
+
+//       setState(() => isLoading = false);
+//     } catch (e) {
+//       debugPrint("Dashboard load error: $e");
+//       setState(() => isLoading = false);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _timer?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = ref.watch(authProvider).value;
+
+//     if (user == null || isLoading) {
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     final isManager = (user['emp_role'] ?? '').toLowerCase() == 'manager';
+
+//     // Calculate hasCheckedInToday
+//     final attendance = dashboardData?['attendance'] as List<dynamic>? ?? [];
+//     final today = DateTime.now().toString().substring(0, 10); // "2025-12-18"
+//     final hasCheckedInToday = attendance.any(
+//       (rec) => rec['att_date'] == today && rec['att_status'] == 'checkin',
+//     );
+
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: Builder(
+//           builder: (ctx) => IconButton(
+//             icon: CircleAvatar(
+//               radius: 18,
+//               backgroundColor: Colors.white.withOpacity(0.2),
+//               child: Icon(Icons.person, color: Colors.white, size: 24),
+//             ),
+//             onPressed: () => Scaffold.of(ctx).openDrawer(),
+//           ),
+//         ),
+//         title: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Welcome${isManager ? '' : ' back'},",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//             Text(
+//               user['emp_name'] ?? 'User',
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 20,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             Text(
+//               "${user['emp_role'] ?? ''} • ${user['emp_department'] ?? ''}",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//           ],
+//         ),
+//         actions: [
+//           // Geofence Toggle - Sirf Employee ko
+//           if (!isManager)
+//             IconButton(
+//               icon: Icon(
+//                 geofenceEnabled ? Icons.location_on : Icons.location_off,
+//                 color: Colors.white,
+//               ),
+//               onPressed: () =>
+//                   setState(() => geofenceEnabled = !geofenceEnabled),
+//             ),
+//           // Notifications
+//           Stack(
+//             children: [
+//               IconButton(
+//                 icon: Icon(Icons.notifications, color: Colors.white),
+//                 onPressed: () {},
+//               ),
+//               Positioned(
+//                 right: 8,
+//                 top: 8,
+//                 child: Container(
+//                   padding: EdgeInsets.all(4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.red,
+//                     shape: BoxShape.circle,
+//                   ),
+//                   child: Text(
+//                     "3",
+//                     style: TextStyle(color: Colors.white, fontSize: 10),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.refresh, color: Colors.white),
+//             onPressed: _loadDashboardData,
+//           ),
+//         ],
+//       ),
+//       drawer: AppDrawer(
+//         user: user,
+//         onLogout: () async {
+//           await DBHelper.instance.clearCurrentUser();
+//           ref.read(authProvider.notifier).logout();
+//           Navigator.pushReplacementNamed(context, '/login');
+//         },
+//       ),
+//       body: Stack(
+//         children: [
+//           Container(
+//             height: 280,
+//             decoration: BoxDecoration(
+//               gradient: LinearGradient(
+//                 colors: [Colors.blue[800]!, Colors.blue[600]!],
+//                 begin: Alignment.topLeft,
+//                 end: Alignment.bottomRight,
+//               ),
+//               borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+//             ),
+//           ),
+//           SafeArea(
+//             child: SingleChildScrollView(
+//               padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+//               child: Column(
+//                 children: [
+//                   // Live Date & Time (Both roles)
+//                   Card(
+//                     elevation: 12,
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(24),
+//                     ),
+//                     child: Padding(
+//                       padding: EdgeInsets.all(24),
+//                       child: Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               Text(
+//                                 DateFormat(
+//                                   'EEEE, d MMMM yyyy',
+//                                 ).format(DateTime.now()),
+//                                 style: TextStyle(
+//                                   fontSize: 18,
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                               Text(
+//                                 _currentTime,
+//                                 style: TextStyle(
+//                                   fontSize: 36,
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                           Container(
+//                             padding: EdgeInsets.symmetric(
+//                               horizontal: 20,
+//                               vertical: 10,
+//                             ),
+//                             decoration: BoxDecoration(
+//                               color: Colors.green[100],
+//                               borderRadius: BorderRadius.circular(30),
+//                             ),
+//                             child: Text(
+//                               user['emp_role'] ?? '',
+//                               style: TextStyle(
+//                                 color: Colors.green[800],
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 10,
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+
+//                   SizedBox(height: 5),
+
+//                   // Check-in/Check-out Widget — SIRF EMPLOYEE KO
+//                   if (!isManager)
+//                     CheckInOutWidget(
+//                       hasCheckedInToday: hasCheckedInToday,
+//                       isInGeofence: geofenceEnabled,
+//                       onCheckIn: () {
+//                         // Check-in logic (face detection + geofence + insert attendance)
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           SnackBar(content: Text("Check-in successful!")),
+//                         );
+//                       },
+//                       onCheckOut: () {
+//                         // Check-out logic
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           SnackBar(content: Text("Check-out successful!")),
+//                         );
+//                       },
+//                     ),
+
+//                   SizedBox(height: 5),
+
+//                   // Role-based Main Content
+//                   // isManager
+//                   //     ? ManagerDashboardContent(data: dashboardData!)
+//                   //     : EmployeeDashboardContent(data: dashboardData!),
+
+//                   // Present Dashboard Card Section (common)
+//                   SizedBox(height: 30),
+//                   PresentDashboardCardSection(
+//                     dashboardData: dashboardData!,
+//                     isManager: isManager,
+//                   ),
+
+//                   SizedBox(height: 5),
+
+//                   // Attendance Breakdown (Pie Chart + Avg Hours) - Sirf Employee ko
+//                   if (!isManager)
+//                     AttendanceBreakdownSection(
+//                       present: 9, // Real calculation baad mein
+//                       leave: 2,
+//                       absent: 1,
+//                       onTime: 6,
+//                       late: 3,
+//                       dailyAvg: 9.0,
+//                       monthlyAvg: 63.0,
+//                     ),
+
+//                   SizedBox(height: 15),
+
+//                   // Mapped Projects - Both roles ko
+                  
+
+//                   SizedBox(height: 100),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: Colors.blue,
+//         unselectedItemColor: Colors.grey,
+//         items: const [
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.dashboard),
+//             label: "Dashboard",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.edit_calendar),
+//             label: "Regularization",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.beach_access),
+//             label: "Leave",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.pie_chart),
+//             label: "Timesheet",
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+/// IMPLLIEOHR
+/// // lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/attendance_timer_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+
+// class DashboardScreen extends ConsumerStatefulWidget {
+//   const DashboardScreen({super.key});
+
+//   @override
+//   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+// }
+
+// class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+//   String _currentTime = '';
+//   Timer? _timer;
+//   Map<String, dynamic>? dashboardData;
+//   bool isLoading = true;
+//   bool geofenceEnabled = true; // Employee ke liye toggle
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startClock();
+//     _loadDashboardData();
+//   }
+
+//   void _startClock() {
+//     _updateTime();
+//     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+//   }
+
+//   void _updateTime() {
+//     final now = DateTime.now();
+//     setState(() {
+//       _currentTime = DateFormat('HH:mm:ss').format(now);
+//     });
+//   }
+
+//   Future<void> _loadDashboardData() async {
+//     setState(() => isLoading = true);
+
+//     try {
+//       final currentUser = ref.read(authProvider).value;
+//       if (currentUser == null) {
+//         Navigator.pushReplacementNamed(context, '/login');
+//         return;
+//       }
+
+//       final db = await DBHelper.instance.database;
+
+//       // Mapped projects
+//       final mapped = await db.query(
+//         'employee_mapped_projects',
+//         where: 'emp_id = ? AND mapping_status = ?',
+//         whereArgs: [currentUser['emp_id'], 'active'],
+//       );
+
+//       List<Map<String, dynamic>> projects = [];
+//       if (mapped.isNotEmpty) {
+//         final projectIds = mapped.map((m) => m['project_id'] as String).toList();
+//         projects = await db.query(
+//           'project_master',
+//           where: 'project_id IN (${List.filled(projectIds.length, '?').join(',')})',
+//           whereArgs: projectIds,
+//         );
+//       }
+
+//       // Attendance records
+//       final attendance = await db.query(
+//         'employee_attendance',
+//         where: 'emp_id = ?',
+//         whereArgs: [currentUser['emp_id']],
+//         orderBy: 'att_date DESC',
+//       );
+
+//       // Pending leaves (company-wide for manager)
+//       final pendingLeaves = Sqflite.firstIntValue(await db.rawQuery(
+//             'SELECT COUNT(*) FROM employee_leaves WHERE leave_approval_status = ?',
+//             ['pending'],
+//           )) ?? 0;
+
+//       dashboardData = {
+//         'user': currentUser,
+//         'projects': projects,
+//         'attendance': attendance,
+//         'pending_leaves': pendingLeaves,
+//       };
+
+//       setState(() => isLoading = false);
+//     } catch (e) {
+//       debugPrint("Dashboard load error: $e");
+//       setState(() => isLoading = false);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _timer?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = ref.watch(authProvider).value;
+
+//     if (user == null || isLoading) {
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     final isManager = (user['emp_role'] ?? '').toLowerCase() == 'manager';
+
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: Builder(
+//           builder: (ctx) => IconButton(
+//             icon: CircleAvatar(
+//               radius: 18,
+//               backgroundColor: Colors.white.withOpacity(0.2),
+//               child: Icon(Icons.person, color: Colors.white, size: 20),
+//             ),
+//             onPressed: () => Scaffold.of(ctx).openDrawer(),
+//           ),
+//         ),
+//         title: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text("Welcome back,", style: TextStyle(color: Colors.white70, fontSize: 14)),
+//             Text(user['emp_name'] ?? 'User', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+//             Text("${user['emp_role'] ?? ''} • ${user['emp_department'] ?? ''}", style: TextStyle(color: Colors.white70, fontSize: 14)),
+//           ],
+//         ),
+//         actions: [
+//           // Geofence Toggle - Sirf Employee ko
+//           if (!isManager)
+//             IconButton(
+//               icon: Icon(geofenceEnabled ? Icons.location_on : Icons.location_off, color: Colors.white),
+//               onPressed: () {
+//                 setState(() => geofenceEnabled = !geofenceEnabled);
+//               },
+//             ),
+//           Stack(
+//             children: [
+//               IconButton(icon: Icon(Icons.notifications, color: Colors.white), onPressed: () {}),
+//               Positioned(
+//                 right: 8,
+//                 top: 8,
+//                 child: Container(
+//                   padding: EdgeInsets.all(4),
+//                   decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+//                   child: Text("3", style: TextStyle(color: Colors.white, fontSize: 10)),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           IconButton(icon: Icon(Icons.refresh, color: Colors.white), onPressed: _loadDashboardData),
+//         ],
+//       ),
+//       drawer: AppDrawer(
+//         user: user,
+//         onLogout: () async {
+//           await DBHelper.instance.clearCurrentUser();
+//           ref.read(authProvider.notifier).logout();
+//           Navigator.pushReplacementNamed(context, '/login');
+//         },
+//       ),
+//       body: Stack(
+//         children: [
+//           // Gradient Header Background
+//           Container(
+//             height: 280,
+//             decoration: BoxDecoration(
+//               gradient: LinearGradient(
+//                 colors: [Colors.blue[800]!, Colors.blue[600]!],
+//                 begin: Alignment.topLeft,
+//                 end: Alignment.bottomRight,
+//               ),
+//               borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+//             ),
+//           ),
+//           // Main Content
+//           SafeArea(
+//             child: SingleChildScrollView(
+//               padding: EdgeInsets.fromLTRB(16, 100, 16, 20),
+//               child: Column(
+//                 children: [
+//                   // Live Date & Time Card
+//                   Card(
+//                     elevation: 12,
+//                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+//                     child: Padding(
+//                       padding: EdgeInsets.all(24),
+//                       child: Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               Text(DateFormat('EEEE, d MMMM yyyy').format(DateTime.now()),
+//                                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//                               Text(_currentTime, style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+//                             ],
+//                           ),
+//                           Container(
+//                             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                             decoration: BoxDecoration(color: Colors.green[100], borderRadius: BorderRadius.circular(30)),
+//                             child: Text("LIVE", style: TextStyle(color: Colors.green[800], fontWeight: FontWeight.bold, fontSize: 16)),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+
+//                   SizedBox(height: 30),
+
+//                   // Role-based Content
+//                   isManager
+//                       ? ManagerDashboardContent(data: dashboardData!)
+//                       : EmployeeDashboardContent(data: dashboardData!),
+
+//                   // Present Dashboard Card Section (common)
+//                   SizedBox(height: 30),
+//                   PresentDashboardCardSection(
+//                     dashboardData: dashboardData!,
+//                     isManager: isManager,
+//                   ),
+
+//                   SizedBox(height: 30),
+
+//                   // Mapped Projects (both roles)
+//                   Text(
+//                     "Mapped Projects (${dashboardData!['projects'].length})",
+//                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                   ),
+//                   SizedBox(height: 16),
+//                   SizedBox(
+//                     height: 200,
+//                     child: ListView.builder(
+//                       scrollDirection: Axis.horizontal,
+//                       itemCount: dashboardData!['projects'].length,
+//                       itemBuilder: (context, index) {
+//                         final project = dashboardData!['projects'][index];
+//                         return Container(
+//                           width: 260,
+//                           margin: EdgeInsets.only(right: 16),
+//                           decoration: BoxDecoration(
+//                             color: Colors.white,
+//                             borderRadius: BorderRadius.circular(20),
+//                             boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
+//                           ),
+//                           child: Padding(
+//                             padding: EdgeInsets.all(16),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Row(
+//                                   children: [
+//                                     Icon(Icons.work, color: Colors.blue, size: 30),
+//                                     SizedBox(width: 12),
+//                                     Expanded(
+//                                       child: Text(
+//                                         project['project_name'] ?? 'Project',
+//                                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                                         overflow: TextOverflow.ellipsis,
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 SizedBox(height: 12),
+//                                 Text("Site: ${project['project_site'] ?? ''}"),
+//                                 Text("Client: ${project['client_name'] ?? ''}"),
+//                                 if (!isManager)
+//                                   Text("Manager: ${project['mng_name'] ?? ''}"),
+//                                 Spacer(),
+//                                 Text("Email: ${project['mng_email'] ?? ''}"),
+//                               ],
+//                             ),
+//                           ),
+//                         );
+//                       },
+//                     ),
+//                   ),
+
+//                   SizedBox(height: 100),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: Colors.blue,
+//         unselectedItemColor: Colors.grey,
+//         items: const [
+//           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
+//           BottomNavigationBarItem(icon: Icon(Icons.edit_calendar), label: "Regularization"),
+//           BottomNavigationBarItem(icon: Icon(Icons.beach_access), label: "Leave"),
+//           BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: "Timesheet"),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+// // lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+// import 'package:sqflite/sqflite.dart';
+
+// class DashboardScreen extends ConsumerStatefulWidget {
+//   const DashboardScreen({super.key});
+
+//   @override
+//   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+// }
+
+// class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+//   String _currentTime = '';
+//   Timer? _timer;
+//   Map<String, dynamic>? dashboardData;
+//   bool isLoading = true;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startClock();
+//     _loadDashboardData();
+//   }
+
+//   void _startClock() {
+//     _updateTime();
+//     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+//   }
+
+//   void _updateTime() {
+//     final now = DateTime.now();
+//     setState(() {
+//       _currentTime = DateFormat('HH:mm:ss').format(now);
+//     });
+//   }
+
+//   Future<void> _loadDashboardData() async {
+//     setState(() => isLoading = true);
+
+//     try {
+//       final currentUser = ref.read(authProvider).value;
+//       if (currentUser == null) {
+//         Navigator.pushReplacementNamed(context, '/login');
+//         return;
+//       }
+
+//       final db = await DBHelper.instance.database;
+
+//       // Get mapped projects
+//       final mapped = await db.query(
+//         'employee_mapped_projects',
+//         where: 'emp_id = ? AND mapping_status = ?',
+//         whereArgs: [currentUser['emp_id'], 'active'],
+//       );
+
+//       List<Map<String, dynamic>> projects = [];
+//       if (mapped.isNotEmpty) {
+//         final projectIds = mapped
+//             .map((m) => m['project_id'] as String)
+//             .toList();
+//         projects = await db.query(
+//           'project_master',
+//           where:
+//               'project_id IN (${List.filled(projectIds.length, '?').join(',')})',
+//           whereArgs: projectIds,
+//         );
+//       }
+
+//       // Get attendance
+//       final attendance = await db.query(
+//         'employee_attendance',
+//         where: 'emp_id = ?',
+//         whereArgs: [currentUser['emp_id']],
+//         orderBy: 'att_date DESC',
+//       );
+
+//       // Pending leaves (company-wide for manager)
+//       final pendingLeaves =
+//           Sqflite.firstIntValue(
+//             await db.rawQuery(
+//               'SELECT COUNT(*) FROM employee_leaves WHERE leave_approval_status = ?',
+//               ['pending'],
+//             ),
+//           ) ??
+//           0;
+
+//       dashboardData = {
+//         'user': currentUser,
+//         'projects': projects,
+//         'attendance': attendance,
+//         'pending_leaves': pendingLeaves,
+//       };
+
+//       setState(() => isLoading = false);
+//     } catch (e) {
+//       debugPrint("Dashboard load error: $e");
+//       setState(() => isLoading = false);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _timer?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = ref.watch(authProvider).value;
+
+//     if (user == null || isLoading) {
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     final isManager = (user['emp_role'] ?? '').toLowerCase() == 'manager';
+
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: Builder(
+//           builder: (context) => IconButton(
+//             icon: Icon(Icons.menu, color: Colors.white),
+//             onPressed: () => Scaffold.of(context).openDrawer(),
+//           ),
+//         ),
+//         title: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Welcome back,",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//             Text(
+//               user['emp_name'] ?? 'User',
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 18,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             Text(
+//               user['emp_email'] ?? '',
+//               style: TextStyle(color: Colors.white70, fontSize: 12),
+//             ),
+//           ],
+//         ),
+//         actions: [
+//           Stack(
+//             children: [
+//               IconButton(
+//                 icon: Icon(Icons.notifications, color: Colors.white),
+//                 onPressed: () {},
+//               ),
+//               Positioned(
+//                 right: 8,
+//                 top: 8,
+//                 child: Container(
+//                   padding: EdgeInsets.all(4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.red,
+//                     shape: BoxShape.circle,
+//                   ),
+//                   child: Text(
+//                     "3",
+//                     style: TextStyle(color: Colors.white, fontSize: 10),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.refresh, color: Colors.white),
+//             onPressed: _loadDashboardData,
+//           ),
+//         ],
+//       ),
+
+//       drawer: AppDrawer(
+//         user: user,
+//         onLogout: () async {
+//           await DBHelper.instance.clearCurrentUser();
+//           ref.read(authProvider.notifier).logout();
+//           Navigator.pushReplacementNamed(context, '/login');
+//         },
+//       ),
+//       body: Stack(
+//         children: [
+//           // Gradient Header Background
+//           Container(
+//             height: 240,
+//             decoration: BoxDecoration(
+//               gradient: LinearGradient(
+//                 colors: [Colors.blue[800]!, Colors.blue[600]!],
+//                 begin: Alignment.topLeft,
+//                 end: Alignment.bottomRight,
+//               ),
+//               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+//             ),
+//           ),
+//           // Main Content
+//           SafeArea(
+//             child: Container(
+//               decoration: BoxDecoration(
+//                 gradient: LinearGradient(
+//                   begin: Alignment.topCenter,
+//                   end: Alignment.bottomCenter,
+//                   colors: [Colors.blue[50]!, Colors.purple[50]!],
+//                   stops: [0.2, 1.0],
+//                 ),
+//               ),
+//               child: SingleChildScrollView(
+//                 padding: EdgeInsets.fromLTRB(5, 0, 5, 20),
+//                 child: Column(
+//                   children: [
+//                     // Live Time Card
+//                     // Card(
+//                     //   elevation: 12,
+//                     //   shape: RoundedRectangleBorder(
+//                     //     borderRadius: BorderRadius.circular(24),
+//                     //   ),
+//                     //   child: Padding(
+//                     //     padding: EdgeInsets.all(24),
+//                     //     child: Row(
+//                     //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     //       children: [
+//                     //         Column(
+//                     //           crossAxisAlignment: CrossAxisAlignment.start,
+//                     //           children: [
+//                     //             Text(
+//                     //               DateFormat(
+//                     //                 'EEEE, d MMMM yyyy',
+//                     //               ).format(DateTime.now()),
+//                     //               style: TextStyle(
+//                     //                 fontSize: 18,
+//                     //                 fontWeight: FontWeight.bold,
+//                     //               ),
+//                     //             ),
+//                     //             Text(
+//                     //               _currentTime,
+//                     //               style: TextStyle(
+//                     //                 fontSize: 36,
+//                     //                 fontWeight: FontWeight.bold,
+//                     //               ),
+//                     //             ),
+//                     //           ],
+//                     //         ),
+//                     //         Container(
+//                     //           padding: EdgeInsets.symmetric(
+//                     //             horizontal: 20,
+//                     //             vertical: 10,
+//                     //           ),
+//                     //           decoration: BoxDecoration(
+//                     //             color: Colors.green[100],
+//                     //             borderRadius: BorderRadius.circular(30),
+//                     //           ),
+//                     //           child: Text(
+//                     //             "LIVE",
+//                     //             style: TextStyle(
+//                     //               color: Colors.green[800],
+//                     //               fontWeight: FontWeight.bold,
+//                     //               fontSize: 16,
+//                     //             ),
+//                     //           ),
+//                     //         ),
+//                     //       ],
+//                     //     ),
+//                     //   ),
+//                     // ),
+
+//                     // SizedBox(height: 30),
+
+//                     // Role-based Content
+//                     isManager
+//                         ? ManagerDashboardContent(data: dashboardData!)
+//                         : EmployeeDashboardContent(data: dashboardData!),
+
+//                     SizedBox(height: 30),
+
+//                     PresentDashboardCardSection(
+//                       dashboardData: dashboardData!,
+//                       isManager: isManager,
+//                     ),
+
+//                     SizedBox(height: 30),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: Colors.blue,
+//         unselectedItemColor: Colors.grey,
+//         items: const [
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.dashboard),
+//             label: "Dashboard",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.edit_calendar),
+//             label: "Regularization",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.beach_access),
+//             label: "Leave",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.pie_chart),
+//             label: "Timesheet",
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// // lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/common/app_drawer.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/metrics_counter.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/manager_dashboard_content.dart';
+// import 'package:appattendance/features/dashboard/presentation/widgets/employeewidgets/employee_dashboard_content.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+
+// class DashboardScreen extends ConsumerStatefulWidget {
+//   const DashboardScreen({super.key});
+
+//   @override
+//   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+// }
+
+// class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+//   String _currentTime = '';
+//   Timer? _timer;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startClock();
+//   }
+
+//   void _startClock() {
+//     _updateTime();
+//     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+//   }
+
+//   void _updateTime() {
+//     final now = DateTime.now();
+//     setState(() {
+//       _currentTime = DateFormat('HH:mm:ss').format(now);
+//     });
+//   }
+
+//   @override
+//   void dispose() {
+//     _timer?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = ref.watch(authProvider).value;
+
+//     if (user == null) {
+//       WidgetsBinding.instance.addPostFrameCallback((_) {
+//         Navigator.pushReplacementNamed(context, '/login');
+//       });
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     final isManager = (user['emp_role'] ?? '').toLowerCase() == 'manager';
+
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: Builder(
+//           builder: (context) => IconButton(
+//             icon: Icon(Icons.menu, color: Colors.white),
+//             onPressed: () => Scaffold.of(context).openDrawer(),
+//           ),
+//         ),
+//         title: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Welcome back,",
+//               style: TextStyle(color: Colors.white70, fontSize: 14),
+//             ),
+//             Text(
+//               user['emp_name'],
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 18,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             // Text(
+//             //   user['emp_email'],
+//             //   style: TextStyle(color: Colors.white70, fontSize: 12),
+//             // ),
+//           ],
+//         ),
+//         actions: [
+//           Stack(
+//             children: [
+//               IconButton(
+//                 icon: Icon(Icons.notifications, color: Colors.white),
+//                 onPressed: () {},
+//               ),
+//               Positioned(
+//                 right: 8,
+//                 top: 8,
+//                 child: Container(
+//                   padding: EdgeInsets.all(4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.red,
+//                     shape: BoxShape.circle,
+//                   ),
+//                   child: Text(
+//                     "3",
+//                     style: TextStyle(color: Colors.white, fontSize: 10),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.refresh, color: Colors.white),
+//             onPressed: () {},
+//           ),
+//         ],
+//         flexibleSpace: Container(
+//           decoration: BoxDecoration(
+//             gradient: LinearGradient(
+//               colors: [Colors.blue[800]!, Colors.blue[600]!],
+//               begin: Alignment.topLeft,
+//               end: Alignment.bottomRight,
+//             ),
+//           ),
+//         ),
+//       ),
+//       drawer: AppDrawer(
+//         user: user,
+//         onLogout: () async {
+//           await DBHelper.instance.clearCurrentUser();
+//           ref.read(authProvider.notifier).logout();
+//           Navigator.pushReplacementNamed(context, '/login');
+//         },
+//       ),
+//       body: Container(
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             begin: Alignment.topCenter,
+//             end: Alignment.bottomCenter,
+//             colors: [Colors.blue[50]!, Colors.purple[50]!],
+//           ),
+//         ),
+//         child: SingleChildScrollView(
+//           // padding: EdgeInsets.fromLTRB(20, 140, 20, 20),
+//           child: Column(
+//             children: [
+//               // Live Time Card
+//               // Card(
+//               //   elevation: 8,
+//               //   shape: RoundedRectangleBorder(
+//               //     borderRadius: BorderRadius.circular(20),
+//               //   ),
+//               //   child: Padding(
+//               //     padding: EdgeInsets.all(20),
+//               //     child: Row(
+//               //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               //       children: [
+//               //         Column(
+//               //           crossAxisAlignment: CrossAxisAlignment.start,
+//               //           children: [
+//               //             Text(
+//               //               DateFormat(
+//               //                 'EEEE, d MMMM yyyy',
+//               //               ).format(DateTime.now()),
+//               //               style: TextStyle(
+//               //                 fontSize: 18,
+//               //                 fontWeight: FontWeight.bold,
+//               //               ),
+//               //             ),
+//               //             Text(
+//               //               _currentTime,
+//               //               style: TextStyle(
+//               //                 fontSize: 32,
+//               //                 fontWeight: FontWeight.bold,
+//               //               ),
+//               //             ),
+//               //           ],
+//               //         ),
+//               //         Container(
+//               //           padding: EdgeInsets.symmetric(
+//               //             horizontal: 16,
+//               //             vertical: 8,
+//               //           ),
+//               //           decoration: BoxDecoration(
+//               //             color: Colors.green[100],
+//               //             borderRadius: BorderRadius.circular(20),
+//               //           ),
+//               //           child: Text(
+//               //             "LIVE",
+//               //             style: TextStyle(
+//               //               color: Colors.green[800],
+//               //               fontWeight: FontWeight.bold,
+//               //             ),
+//               //           ),
+//               //         ),
+//               //       ],
+//               //     ),
+//               //   ),
+//               // ),
+
+//               // SizedBox(height: 30),
+
+//               // Role-based Content
+//               isManager
+//                   ? ManagerDashboardContent(
+//                       data: {'user': user},
+//                     ) // MetricsCounter yahan call hoga
+//                   : EmployeeDashboardContent(
+//                       data: {'user': user},
+//                     ), // Simple employee view
+//               //SizedBox(height: 100),
+//             ],
+//           ),
+//         ),
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: Colors.blue,
+//         unselectedItemColor: Colors.grey,
+//         items: [
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.dashboard),
+//             label: "Dashboard",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.edit_calendar),
+//             label: "Regularization",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.beach_access),
+//             label: "Leave",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.pie_chart),
+//             label: "Timesheet",
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 // // lib/features/dashboard/presentation/screens/dashboard_screen.dart
 

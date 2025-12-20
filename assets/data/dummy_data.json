@@ -153,15 +153,49 @@
 
   "employee_regularization": [
     {
+      "reg_id": "REG001",
       "emp_id": "EMP001",
-      "reg_date_applied": "2025-12-10",
       "reg_applied_for_date": "2025-12-08",
-      "reg_justification": "Was sick, forgot to apply leave",
+      "reg_date_applied": "2025-12-10",
+      "reg_justification": "Was sick, forgot to apply leave in advance",
       "reg_approval_status": "pending",
-      "created_at": "2025-12-10T12:00:00Z",
-      "updated_at": "2025-12-10T12:00:00Z"
+      "reg_type": "Full Day",
+      "checkin_time": "9:00 AM",
+      "checkout_time": "12:00 PM",
+      "shortfall_time": "1h 30m"
+    },
+    {
+      "reg_id": "REG002",
+      "emp_id": "EMP001",
+      "reg_applied_for_date": "2025-12-15",
+      "reg_date_applied": "2025-12-15",
+      "reg_justification": "Traffic jam due to accident on the highway. Had to take alternate route which took extra time.",
+      "reg_approval_status": "pending",
+      "reg_type": "Check-in Only",
+      "checkin_time": "10:30 AM",
+      "checkout_time": "03:00 PM",
+      "shortfall_time": "1h 30m"
+    },
+    {
+      "reg_id": "REG003",
+      "emp_id": "EMP001",
+      "reg_applied_for_date": "2025-12-12",
+      "reg_date_applied": "2025-12-13",
+      "reg_justification": "Doctor appointment in the morning",
+      "reg_approval_status": "approved",
+      "reg_type": "Full Day",
+      "checkin_time": "12:00 PM",
+      "checkout_time": "04:00 PM",
+      "shortfall_time": "2h 30m"
     }
   ],
+
+  "stats": {
+    "total": 3,
+    "pending": 2,
+    "approved": 1,
+    "rejected": 0
+  },
 
   "employee_leaves": [
     {
@@ -239,4 +273,5 @@
       "shift_end_time": "18:00"
     }
   ]
+  
 }

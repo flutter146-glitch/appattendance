@@ -110,17 +110,23 @@ class DBHelper {
 
     // 6. employee_regularization
     await db.execute('''
-      CREATE TABLE employee_regularization (
-        reg_id TEXT PRIMARY KEY, -- Added PRIMARY KEY for multiple entries
-        emp_id TEXT NOT NULL,
-        reg_date_applied TEXT,
-        reg_applied_for_date TEXT,
-        reg_justification TEXT,
-        reg_approval_status TEXT, -- pending/approved/rejected
-        created_at TEXT NOT NULL,
-        updated_at TEXT
-      )
-    ''');
+  CREATE TABLE employee_regularization (
+    reg_id TEXT PRIMARY KEY,
+    emp_id TEXT NOT NULL,
+    reg_applied_for_date TEXT NOT NULL,        -- Date jiske liye regularization
+    reg_date_applied TEXT NOT NULL,            -- Kab apply kiya gaya
+    reg_type TEXT NOT NULL,                    -- 'Full Day', 'Check-in Only', 'Check-out Only'
+    reg_justification TEXT NOT NULL,           -- Employee ka reason
+    checkin_time TEXT,                         -- Agar partial hai toh actual checkin time
+    checkout_time TEXT,                        -- Agar partial hai toh actual checkout time
+    shortfall_time TEXT,                       -- Kitna late/shortfall
+    reg_approval_status TEXT DEFAULT 'pending', -- pending / approved / rejected
+    manager_remarks TEXT,                      -- Manager ka comment (approve/reject pe)
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (emp_id) REFERENCES employee_master (emp_id) ON DELETE CASCADE
+  )
+''');
 
     // 7. employee_leaves
     await db.execute('''

@@ -1,4 +1,5 @@
 // lib/features/auth/presentation/screens/device_verification_screen.dart
+
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/screens/otp_verification_screen.dart';
@@ -45,8 +46,8 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
 
     _animController.forward();
 
-    // Testing ke liye
-    _emailController.text = "";
+    // Testing ke liye (remove in production)
+    // _emailController.text = "raj@nutantek.com";
   }
 
   @override
@@ -57,10 +58,13 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
   }
 
   Future<void> _verifyEmail() async {
-    final email = _emailController.text.trim();
+    final email = _emailController.text.trim().toLowerCase();
 
-    if (email.isEmpty || !email.contains('@')) {
-      _showSnackBar("Please enter a valid company email", isError: true);
+    if (email.isEmpty || !email.contains('@nutantek.com')) {
+      _showSnackBar(
+        "Please enter a valid Nutantek email (e.g. name@nutantek.com)",
+        isError: true,
+      );
       return;
     }
 
@@ -69,33 +73,40 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
     try {
       final db = await DBHelper.instance.database;
 
+      // employee_master se email check karo (emp_email field)
       final result = await db.query(
         'employee_master',
         where: 'emp_email = ?',
         whereArgs: [email],
       );
 
-      await Future.delayed(const Duration(seconds: 1)); // Fake delay
+      if (result.isEmpty) {
+        _showSnackBar(
+          "This email is not registered with Nutantek. Contact HR.",
+          isError: true,
+        );
+        setState(() => _isVerifying = false);
+        return;
+      }
 
-      if (result.isNotEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('is_device_verified', true);
+      // Device verified — save in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_device_verified', true);
 
-        _showSnackBar("Device verified successfully!", isSuccess: true);
+      _showSnackBar("Device verified successfully!", isSuccess: true);
 
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => OtpVerificationScreen(email: email),
-            ),
-          );
-        }
-      } else {
-        _showSnackBar("Email not registered. Contact HR.", isError: true);
+      // OTP screen pe jaao
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OtpVerificationScreen(email: email),
+          ),
+        );
       }
     } catch (e) {
-      _showSnackBar("Verification failed. Try again.", isError: true);
+      debugPrint("Device verification error: $e");
+      _showSnackBar("Verification failed. Please try again.", isError: true);
     } finally {
       if (mounted) {
         setState(() => _isVerifying = false);
@@ -113,6 +124,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
         content: Text(message),
         backgroundColor: isSuccess ? Colors.green : Colors.red,
         behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: isSuccess ? 2 : 4),
       ),
     );
   }
@@ -157,7 +169,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                           width: 110,
                           height: 110,
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
+                            gradient: LinearGradient(
                               colors: [
                                 AppColors.primary,
                                 AppColors.primaryLight,
@@ -168,7 +180,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                               BoxShadow(
                                 color: AppColors.primary.withOpacity(0.4),
                                 blurRadius: 30,
-                                offset: const Offset(0, 15),
+                                offset: Offset(0, 15),
                               ),
                             ],
                           ),
@@ -180,7 +192,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: 40),
 
                         Text(
                           'Device Verification Required',
@@ -191,10 +203,10 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                               ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
 
                         Text(
-                          'This is the first time you\'re using the app on this device.\nPlease enter your company email to continue.',
+                          'This is the first time you\'re using the app on this device.\nPlease enter your Nutantek company email to continue.',
                           style: TextStyle(
                             fontSize: 16,
                             color: isDark ? Colors.white70 : Colors.grey[700],
@@ -202,16 +214,16 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 60),
+                        SizedBox(height: 60),
 
                         // Email Field
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Company Email',
-                            hintText: 'e.g. name@nutantek.com',
-                            prefixIcon: const Icon(Icons.email_outlined),
+                            labelText: 'Nutantek Email',
+                            hintText: 'e.g. raj@nutantek.com',
+                            prefixIcon: Icon(Icons.email_outlined),
                             filled: true,
                             fillColor: isDark
                                 ? Colors.grey[800]
@@ -222,7 +234,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 50),
+                        SizedBox(height: 50),
 
                         // Verify Button
                         SizedBox(
@@ -238,7 +250,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                               elevation: 6,
                             ),
                             child: _isVerifying
-                                ? const SizedBox(
+                                ? SizedBox(
                                     height: 24,
                                     width: 24,
                                     child: CircularProgressIndicator(
@@ -246,7 +258,7 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                                       strokeWidth: 2.5,
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'VERIFY DEVICE',
                                     style: TextStyle(
                                       fontSize: 18,
@@ -256,10 +268,10 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 60),
+                        SizedBox(height: 60),
 
                         Text(
-                          'Only authorized company devices are allowed.',
+                          'Only authorized Nutantek devices are allowed.',
                           style: TextStyle(
                             fontSize: 13,
                             color: isDark ? Colors.white60 : Colors.grey[600],
@@ -278,6 +290,287 @@ class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
     );
   }
 }
+
+// // lib/features/auth/presentation/screens/device_verification_screen.dart
+// import 'package:appattendance/core/database/db_helper.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/auth/presentation/screens/otp_verification_screen.dart';
+// import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+
+// class DeviceVerificationScreen extends StatefulWidget {
+//   const DeviceVerificationScreen({super.key});
+
+//   @override
+//   State<DeviceVerificationScreen> createState() =>
+//       _DeviceVerificationScreenState();
+// }
+
+// class _DeviceVerificationScreenState extends State<DeviceVerificationScreen>
+//     with SingleTickerProviderStateMixin {
+//   final _emailController = TextEditingController();
+//   bool _isVerifying = false;
+
+//   late AnimationController _animController;
+//   late Animation<double> _opacity;
+//   late Animation<Offset> _slide;
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     _animController = AnimationController(
+//       vsync: this,
+//       duration: const Duration(milliseconds: 1200),
+//     );
+
+//     _opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+//       CurvedAnimation(parent: _animController, curve: const Interval(0.0, 0.6)),
+//     );
+
+//     _slide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+//         .animate(
+//           CurvedAnimation(
+//             parent: _animController,
+//             curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+//           ),
+//         );
+
+//     _animController.forward();
+
+//     // Testing ke liye
+//     _emailController.text = "";
+//   }
+
+//   @override
+//   void dispose() {
+//     _emailController.dispose();
+//     _animController.dispose();
+//     super.dispose();
+//   }
+
+//   Future<void> _verifyEmail() async {
+//     final email = _emailController.text.trim();
+
+//     if (email.isEmpty || !email.contains('@')) {
+//       _showSnackBar("Please enter a valid company email", isError: true);
+//       return;
+//     }
+
+//     setState(() => _isVerifying = true);
+
+//     try {
+//       final db = await DBHelper.instance.database;
+
+//       final result = await db.query(
+//         'employee_master',
+//         where: 'emp_email = ?',
+//         whereArgs: [email],
+//       );
+
+//       await Future.delayed(const Duration(seconds: 1)); // Fake delay
+
+//       if (result.isNotEmpty) {
+//         final prefs = await SharedPreferences.getInstance();
+//         await prefs.setBool('is_device_verified', true);
+
+//         _showSnackBar("Device verified successfully!", isSuccess: true);
+
+//         if (mounted) {
+//           Navigator.pushReplacement(
+//             context,
+//             MaterialPageRoute(
+//               builder: (_) => OtpVerificationScreen(email: email),
+//             ),
+//           );
+//         }
+//       } else {
+//         _showSnackBar("Email not registered. Contact HR.", isError: true);
+//       }
+//     } catch (e) {
+//       _showSnackBar("Verification failed. Try again.", isError: true);
+//     } finally {
+//       if (mounted) {
+//         setState(() => _isVerifying = false);
+//       }
+//     }
+//   }
+
+//   void _showSnackBar(
+//     String message, {
+//     bool isError = false,
+//     bool isSuccess = false,
+//   }) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(message),
+//         backgroundColor: isSuccess ? Colors.green : Colors.red,
+//         behavior: SnackBarBehavior.floating,
+//       ),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+//     return Scaffold(
+//       body: Container(
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//             colors: isDark
+//                 ? [AppColors.primary.withOpacity(0.2), Colors.black]
+//                 : [
+//                     AppColors.primary.withOpacity(0.08),
+//                     AppColors.backgroundLight,
+//                   ],
+//           ),
+//         ),
+//         child: SafeArea(
+//           child: AnimatedBuilder(
+//             animation: _animController,
+//             builder: (context, child) {
+//               return FadeTransition(
+//                 opacity: _opacity,
+//                 child: SlideTransition(
+//                   position: _slide,
+//                   child: SingleChildScrollView(
+//                     padding: EdgeInsets.only(
+//                       left: 24,
+//                       right: 24,
+//                       top: 40,
+//                       bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+//                     ),
+//                     child: Column(
+//                       children: [
+//                         // Logo
+//                         Container(
+//                           width: 110,
+//                           height: 110,
+//                           decoration: BoxDecoration(
+//                             gradient: const LinearGradient(
+//                               colors: [
+//                                 AppColors.primary,
+//                                 AppColors.primaryLight,
+//                               ],
+//                             ),
+//                             borderRadius: BorderRadius.circular(24),
+//                             boxShadow: [
+//                               BoxShadow(
+//                                 color: AppColors.primary.withOpacity(0.4),
+//                                 blurRadius: 30,
+//                                 offset: const Offset(0, 15),
+//                               ),
+//                             ],
+//                           ),
+//                           child: Center(
+//                             child: Icon(
+//                               Icons.verified_user_rounded,
+//                               size: 60,
+//                               color: Colors.white,
+//                             ),
+//                           ),
+//                         ),
+//                         const SizedBox(height: 40),
+
+//                         Text(
+//                           'Device Verification Required',
+//                           style: Theme.of(context).textTheme.headlineMedium
+//                               ?.copyWith(
+//                                 fontWeight: FontWeight.bold,
+//                                 color: isDark ? Colors.white : Colors.black87,
+//                               ),
+//                           textAlign: TextAlign.center,
+//                         ),
+//                         const SizedBox(height: 20),
+
+//                         Text(
+//                           'This is the first time you\'re using the app on this device.\nPlease enter your company email to continue.',
+//                           style: TextStyle(
+//                             fontSize: 16,
+//                             color: isDark ? Colors.white70 : Colors.grey[700],
+//                             height: 1.5,
+//                           ),
+//                           textAlign: TextAlign.center,
+//                         ),
+//                         const SizedBox(height: 60),
+
+//                         // Email Field
+//                         TextField(
+//                           controller: _emailController,
+//                           keyboardType: TextInputType.emailAddress,
+//                           decoration: InputDecoration(
+//                             labelText: 'Company Email',
+//                             hintText: 'e.g. name@nutantek.com',
+//                             prefixIcon: const Icon(Icons.email_outlined),
+//                             filled: true,
+//                             fillColor: isDark
+//                                 ? Colors.grey[800]
+//                                 : Colors.grey[50],
+//                             border: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(16),
+//                               borderSide: BorderSide.none,
+//                             ),
+//                           ),
+//                         ),
+//                         const SizedBox(height: 50),
+
+//                         // Verify Button
+//                         SizedBox(
+//                           width: double.infinity,
+//                           height: 56,
+//                           child: ElevatedButton(
+//                             onPressed: _isVerifying ? null : _verifyEmail,
+//                             style: ElevatedButton.styleFrom(
+//                               backgroundColor: AppColors.primary,
+//                               shape: RoundedRectangleBorder(
+//                                 borderRadius: BorderRadius.circular(14),
+//                               ),
+//                               elevation: 6,
+//                             ),
+//                             child: _isVerifying
+//                                 ? const SizedBox(
+//                                     height: 24,
+//                                     width: 24,
+//                                     child: CircularProgressIndicator(
+//                                       color: Colors.white,
+//                                       strokeWidth: 2.5,
+//                                     ),
+//                                   )
+//                                 : const Text(
+//                                     'VERIFY DEVICE',
+//                                     style: TextStyle(
+//                                       fontSize: 18,
+//                                       fontWeight: FontWeight.bold,
+//                                       color: Colors.white,
+//                                     ),
+//                                   ),
+//                           ),
+//                         ),
+//                         const SizedBox(height: 60),
+
+//                         Text(
+//                           'Only authorized company devices are allowed.',
+//                           style: TextStyle(
+//                             fontSize: 13,
+//                             color: isDark ? Colors.white60 : Colors.grey[600],
+//                           ),
+//                           textAlign: TextAlign.center,
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               );
+//             },
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // // lib/features/auth/presentation/screens/device_verification_screen.dart
 // import 'package:appattendance/core/database/db_helper.dart';

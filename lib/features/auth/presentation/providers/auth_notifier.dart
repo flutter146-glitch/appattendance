@@ -1,20 +1,24 @@
 // lib/features/auth/presentation/providers/auth_notifier.dart
 
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
-  AuthNotifier() : super(const AsyncData(null));
+  AuthNotifier() : super(const AsyncData(null)) {
+    checkLoginStatus();
+  }
 
-  bool get isLoading => state.isLoading;
   String? _token;
   String? get token => _token;
 
-  // Yeh methods add kar dena
+  // Helper methods — login_screen ke liye
   void setLoading(bool loading) {
-    state = loading ? const AsyncLoading() : state;
+    if (loading) {
+      state = const AsyncLoading();
+    }
   }
 
   void setUser(Map<String, dynamic> user) {
@@ -25,55 +29,60 @@ class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
     state = AsyncError(error, StackTrace.current);
   }
 
-  // Login function
+  // Login
   Future<void> login(String email, String password) async {
-    //setLoading(true);
-    state = const AsyncLoading();
+    setLoading(true);
+
     try {
       final response = await http.post(
-        Uri.parse("http://192.168.125.110:3000/api/login"), // Apna IP daal dena
+        Uri.parse("http://192.168.125.110:3000/api/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+        body: jsonEncode({
+          "email": email.trim().toLowerCase(),
+          "password": password,
+        }),
       );
 
       final data = jsonDecode(response.body);
 
-      if (data['success'] == true) {
-        final user = data['user'];
-        final token = data['token'];
+      if (response.statusCode == 200 && data['success'] == true) {
+        final user = data['user'] as Map<String, dynamic>;
+        final token = data['token'] as String;
+
         _token = token;
 
-        // Save to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
         await prefs.setString('user_data', jsonEncode(user));
 
-        state = AsyncData(user);
+        setUser(user);
       } else {
-        state = AsyncError(
-          data['message'] ?? "Login failed",
-          StackTrace.current,
-        );
+        setError(data['message'] ?? "Invalid email or password");
       }
     } catch (e) {
-      state = AsyncError("No internet", StackTrace.current);
+      setError("No internet connection");
     }
   }
 
-  // Auto login on app start
+  // Auto login
   Future<void> checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-    final userJson = prefs.getString('user_data');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      final userJson = prefs.getString('user_data');
 
-    if (token != null && userJson != null) {
-      _token = token; // Token restore karo
-      state = AsyncData(jsonDecode(userJson));
+      if (token != null && userJson != null) {
+        _token = token;
+        final user = jsonDecode(userJson) as Map<String, dynamic>;
+        state = AsyncData(user);
+      }
+    } catch (e) {
+      state = const AsyncData(null);
     }
   }
 
   // Logout
-  void logout() async {
+  Future<void> logout() async {
     _token = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -81,15 +90,105 @@ class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
   }
 }
 
-// Provider
 final authProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<Map<String, dynamic>?>>((
       ref,
     ) {
-      final notifier = AuthNotifier();
-      notifier.checkLoginStatus();
-      return notifier;
+      return AuthNotifier();
     });
+
+// // lib/features/auth/presentation/providers/auth_notifier.dart
+
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'dart:convert';
+
+// class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
+//   AuthNotifier() : super(const AsyncData(null));
+
+//   bool get isLoading => state.isLoading;
+//   String? _token;
+//   String? get token => _token;
+
+//   // Yeh methods add kar dena
+//   void setLoading(bool loading) {
+//     state = loading ? const AsyncLoading() : state;
+//   }
+
+//   void setUser(Map<String, dynamic> user) {
+//     state = AsyncData(user);
+//   }
+
+//   void setError(String error) {
+//     state = AsyncError(error, StackTrace.current);
+//   }
+
+//   // Login function
+//   Future<void> login(String email, String password) async {
+//     //setLoading(true);
+//     state = const AsyncLoading();
+//     try {
+//       final response = await http.post(
+//         Uri.parse("http://192.168.125.110:3000/api/login"), // Apna IP daal dena
+//         headers: {"Content-Type": "application/json"},
+//         body: jsonEncode({"email": email, "password": password}),
+//       );
+
+//       final data = jsonDecode(response.body);
+
+//       if (data['success'] == true) {
+//         final user = data['user'];
+//         final token = data['token'];
+//         _token = token;
+
+//         // Save to SharedPreferences
+//         final prefs = await SharedPreferences.getInstance();
+//         await prefs.setString('auth_token', token);
+//         await prefs.setString('user_data', jsonEncode(user));
+
+//         state = AsyncData(user);
+//       } else {
+//         state = AsyncError(
+//           data['message'] ?? "Login failed",
+//           StackTrace.current,
+//         );
+//       }
+//     } catch (e) {
+//       state = AsyncError("No internet", StackTrace.current);
+//     }
+//   }
+
+//   // Auto login on app start
+//   Future<void> checkLoginStatus() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('auth_token');
+//     final userJson = prefs.getString('user_data');
+
+//     if (token != null && userJson != null) {
+//       _token = token; // Token restore karo
+//       state = AsyncData(jsonDecode(userJson));
+//     }
+//   }
+
+//   // Logout
+//   void logout() async {
+//     _token = null;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.clear();
+//     state = const AsyncData(null);
+//   }
+// }
+
+// // Provider
+// final authProvider =
+//     StateNotifierProvider<AuthNotifier, AsyncValue<Map<String, dynamic>?>>((
+//       ref,
+//     ) {
+//       final notifier = AuthNotifier();
+//       notifier.checkLoginStatus();
+//       return notifier;
+//     });
 
 
 //     Final Recommended Code (Copy-Paste Kar De)

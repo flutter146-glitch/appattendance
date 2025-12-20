@@ -3,7 +3,8 @@
 import 'dart:async';
 
 import 'package:appattendance/core/utils/app_colors.dart';
-import 'package:appattendance/features/dashboard/presentation/widgets/managerwidgets/metrics_counter.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/common/present_dashboard_card_section.dart';
+import 'package:appattendance/features/dashboard/presentation/widgets/common/metrics_counter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -71,287 +72,221 @@ class _ManagerDashboardContentState extends State<ManagerDashboardContent> {
       child: Column(
         children: [
           // Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[800]!, Colors.blue[600]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
-            ),
-            padding: EdgeInsets.fromLTRB(5, 5, 5, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person,
-                        size: 50,
-                        color: Colors.blue[700],
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Text(
-                          //   "Welcome back,",
-                          //   style: TextStyle(
-                          //     color: Colors.white70,
-                          //     fontSize: 14,
-                          //   ),
-                          // ),
-                          // Text(
-                          //   user['emp_name'] ?? 'Manager',
-                          //   style: TextStyle(
-                          //     color: Colors.white,
-                          //     fontSize: 22,
-                          //     fontWeight: FontWeight.bold,
-                          //   ),
-                          // ),
-                          Text(
-                            user['emp_email'] ?? '',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            user['emp_id'] ?? '',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            // child: Text(
-                            //   "MANAGER",
-                            //   style: TextStyle(
-                            //     color: Colors.white,
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Stack(
-                      children: [
-                        Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Text(
-                              "3",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Center(
-                  child: Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Text(
-                            DateFormat(
-                              'EEEE, d MMMM yyyy',
-                            ).format(DateTime.now()),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            _currentTime,
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              "IT MANAGER",
-                              style: TextStyle(
-                                color: Colors.green[800],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Container(
+          //   width: double.infinity,
+          //   decoration: BoxDecoration(
+          //     gradient: LinearGradient(
+          //       colors: [Colors.blue[800]!, Colors.blue[600]!],
+          //       begin: Alignment.topLeft,
+          //       end: Alignment.bottomRight,
+          //     ),
+          //     borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+          //   ),
+          //   padding: EdgeInsets.fromLTRB(5, 5, 5, 20),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          // Row(
+          //   children: [
+          //     CircleAvatar(
+          //       radius: 35,
+          //       backgroundColor: Colors.white,
+          //       child: Icon(
+          //         Icons.person,
+          //         size: 50,
+          //         color: Colors.blue[700],
+          //       ),
+          //     ),
+          //     SizedBox(width: 16),
+          //     Expanded(
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          // Text(
+          //   "Welcome back,",
+          //   style: TextStyle(
+          //     color: Colors.white70,
+          //     fontSize: 14,
+          //   ),
+          // ),
+          // Text(
+          //   user['emp_name'] ?? 'Manager',
+          //   style: TextStyle(
+          //     color: Colors.white,
+          //     fontSize: 22,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
+          // Text(
+          //   user['emp_email'] ?? '',
+          //   style: TextStyle(
+          //     color: Colors.white70,
+          //     fontSize: 14,
+          //   ),
+          // ),
+          // Text(
+          //   user['emp_id'] ?? '',
+          //   style: TextStyle(
+          //     color: Colors.white70,
+          //     fontSize: 14,
+          //   ),
+          // ),
+          // Container(
+          //   padding: EdgeInsets.symmetric(
+          //     horizontal: 12,
+          //     vertical: 4,
+          //   ),
+          //   decoration: BoxDecoration(
+          //     color: Colors.white24,
+          //     borderRadius: BorderRadius.circular(20),
+          //   ),
+          //   child: Text(
+          //     "MANAGER",
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          // ),
+          //               ],
+          //             ),
+          //           ),
+          //           Stack(
+          //             children: [
+          //               Icon(
+          //                 Icons.notifications,
+          //                 color: Colors.white,
+          //                 size: 30,
+          //               ),
+          //               Positioned(
+          //                 right: 0,
+          //                 top: 0,
+          //                 child: Container(
+          //                   padding: EdgeInsets.all(4),
+          //                   decoration: BoxDecoration(
+          //                     color: Colors.red,
+          //                     shape: BoxShape.circle,
+          //                   ),
+          //                   child: Text(
+          //                     "3",
+          //                     style: TextStyle(
+          //                       color: Colors.white,
+          //                       fontSize: 10,
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ],
+          //       ),
+          //       SizedBox(height: 20),
+          //       Center(
+          //         child: Card(
+          //           elevation: 8,
+          //           shape: RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.circular(20),
+          //           ),
+          //           child: Padding(
+          //             padding: EdgeInsets.all(20),
+          //             child: Column(
+          //               children: [
+          //                 Text(
+          //                   DateFormat(
+          //                     'EEEE, d MMMM yyyy',
+          //                   ).format(DateTime.now()),
+          //                   style: TextStyle(
+          //                     fontSize: 18,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //                 Text(
+          //                   _currentTime,
+          //                   style: TextStyle(
+          //                     fontSize: 32,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //                 Container(
+          //                   padding: EdgeInsets.symmetric(
+          //                     horizontal: 16,
+          //                     vertical: 8,
+          //                   ),
+          //                   decoration: BoxDecoration(
+          //                     color: Colors.green[100],
+          //                     borderRadius: BorderRadius.circular(20),
+          //                   ),
+          //                   child: Text(
+          //                     "IT MANAGER",
+          //                     style: TextStyle(
+          //                       color: Colors.green[800],
+          //                       fontWeight: FontWeight.bold,
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
 
-          SizedBox(height: 30),
-
-          // Stats Row
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children:
-                  [
-                        _statCard("Team", teamSize.toString(), Icons.people),
-                        _statCard(
-                          "Present",
-                          presentToday.toString(),
-                          Icons.check_circle,
-                        ),
-                        _statCard(
-                          "Leaves",
-                          pendingLeaves.toString(),
-                          Icons.beach_access,
-                        ),
-                        _statCard(
-                          "Absent",
-                          absentToday.toString(),
-                          Icons.cancel,
-                        ),
-                        _statCard(
-                          "Overall Present",
-                          "$overallPresentPercentage%",
-                          Icons.trending_up,
-                        ),
-                      ]
-                      .map(
-                        (card) => Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: card,
-                          ),
-                        ),
-                      )
-                      .toList(),
-            ),
-          ),
-
-          SizedBox(height: 40),
+          // dashboard_screen.dart ke body mein
 
           // Metrics Counter — 4 Big Cards
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: MetricsCounter(
-              projectsCount: totalProjects,
-              teamSize: teamSize,
-              presentToday: presentToday,
-              timesheetPeriod: "Q4 2025",
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 20),
+          //   child: MetricsCounter(
+          //     projectsCount: totalProjects,
+          //     teamSize: teamSize,
+          //     presentToday: presentToday,
+          //     timesheetPeriod: "Q4 2025",
+          //   ),
+          // ),
 
-          SizedBox(height: 40),
+          // SizedBox(height: 40),
 
-          // Mapped Projects
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Mapped Project",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 15),
-                SizedBox(
-                  height: 160,
-                  child: projects.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No projects assigned",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        )
-                      : ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: projects
-                              .map(
-                                (p) => Padding(
-                                  padding: EdgeInsets.only(right: 15),
-                                  child: _projectCard(p),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 30),
+          // // Mapped Projects
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 20),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //         "Mapped Project",
+          //         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          //       ),
+          //       SizedBox(height: 15),
+          //       SizedBox(
+          //         height: 160,
+          //         child: projects.isEmpty
+          //             ? Center(
+          //                 child: Text(
+          //                   "No projects assigned",
+          //                   style: TextStyle(color: Colors.grey),
+          //                 ),
+          //               )
+          //             : ListView(
+          //                 scrollDirection: Axis.horizontal,
+          //                 children: projects
+          //                     .map(
+          //                       (p) => Padding(
+          //                         padding: EdgeInsets.only(right: 15),
+          //                         child: _projectCard(p),
+          //                       ),
+          //                     )
+          //                     .toList(),
+          //               ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(height: 30),
 
           // Quick Actions
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _actionCard(
-                    "Attendance",
-                    Icons.how_to_reg,
-                    Colors.blue,
-                  ),
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: _actionCard(
-                    "Employees",
-                    Icons.people_alt,
-                    Colors.orange,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 100),
+          // SizedBox(height: 100),
         ],
       ),
     );

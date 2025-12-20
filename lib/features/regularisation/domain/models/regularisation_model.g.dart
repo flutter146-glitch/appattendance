@@ -9,45 +9,43 @@ part of 'regularisation_model.dart';
 _$RegularisationModelImpl _$$RegularisationModelImplFromJson(
   Map<String, dynamic> json,
 ) => _$RegularisationModelImpl(
-  id: json['id'] as String,
-  userId: json['userId'] as String,
-  date: DateTime.parse(json['date'] as String),
+  regId: json['regId'] as String,
+  empId: json['empId'] as String,
+  appliedForDate: DateTime.parse(json['appliedForDate'] as String),
+  appliedDate: DateTime.parse(json['appliedDate'] as String),
   type: $enumDecode(_$RegularisationTypeEnumMap, json['type']),
+  justification: json['justification'] as String,
   status: $enumDecode(_$RegularisationStatusEnumMap, json['status']),
-  reason: json['reason'] as String,
   managerRemarks: json['managerRemarks'] as String?,
   supportingDocs:
       (json['supportingDocs'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList() ??
       const [],
-  requestedDate: json['requestedDate'] == null
-      ? null
-      : DateTime.parse(json['requestedDate'] as String),
-  approvedDate: json['approvedDate'] == null
-      ? null
-      : DateTime.parse(json['approvedDate'] as String),
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$$RegularisationModelImplToJson(
   _$RegularisationModelImpl instance,
 ) => <String, dynamic>{
-  'id': instance.id,
-  'userId': instance.userId,
-  'date': instance.date.toIso8601String(),
+  'regId': instance.regId,
+  'empId': instance.empId,
+  'appliedForDate': instance.appliedForDate.toIso8601String(),
+  'appliedDate': instance.appliedDate.toIso8601String(),
   'type': _$RegularisationTypeEnumMap[instance.type]!,
+  'justification': instance.justification,
   'status': _$RegularisationStatusEnumMap[instance.status]!,
-  'reason': instance.reason,
   'managerRemarks': instance.managerRemarks,
   'supportingDocs': instance.supportingDocs,
-  'requestedDate': instance.requestedDate?.toIso8601String(),
-  'approvedDate': instance.approvedDate?.toIso8601String(),
+  'createdAt': instance.createdAt.toIso8601String(),
+  'updatedAt': instance.updatedAt.toIso8601String(),
 };
 
 const _$RegularisationTypeEnumMap = {
-  RegularisationType.checkIn: 'checkIn',
-  RegularisationType.checkOut: 'checkOut',
   RegularisationType.fullDay: 'fullDay',
+  RegularisationType.checkInOnly: 'checkInOnly',
+  RegularisationType.checkOutOnly: 'checkOutOnly',
   RegularisationType.halfDay: 'halfDay',
 };
 
