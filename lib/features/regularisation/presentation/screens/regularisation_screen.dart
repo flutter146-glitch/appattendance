@@ -6,6 +6,7 @@ import 'package:appattendance/core/providers/view_mode_provider.dart'; // ViewMo
 import 'package:appattendance/core/theme/bottom_navigation.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:appattendance/features/regularisation/presentation/screens/apply_regularisation_screen.dart';
 import 'package:appattendance/features/regularisation/presentation/screens/manager_regularisation_screen.dart';
 import 'package:appattendance/features/regularisation/presentation/screens/employee_regularisation_screen.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +60,12 @@ class RegularisationScreen extends ConsumerWidget {
           ? FloatingActionButton(
               onPressed: () {
                 // Navigate to Apply Form
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ApplyRegularisationScreen(user: user),
+                  ),
+                );
               },
               backgroundColor: AppColors.primary,
               child: Icon(Icons.add, color: Colors.white),

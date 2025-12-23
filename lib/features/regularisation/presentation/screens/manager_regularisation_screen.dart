@@ -4,13 +4,16 @@ import 'package:appattendance/core/theme/app_gradients.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/regularisation/presentation/providers/regularisation_filter_provider.dart';
 import 'package:appattendance/features/regularisation/presentation/providers/regularisation_notifier.dart';
+import 'package:appattendance/features/regularisation/presentation/widgets/common/month_filter_widget.dart';
 import 'package:appattendance/features/regularisation/presentation/widgets/common/monthly_overview_widget.dart';
+import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_detail_dialog.dart';
 import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_filter_bar.dart';
 import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_request_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class ManagerRegularisationScreen extends ConsumerWidget {
+class ManagerRegularisationScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> user;
   final bool canApproveReject;
   final bool isEmployeeViewMode;
@@ -23,33 +26,52 @@ class ManagerRegularisationScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ManagerRegularisationScreen> createState() =>
+      _ManagerRegularisationScreenState();
+}
+
+class _ManagerRegularisationScreenState
+    extends ConsumerState<ManagerRegularisationScreen> {
+  String _selectedMonth = DateFormat('MMM yyyy').format(DateTime.now());
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final regState = ref.watch(regularisationProvider);
 
     // Data filter based on view mode
-    final displayedRequests = isEmployeeViewMode
+    final List<RegularisationRequest> displayedRequests =
+        widget.isEmployeeViewMode
         ? regState.requests
-              .where((r) => r.empId == user['emp_id'])
-              .toList() // Manager apna data dekhega
-        : regState.requests; // Team data
+              .where((r) => r.empId == widget.user['emp_id'])
+              .toList()
+        : regState.requests;
 
-    // Stats from displayed requests
-    final int total = displayedRequests.length;
-    final int pending = displayedRequests
+    // Filter by selected month (only in employee view mode)
+    final filteredRequests = widget.isEmployeeViewMode
+        ? displayedRequests.where((r) {
+            final date = DateTime.parse(r.forDate);
+            final monthYear = DateFormat('MMM yyyy').format(date);
+            return monthYear == _selectedMonth;
+          }).toList()
+        : displayedRequests;
+
+    // Stats from filtered requests
+    final int total = filteredRequests.length;
+    final int pending = filteredRequests
         .where((r) => r.status == 'pending')
         .length;
-    final int approved = displayedRequests
+    final int approved = filteredRequests
         .where((r) => r.status == 'approved')
         .length;
-    final int rejected = displayedRequests
+    final int rejected = filteredRequests
         .where((r) => r.status == 'rejected')
         .length;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isEmployeeViewMode
+          widget.isEmployeeViewMode
               ? 'My Regularisation Requests'
               : 'Regularisation Requests',
         ),
@@ -57,45 +79,69 @@ class ManagerRegularisationScreen extends ConsumerWidget {
         elevation: 0,
         backgroundColor: AppColors.warning,
       ),
-
       body: Container(
         decoration: BoxDecoration(gradient: AppGradients.dashboard(isDark)),
         child: Column(
           children: [
-            // Monthly Overview — view mode ke hisaab se
+            // Month Filter - ONLY in employee view mode
+            if (widget.isEmployeeViewMode)
+              MonthFilterWidget(
+                selectedMonthYear: _selectedMonth,
+                onMonthSelected: (newMonth) {
+                  setState(() => _selectedMonth = newMonth);
+                },
+              ),
+
+            // Monthly Overview
             MonthlyOverviewWidget(
               total: total,
               pending: pending,
               approved: approved,
               rejected: rejected,
-              isManager: !isEmployeeViewMode,
+              avgShortfall: 1.2, // Placeholder
+              totalDays: filteredRequests.length,
+              isManager: !widget.isEmployeeViewMode,
             ),
 
-            // Filter Bar — sirf Manager view mein
-            if (isEmployeeViewMode)
+            // Filter Bar - ONLY in manager view (team data)
+            if (!widget.isEmployeeViewMode)
               RegularisationFilterBar(
                 selectedFilter: ref.watch(regularisationFilterProvider),
                 onFilterChanged: (filter) =>
                     ref.read(regularisationFilterProvider.notifier).state =
                         filter,
-                filteredRequests: displayedRequests,
+                allRequests:
+                    filteredRequests, // ← yeh change karo (filteredRequests ko allRequests mein rename ya match karo)
               ),
 
-            // Cards
+            // Cards list
             Expanded(
-              child: displayedRequests.isEmpty
-                  ? Center(child: Text("No requests found"))
+              child: filteredRequests.isEmpty
+                  ? const Center(child: Text("No requests found"))
                   : ListView.builder(
-                      itemCount: displayedRequests.length,
+                      itemCount: filteredRequests.length,
                       itemBuilder: (context, index) {
-                        final req = displayedRequests[index];
-                        return RegularisationRequestCard(
-                          request: req,
-                          isDark: isDark,
-                          showActions:
-                              canApproveReject &&
-                              !isEmployeeViewMode &&
-                              req.status == 'pending',
+                        final req = filteredRequests[index];
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => RegularisationDetailDialog(
+                                request: req,
+                                isManager: !widget
+                                    .isEmployeeViewMode, // Manager mode mein true
+                              ),
+                            );
+                          },
+                          child: RegularisationRequestCard(
+                            request: req,
+                            isDark: isDark,
+                            showActions:
+                                widget.canApproveReject &&
+                                !widget.isEmployeeViewMode &&
+                                req.status == 'pending',
+                            isEmployeeView: widget.isEmployeeViewMode,
+                          ),
                         );
                       },
                     ),
@@ -106,6 +152,277 @@ class ManagerRegularisationScreen extends ConsumerWidget {
     );
   }
 }
+
+// // lib/features/regularisation/presentation/screens/manager_regularisation_screen.dart
+
+// import 'package:appattendance/core/theme/app_gradients.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/regularisation/presentation/providers/regularisation_filter_provider.dart';
+// import 'package:appattendance/features/regularisation/presentation/providers/regularisation_notifier.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/month_filter_widget.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/monthly_overview_widget.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_filter_bar.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_request_card.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+
+// class ManagerRegularisationScreen extends ConsumerStatefulWidget {
+//   final Map<String, dynamic> user;
+//   final bool canApproveReject;
+//   final bool isEmployeeViewMode;
+
+//   const ManagerRegularisationScreen({
+//     super.key,
+//     required this.user,
+//     this.canApproveReject = false,
+//     this.isEmployeeViewMode = false,
+//   });
+
+//   @override
+//   ConsumerState<ManagerRegularisationScreen> createState() =>
+//       _ManagerRegularisationScreenState();
+// }
+
+// class _ManagerRegularisationScreenState
+//     extends ConsumerState<ManagerRegularisationScreen> {
+//   String _selectedMonth = DateFormat('MMM yyyy').format(DateTime.now());
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final regState = ref.watch(regularisationProvider);
+
+//     // Data filter based on view mode
+//     final List<RegularisationRequest> displayedRequests =
+//         widget.isEmployeeViewMode
+//         ? regState.requests
+//               .where((r) => r.empId == widget.user['emp_id'])
+//               .toList() // Manager apna data
+//         : regState.requests; // Team data
+
+//     // Stats from displayed requests
+//     final int total = displayedRequests.length;
+//     final int pending = displayedRequests
+//         .where((r) => r.status == 'pending')
+//         .length;
+//     final int approved = displayedRequests
+//         .where((r) => r.status == 'approved')
+//         .length;
+//     final int rejected = displayedRequests
+//         .where((r) => r.status == 'rejected')
+//         .length;
+
+//     // Filter by selected month (sirf employee view mode mein)
+//     final filteredRequests = widget.isEmployeeViewMode
+//         ? displayedRequests.where((r) {
+//             final date = DateTime.parse(r.forDate);
+//             final monthYear = DateFormat('MMM yyyy').format(date);
+//             return monthYear == _selectedMonth;
+//           }).toList()
+//         : displayedRequests;
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(
+//           widget.isEmployeeViewMode
+//               ? 'My Regularisation Requests'
+//               : 'Regularisation Requests',
+//         ),
+//         centerTitle: true,
+//         elevation: 0,
+//         backgroundColor: AppColors.warning,
+//       ),
+//       body: Container(
+//         decoration: BoxDecoration(gradient: AppGradients.dashboard(isDark)),
+//         child: Column(
+//           children: [
+//             // Month Filter — SIRF employee view mode mein show karo
+//             if (widget.isEmployeeViewMode)
+//               MonthFilterWidget(
+//                 selectedMonthYear: _selectedMonth,
+//                 onMonthSelected: (newMonth) {
+//                   setState(() => _selectedMonth = newMonth);
+//                 },
+//               ),
+
+//             // Monthly Overview — view mode ke hisaab se
+//             MonthlyOverviewWidget(
+//               total: filteredRequests.length,
+//               pending: filteredRequests
+//                   .where((r) => r.status == 'pending')
+//                   .length,
+//               approved: filteredRequests
+//                   .where((r) => r.status == 'approved')
+//                   .length,
+//               rejected: filteredRequests
+//                   .where((r) => r.status == 'rejected')
+//                   .length,
+//               isManager: !widget.isEmployeeViewMode,
+//             ),
+
+//             // Filter Bar — sirf manager view mein (team data)
+//             if (!widget.isEmployeeViewMode)
+//               RegularisationFilterBar(
+//                 selectedFilter: ref.watch(regularisationFilterProvider),
+//                 onFilterChanged: (filter) =>
+//                     ref.read(regularisationFilterProvider.notifier).state =
+//                         filter,
+//                 filteredRequests: filteredRequests,
+//               ),
+
+//             // Cards
+//             Expanded(
+//               child: filteredRequests.isEmpty
+//                   ? Center(child: Text("No requests found"))
+//                   : ListView.builder(
+//                       itemCount: filteredRequests.length,
+//                       itemBuilder: (context, index) {
+//                         final req = filteredRequests[index];
+//                         return RegularisationRequestCard(
+//                           request: req,
+//                           isDark: isDark,
+//                           showActions:
+//                               widget.canApproveReject &&
+//                               !widget.isEmployeeViewMode &&
+//                               req.status == 'pending',
+//                           isEmployeeView: widget.isEmployeeViewMode,
+//                         );
+//                       },
+//                     ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// // lib/features/regularisation/presentation/screens/manager_regularisation_screen.dart
+
+// import 'package:appattendance/core/theme/app_gradients.dart';
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:appattendance/features/regularisation/presentation/providers/regularisation_filter_provider.dart';
+// import 'package:appattendance/features/regularisation/presentation/providers/regularisation_notifier.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/month_filter_widget.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/monthly_overview_widget.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_filter_bar.dart';
+// import 'package:appattendance/features/regularisation/presentation/widgets/common/regularisation_request_card.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// class ManagerRegularisationScreen extends ConsumerWidget {
+//   final Map<String, dynamic> user;
+//   final bool canApproveReject;
+//   final bool isEmployeeViewMode;
+
+//   const ManagerRegularisationScreen({
+//     super.key,
+//     required this.user,
+//     this.canApproveReject = false,
+//     this.isEmployeeViewMode = false,
+//   });
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final regState = ref.watch(regularisationProvider);
+
+//     // Data filter based on view mode
+//     final displayedRequests = isEmployeeViewMode
+//         ? regState.requests
+//               .where((r) => r.empId == user['emp_id'])
+//               .toList() // Manager apna data dekhega
+//         : regState.requests; // Team data
+
+//     // Stats from displayed requests
+//     final int total = displayedRequests.length;
+//     final int pending = displayedRequests
+//         .where((r) => r.status == 'pending')
+//         .length;
+//     final int approved = displayedRequests
+//         .where((r) => r.status == 'approved')
+//         .length;
+//     final int rejected = displayedRequests
+//         .where((r) => r.status == 'rejected')
+//         .length;
+
+//     // Filter by selected month
+//     // final filteredRequests = ownRequests.where((r) {
+//     //   final date = DateTime.parse(r.forDate);
+//     //   final monthYear = DateFormat('MMM yyyy').format(date);
+//     //   return monthYear == _selectedMonth;
+//     // }).toList();
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(
+//           isEmployeeViewMode
+//               ? 'My Regularisation Requests'
+//               : 'Regularisation Requests',
+//         ),
+//         centerTitle: true,
+//         elevation: 0,
+//         backgroundColor: AppColors.warning,
+//       ),
+
+//       body: Container(
+//         decoration: BoxDecoration(gradient: AppGradients.dashboard(isDark)),
+//         child: Column(
+//           children: [
+//             if (isEmployeeViewMode)
+//               // Month Filter (Upar lagaya)
+//               MonthFilterWidget(
+//                 selectedMonthYear: _selectedMonth,
+//                 onMonthSelected: (newMonth) =>
+//                     setState(() => _selectedMonth = newMonth),
+//               ),
+//             // Monthly Overview — view mode ke hisaab se
+//             MonthlyOverviewWidget(
+//               total: total,
+//               pending: pending,
+//               approved: approved,
+//               rejected: rejected,
+//               isManager: !isEmployeeViewMode,
+//             ),
+
+//             // Filter Bar — sirf Manager view mein
+//             if (isEmployeeViewMode || !isEmployeeViewMode)
+//               RegularisationFilterBar(
+//                 selectedFilter: ref.watch(regularisationFilterProvider),
+//                 onFilterChanged: (filter) =>
+//                     ref.read(regularisationFilterProvider.notifier).state =
+//                         filter,
+//                 filteredRequests: displayedRequests,
+//               ),
+
+//             // Cards
+//             Expanded(
+//               child: displayedRequests.isEmpty
+//                   ? Center(child: Text("No requests found"))
+//                   : ListView.builder(
+//                       itemCount: displayedRequests.length,
+//                       itemBuilder: (context, index) {
+//                         final req = displayedRequests[index];
+//                         return RegularisationRequestCard(
+//                           request: req,
+//                           isDark: isDark,
+//                           showActions:
+//                               canApproveReject &&
+//                               !isEmployeeViewMode &&
+//                               req.status == 'pending',
+//                           isEmployeeView:
+//                               isEmployeeViewMode, // Simplified if employee view mode
+//                         );
+//                       },
+//                     ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // class ManagerRegularisationScreen extends ConsumerWidget {
 //   final Map<String, dynamic> user;

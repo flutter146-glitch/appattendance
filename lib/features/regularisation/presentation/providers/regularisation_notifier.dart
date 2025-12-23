@@ -18,6 +18,7 @@ class RegularisationRequest {
   final String? checkoutTime;
   final String? shortfall;
   final List<String> projectNames;
+  final String? managerRemarks;
 
   const RegularisationRequest({
     required this.empId,
@@ -31,7 +32,8 @@ class RegularisationRequest {
     this.checkinTime,
     this.checkoutTime,
     this.shortfall,
-    this.projectNames = const [], // const empty list
+    this.projectNames = const [],
+    this.managerRemarks,
   });
 }
 
@@ -99,6 +101,7 @@ class RegularisationNotifier extends StateNotifier<RegularisationState> {
       final List<dynamic> regList = data['employee_regularization'] ?? [];
 
       final List<RegularisationRequest> allRequests = regList.map((json) {
+        // Projects mapping
         List<String> projects = [];
         final mapped = data['employee_mapped_projects'] as List<dynamic>? ?? [];
         final projectMaster = data['project_master'] as List<dynamic>? ?? [];
@@ -113,6 +116,7 @@ class RegularisationNotifier extends StateNotifier<RegularisationState> {
           }
         }
 
+        // Employee details
         final empMaster = data['employee_master'] as List<dynamic>? ?? [];
         final emp = empMaster.firstWhere(
           (e) => e['emp_id'] == json['emp_id'],
@@ -122,6 +126,17 @@ class RegularisationNotifier extends StateNotifier<RegularisationState> {
           },
         );
 
+        // Type mapping
+        String type = 'Full Day';
+        final regType = json['reg_type']?.toString().toLowerCase();
+        if (regType == 'checkinonly' || regType == 'check-in only') {
+          type = 'Check-in Only';
+        } else if (regType == 'checkoutonly' || regType == 'check-out only') {
+          type = 'Check-out Only';
+        } else if (regType == 'halfday') {
+          type = 'Half Day';
+        }
+
         return RegularisationRequest(
           empId: json['emp_id'],
           empName: emp['emp_name'],
@@ -130,11 +145,16 @@ class RegularisationNotifier extends StateNotifier<RegularisationState> {
           forDate: json['reg_applied_for_date'],
           justification: json['reg_justification'],
           status: json['reg_approval_status'],
-          type: 'Full Day',
+          type: type,
+          checkinTime: json['checkin_time'],
+          checkoutTime: json['checkout_time'],
+          shortfall: json['shortfall_time'],
           projectNames: projects,
+          managerRemarks: json['manager_remarks'] as String?,
         );
       }).toList();
 
+      // Stats calculation
       final int total = allRequests.length;
       final int pending = allRequests
           .where((r) => r.status == 'pending')
@@ -164,8 +184,88 @@ class RegularisationNotifier extends StateNotifier<RegularisationState> {
     }
   }
 
+  // Add new request from Apply form
+  void addRequest(RegularisationRequest newRequest) {
+    final updatedRequests = [...state.requests, newRequest];
+
+    final int total = updatedRequests.length;
+    final int pending = updatedRequests
+        .where((r) => r.status == 'pending')
+        .length;
+    final int approved = updatedRequests
+        .where((r) => r.status == 'approved')
+        .length;
+    final int rejected = updatedRequests
+        .where((r) => r.status == 'rejected')
+        .length;
+
+    state = state.copyWith(
+      requests: updatedRequests,
+      stats: RegularisationStats(
+        total: total,
+        pending: pending,
+        approved: approved,
+        rejected: rejected,
+      ),
+    );
+  }
+
+  // Own requests filter
   List<RegularisationRequest> getOwnRequests(String currentEmpId) {
     return state.requests.where((r) => r.empId == currentEmpId).toList();
+  }
+
+  // Future: approve/reject with remarks
+  void approveRequest(String regId, String remarks) {
+    final updated = state.requests.map((r) {
+      if (r.empId == regId) {
+        // Assuming regId is unique, adjust if needed
+        return RegularisationRequest(
+          empId: r.empId,
+          empName: r.empName,
+          designation: r.designation,
+          appliedDate: r.appliedDate,
+          forDate: r.forDate,
+          justification: r.justification,
+          status: 'approved',
+          type: r.type,
+          checkinTime: r.checkinTime,
+          checkoutTime: r.checkoutTime,
+          shortfall: r.shortfall,
+          projectNames: r.projectNames,
+          managerRemarks: remarks, // ← Update remarks here
+        );
+      }
+      return r;
+    }).toList();
+
+    // Update state
+    state = state.copyWith(requests: updated);
+  }
+
+  void rejectRequest(String regId, String remarks) {
+    final updated = state.requests.map((r) {
+      if (r.empId == regId) {
+        return RegularisationRequest(
+          empId: r.empId,
+          empName: r.empName,
+          designation: r.designation,
+          appliedDate: r.appliedDate,
+          forDate: r.forDate,
+          justification: r.justification,
+          status: 'rejected',
+          type: r.type,
+          checkinTime: r.checkinTime,
+          checkoutTime: r.checkoutTime,
+          shortfall: r.shortfall,
+          projectNames: r.projectNames,
+          managerRemarks: remarks,
+        );
+      }
+      return r;
+    }).toList();
+
+    state = state.copyWith(requests: updated);
   }
 }
 
@@ -173,6 +273,182 @@ final regularisationProvider =
     StateNotifierProvider<RegularisationNotifier, RegularisationState>((ref) {
       return RegularisationNotifier();
     });
+
+// // lib/features/regularisation/presentation/providers/regularisation_notifier.dart
+
+// import 'dart:convert';
+
+// import 'package:flutter/services.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// class RegularisationRequest {
+//   final String empId;
+//   final String empName;
+//   final String designation;
+//   final String appliedDate;
+//   final String forDate;
+//   final String justification;
+//   final String status;
+//   final String type;
+//   final String? checkinTime;
+//   final String? checkoutTime;
+//   final String? shortfall;
+//   final List<String> projectNames;
+
+//   const RegularisationRequest({
+//     required this.empId,
+//     required this.empName,
+//     required this.designation,
+//     required this.appliedDate,
+//     required this.forDate,
+//     required this.justification,
+//     required this.status,
+//     required this.type,
+//     this.checkinTime,
+//     this.checkoutTime,
+//     this.shortfall,
+//     this.projectNames = const [], // const empty list
+//   });
+// }
+
+// class RegularisationStats {
+//   final int total;
+//   final int pending;
+//   final int approved;
+//   final int rejected;
+
+//   const RegularisationStats({
+//     required this.total,
+//     required this.pending,
+//     required this.approved,
+//     required this.rejected,
+//   });
+// }
+
+// class RegularisationState {
+//   final List<RegularisationRequest> requests;
+//   final RegularisationStats stats;
+//   final bool isLoading;
+//   final String error;
+
+//   const RegularisationState({
+//     this.requests = const [],
+//     this.stats = const RegularisationStats(
+//       total: 0,
+//       pending: 0,
+//       approved: 0,
+//       rejected: 0,
+//     ),
+//     this.isLoading = false,
+//     this.error = '',
+//   });
+
+//   RegularisationState copyWith({
+//     List<RegularisationRequest>? requests,
+//     RegularisationStats? stats,
+//     bool? isLoading,
+//     String? error,
+//   }) {
+//     return RegularisationState(
+//       requests: requests ?? this.requests,
+//       stats: stats ?? this.stats,
+//       isLoading: isLoading ?? this.isLoading,
+//       error: error ?? this.error,
+//     );
+//   }
+// }
+
+// class RegularisationNotifier extends StateNotifier<RegularisationState> {
+//   RegularisationNotifier() : super(const RegularisationState()) {
+//     loadRequests();
+//   }
+
+//   Future<void> loadRequests() async {
+//     state = state.copyWith(isLoading: true, error: '');
+
+//     try {
+//       final String jsonString = await rootBundle.loadString(
+//         'assets/data/dummy_data.json',
+//       );
+//       final Map<String, dynamic> data = jsonDecode(jsonString);
+
+//       final List<dynamic> regList = data['employee_regularization'] ?? [];
+
+//       final List<RegularisationRequest> allRequests = regList.map((json) {
+//         List<String> projects = [];
+//         final mapped = data['employee_mapped_projects'] as List<dynamic>? ?? [];
+//         final projectMaster = data['project_master'] as List<dynamic>? ?? [];
+
+//         for (var mapping in mapped) {
+//           if (mapping['emp_id'] == json['emp_id']) {
+//             final proj = projectMaster.firstWhere(
+//               (p) => p['project_id'] == mapping['project_id'],
+//               orElse: () => {'project_name': 'Unknown Project'},
+//             );
+//             projects.add(proj['project_name']);
+//           }
+//         }
+
+//         final empMaster = data['employee_master'] as List<dynamic>? ?? [];
+//         final emp = empMaster.firstWhere(
+//           (e) => e['emp_id'] == json['emp_id'],
+//           orElse: () => {
+//             'emp_name': 'Unknown Employee',
+//             'emp_role': 'Employee',
+//           },
+//         );
+
+//         return RegularisationRequest(
+//           empId: json['emp_id'],
+//           empName: emp['emp_name'],
+//           designation: emp['emp_role'],
+//           appliedDate: json['reg_date_applied'],
+//           forDate: json['reg_applied_for_date'],
+//           justification: json['reg_justification'],
+//           status: json['reg_approval_status'],
+//           type: 'Full Day',
+//           projectNames: projects,
+//         );
+//       }).toList();
+
+//       final int total = allRequests.length;
+//       final int pending = allRequests
+//           .where((r) => r.status == 'pending')
+//           .length;
+//       final int approved = allRequests
+//           .where((r) => r.status == 'approved')
+//           .length;
+//       final int rejected = allRequests
+//           .where((r) => r.status == 'rejected')
+//           .length;
+
+//       state = state.copyWith(
+//         isLoading: false,
+//         requests: allRequests,
+//         stats: RegularisationStats(
+//           total: total,
+//           pending: pending,
+//           approved: approved,
+//           rejected: rejected,
+//         ),
+//       );
+//     } catch (e) {
+//       state = state.copyWith(
+//         isLoading: false,
+//         error: 'Failed to load data: $e',
+//       );
+//     }
+//   }
+
+//   List<RegularisationRequest> getOwnRequests(String currentEmpId) {
+//     return state.requests.where((r) => r.empId == currentEmpId).toList();
+//   }
+// }
+
+// final regularisationProvider =
+//     StateNotifierProvider<RegularisationNotifier, RegularisationState>((ref) {
+//       return RegularisationNotifier();
+//     });
 
 // // lib/features/regularisation/presentation/providers/regularisation_notifier.dart
 
