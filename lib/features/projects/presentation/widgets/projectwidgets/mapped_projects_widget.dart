@@ -4,10 +4,10 @@
 // Loading/error + dark mode + beautiful horizontal cards
 
 import 'package:appattendance/core/utils/app_colors.dart';
-import 'package:appattendance/features/project/domain/models/project_model.dart';
-import 'package:appattendance/features/project/presentation/providers/project_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../providers/project_provider.dart';
 
 class MappedProjectsWidget extends ConsumerWidget {
   const MappedProjectsWidget({super.key});

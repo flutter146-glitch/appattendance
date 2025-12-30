@@ -378,7 +378,7 @@ class _SetPasswordScreenState extends State<SetPasswordScreen>
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),

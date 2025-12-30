@@ -21,7 +21,7 @@ class LeaveScreen extends ConsumerWidget {
 
     return authAsync.when(
       loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
       data: (user) {
         if (user == null) {
@@ -60,13 +60,13 @@ class LeaveScreen extends ConsumerWidget {
           body: body,
           floatingActionButton: showFAB
               ? FloatingActionButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ApplyLeaveScreen()),
-                  ),
-                  child: const Icon(Icons.add),
-                  tooltip: 'Apply Leave',
-                )
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ApplyLeaveScreen()),
+            ),
+            child: const Icon(Icons.add),
+            tooltip: 'Apply Leave',
+          )
               : null,
           bottomNavigationBar: BottomNavigation(
             currentIndex: 2, // Leave tab

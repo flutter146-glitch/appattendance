@@ -74,6 +74,8 @@ class _SplashScreenState extends State<SplashScreen>
           : const LoginScreen();
     }
 
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
@@ -81,9 +83,10 @@ class _SplashScreenState extends State<SplashScreen>
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
-        transitionDuration: Duration(milliseconds: 600),
+        transitionDuration: const Duration(milliseconds: 600),
       ),
     );
+
   }
 
   @override

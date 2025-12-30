@@ -4,10 +4,13 @@
 // Current date: December 29, 2025
 
 import 'package:appattendance/core/utils/app_colors.dart';
+import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
 import 'package:appattendance/features/dashboard/presentation/providers/dashboard_notifier.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'custom_stat_row.dart';
 
 class AttendanceBreakdownSection extends ConsumerWidget {
   const AttendanceBreakdownSection({super.key});
@@ -28,8 +31,6 @@ class AttendanceBreakdownSection extends ConsumerWidget {
         final late = todayAttendance.where((a) => a.isLate).length;
         final onTime = present - late;
 
-        final dailyAvg = 8.5; // TODO: Real calc from attendance duration
-        final monthlyAvg = 180.0; // TODO: Real monthly average
 
         return Column(
           children: [
@@ -82,43 +83,6 @@ class AttendanceBreakdownSection extends ConsumerWidget {
                         _legendItem("On Time", onTime, Colors.teal),
                         _legendItem("Late", late, Colors.deepOrange),
                       ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              color: Colors.transparent,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Text(
-                      "Working Hours Summary",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    CustomStatRow(
-                      label: "Daily Avg",
-                      value: "${dailyAvg.toStringAsFixed(1)} Hrs",
-                      isGood: dailyAvg >= 9.0,
-                    ),
-                    const SizedBox(height: 12),
-                    CustomStatRow(
-                      label: "Monthly Avg",
-                      value: "${monthlyAvg.toStringAsFixed(1)} Hrs",
-                      isGood: monthlyAvg >= 180.0,
                     ),
                   ],
                 ),

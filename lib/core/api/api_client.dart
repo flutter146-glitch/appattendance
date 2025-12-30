@@ -1,3 +1,4 @@
+
 // **Haan bhai, bilkul sahi samjha tune** — `api_client.dart` (jo Dio se bana hai) ki zarurat **abhi nahi hai**, lekin **future mein bahut zaroori ho jayegi** jab real backend (API) connect karna hoga.
 
 // Main tujhe **simple language mein pura clear** karta hoon ki yeh kab, kyun, aur kaise use karna hai.
@@ -41,6 +42,123 @@
 
 // #### 1. Abhi ke liye (Local DB Mode)
 // `api_client.dart` ko **comment out** kar do ya **disable** rakho.
+
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class ApiClient {
+  static Future<Map<String, dynamic>> get(
+      String url, {
+        Map<String, String>? params,
+      }) async {
+    final uri = Uri.parse(url).replace(queryParameters: params);
+    final res = await http
+        .get(uri)
+        .timeout(const Duration(seconds: 60));
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception("GET failed");
+    }
+  }
+
+  static Future<Map<String, dynamic>> post(
+      String url,
+      Map<String, dynamic> body,
+      ) async {
+    final res = await http
+        .post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    )
+        .timeout(const Duration(seconds: 60));
+
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception("POST failed ${res.statusCode}");
+    }
+  }
+
+}
+
+
+
+
+
+// lib/core/api/api_client.dart
+// import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+// import 'package:dio/dio.dart';
+// import 'package:flutter/cupertino.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+//
+// final dioProvider = Provider<Dio>((ref) {
+//   final dio = Dio(
+//     BaseOptions(
+//       baseUrl: 'http://localhost:5000/api', // ← Apna port daal (5000 ya 3000)
+//       connectTimeout: const Duration(seconds: 20),
+//       receiveTimeout: const Duration(seconds: 20),
+//     ),
+//   );
+//
+//   dio.interceptors.add(AuthInterceptor(ref));
+//   dio.interceptors.add(
+//     LogInterceptor(
+//       requestBody: true,
+//       responseBody: true,
+//       logPrint: (obj) => debugPrint(obj.toString()),
+//     ),
+//   );
+//
+//   return dio;
+// });
+//
+// // lib/core/api/api_client.dart
+//
+// class AuthInterceptor extends Interceptor {
+//   final Ref ref;
+//
+//   AuthInterceptor(this.ref);
+//
+//   @override
+//   void onRequest(
+//     RequestOptions options,
+//     RequestInterceptorHandler handler,
+//   ) async {
+//     // Token ab notifier se alag se milega
+//     final authNotifier = ref.read(authProvider.notifier);
+//     final token = authNotifier.token;
+//
+//     if (token != null) {
+//       options.headers['Authorization'] = 'Bearer $token';
+//     }
+//
+//     handler.next(options);
+//   }
+//
+//   @override
+//   void onError(DioException err, ErrorInterceptorHandler handler) {
+//     if (err.response?.statusCode == 401) {
+//       ref.read(authProvider.notifier).logout();
+//       // Optional: Navigate to login
+//     }
+//     handler.next(err);
+//   }
+// }
+
+// final dioProvider = Provider<Dio>((ref) {
+//   final dio = Dio(
+//     BaseOptions(
+//       baseUrl: 'https://10.0.2.2:5000/api', // ← Apna URL daal dena
+//       connectTimeout: const Duration(seconds: 20),
+//       receiveTimeout: const Duration(seconds: 120),
+//       // headers: {'Content-Type': 'application/json'},
+//     ),
+//   );
 
 // `auth_repository_impl.dart` mein Dio code ko comment kar do (jo maine pehle diya tha):
 // ```dart
@@ -139,3 +257,49 @@
 // Main ready hoon — **code abhi deta hoon!** 🚀
 
 // App bilkul tere Nutantek live project jaisa chal raha hai bhai! 😎
+//     if (user?.token != null) {
+//       options.headers['Authorization'] = 'Bearer ${user!.token}';
+//     }
+
+//     handler.next(options); // ← super.onRequest() ki jagah yeh use karo
+//   }
+
+//   @override
+//   void onError(DioException err, ErrorInterceptorHandler handler) async {
+//     if (err.response?.statusCode == 401) {
+//       // Token expired ya invalid → logout
+//       ref.read(authProvider.notifier).logout();
+//     }
+//     handler.next(err);
+//   }
+// }
+
+// class AuthInterceptor extends Interceptor {
+//   final Ref ref;
+
+//   AuthInterceptor(this.ref);
+
+//   @override
+//   void onRequest(
+//     RequestOptions options,
+//     RequestInterceptorHandler handler,
+//   ) async {
+//     final token = ref.read(authProvider)?.token;
+//     if (token != null) {
+//       options.headers['Authorization'] = 'Bearer $token';
+//     }
+//     super.onRequest(options, handler);
+//   }
+
+//   @override
+//   void onError(DioException err, ErrorInterceptorHandler handler) async {
+//     if (err.response?.statusCode == 401) {
+//       // Token expired → logout
+//       ref.read(authProvider.notifier).logout();
+//     }
+//     super.onError(err, handler);
+//   }
+// }
+
+
+

@@ -31,9 +31,9 @@ class _ApplyLeaveScreenState extends ConsumerState<ApplyLeaveScreen> {
   bool _isHalfDayTo = false;
   final TextEditingController _handoverNameController = TextEditingController();
   final TextEditingController _handoverEmailController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _handoverPhoneController =
-      TextEditingController();
+  TextEditingController();
 
   bool _isSubmitting = false;
 
@@ -94,7 +94,7 @@ class _ApplyLeaveScreenState extends ConsumerState<ApplyLeaveScreen> {
         leaveId: const Uuid().v4(),
         empId: user.empId,
         mgrEmpId:
-            user.reportingManagerId ?? '', // TODO: Real mgr_emp_id from DB
+        user.reportingManagerId ?? '', // TODO: Real mgr_emp_id from DB
         leaveFromDate: _fromDate!,
         leaveToDate: _toDate!,
         leaveType: _selectedType,

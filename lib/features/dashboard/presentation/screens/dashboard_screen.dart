@@ -3,6 +3,8 @@
 // Uses DashboardNotifier + projectProvider for real data
 // Role-based UI + pull-to-refresh + all widgets integrated
 
+// lib/features/dashboard/presentation/screens/dashboard_screen.dart
+
 import 'package:appattendance/core/providers/bottom_nav_providers.dart';
 import 'package:appattendance/core/providers/view_mode_provider.dart';
 import 'package:appattendance/core/theme/app_gradients.dart';
@@ -26,6 +28,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../data/dashboard_repository.dart';
+import '../widgets/common/working_hours_section.dart';
+
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -33,7 +38,6 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final dashboardAsync = ref.watch(dashboardProvider);
-    final mappedProjectsAsync = ref.watch(mappedProjectProvider);
     final currentIndex = ref.watch(bottomNavIndexProvider);
     final viewMode = ref.watch(viewModeProvider);
 
@@ -42,12 +46,15 @@ class DashboardScreen extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, '/login');
       });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     final user = authState.value!;
     final isManagerial = user.isManagerial;
-    final effectiveIsManager = isManagerial && viewMode == ViewMode.manager;
+    final effectiveIsManager =
+        isManagerial && viewMode == ViewMode.manager;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -90,34 +97,14 @@ class DashboardScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.location_on, color: Colors.white),
               onPressed: () {
-                // TODO: Real geofence toggle
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Geofence enabled")),
                 );
               },
             ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    "3",
-                    style: TextStyle(color: Colors.white, fontSize: 10),
-                  ),
-                ),
-              ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
@@ -136,149 +123,118 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
         child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await ref.read(dashboardProvider.notifier).refresh();
-              await ref
-                  .read(mappedProjectProvider.notifier)
-                  .loadMappedProjects();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: dashboardAsync.when(
-                data: (state) => Column(
-                  children: [
-                    // Live Time + Role Card
-                    Card(
-                      color: Colors.transparent,
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  DateFormat(
-                                    'EEEE, d MMMM yyyy',
-                                  ).format(DateTime.now()),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+          child: dashboardAsync.when(
+            loading: () =>
+            const Center(child: CircularProgressIndicator()),
+
+            error: (err, _) =>
+                Center(child: Text("Error loading dashboard: $err")),
+
+            data: (state) {
+              final analytics = state.analyticsData;
+              final workingHours = state.workingHoursData;
+
+              final dailyAvg = workingHours['dailyAvg'] ?? 0.0;
+              final monthlyAvg = workingHours['monthlyAvg'] ?? 0.0;
+
+              final present = analytics['present'] ?? 0;
+              final leave = analytics['leave'] ?? 0;
+              final absent = analytics['absent'] ?? 0;
+              final onTime = analytics['on_time'] ?? 0;
+              final late = analytics['late'] ?? 0;
+
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await ref
+                      .read(dashboardProvider.notifier)
+                      .refresh();
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Card(
+                        color: Colors.transparent,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    DateFormat(
+                                      'EEEE, d MMMM yyyy',
+                                    ).format(DateTime.now()),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  DateFormat('HH:mm:ss').format(DateTime.now()),
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                  Text(
+                                    DateFormat('HH:mm:ss')
+                                        .format(DateTime.now()),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
+                                ],
                               ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.cyan.shade400.withOpacity(0.3),
-                                    Colors.blue.shade400.withOpacity(0.2),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Text(
+                              Text(
                                 user.displayRole,
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      if (!effectiveIsManager)
+                        CheckInOutWidget(
+                          hasCheckedInToday:
+                          state.hasCheckedInToday,
+                          isInGeofence: true,
+                        ),
 
-                    // Check-in/Check-out (Employee only)
-                    if (!effectiveIsManager)
-                      const CheckInOutWidget(
-                        hasCheckedInToday:
-                            true, // TODO: Real from state.todayAttendance
-                        isInGeofence: true,
+                      const SizedBox(height: 20),
+                      const PresentDashboardCardSection(),
+                      const SizedBox(height: 20),
+                      AttendanceBreakdownSection(),
+                      const SizedBox(height: 20),
+                      WorkingHoursSection(
+                        dailyAvg: dailyAvg,
+                        monthlyAvg: monthlyAvg,
                       ),
-
-                    const SizedBox(height: 20),
-
-                    // Present Dashboard Card Section
-                    const PresentDashboardCardSection(),
-
-                    const SizedBox(height: 20),
-
-                    // Attendance Breakdown
-                    const AttendanceBreakdownSection(),
-
-                    const SizedBox(height: 20),
-
-                    // Attendance Calendar
-                    const AttendanceCalendarWidget(),
-
-                    const SizedBox(height: 20),
-
-                    // Attendance Period Stats (Monthly)
-                    const AttendancePeriodStatsWidget(
-                      period: AttendancePeriod.monthly,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Metrics Counter (Manager only)
-                    if (effectiveIsManager) const MetricsCounter(),
-
-                    const SizedBox(height: 20),
-
-                    // Mapped Projects (Real data from provider)
-                    const MappedProjectsWidget(),
-
-                    const SizedBox(height: 20),
-
-                    // Manager Quick Actions
-                    if (effectiveIsManager) ManagerQuickActions(user: user),
-
-                    const SizedBox(height: 100),
-                  ],
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Error loading dashboard: $err"),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () =>
-                            ref.read(dashboardProvider.notifier).refresh(),
-                        child: const Text('Retry'),
+                      const SizedBox(height: 20),
+                      const AttendanceCalendarWidget(),
+                      const SizedBox(height: 20),
+                      const AttendancePeriodStatsWidget(
+                        period: AttendancePeriod.monthly,
                       ),
+                      const SizedBox(height: 20),
+                      if (effectiveIsManager)
+                        MetricsCounter(),
+
+                      const MappedProjectsWidget(),
+
+                      if (effectiveIsManager)
+                        ManagerQuickActions(user: user),
+
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -296,6 +252,9 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 }
+
+
+
 
 
 
@@ -602,10 +561,10 @@ class DashboardScreen extends ConsumerWidget {
 
 
 /*******************************
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  ****************************/
 
 
@@ -1842,7 +1801,7 @@ class DashboardScreen extends ConsumerWidget {
 //                   SizedBox(height: 15),
 
 //                   // Mapped Projects - Both roles ko
-                  
+
 
 //                   SizedBox(height: 100),
 //                 ],

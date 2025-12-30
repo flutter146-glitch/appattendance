@@ -35,7 +35,7 @@ class _ManagerLeaveScreenState extends ConsumerState<ManagerLeaveScreen> {
 
     return authAsync.when(
       loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) =>
           Scaffold(body: Center(child: Text('Auth Error: $err'))),
       data: (user) {
@@ -83,41 +83,41 @@ class _ManagerLeaveScreenState extends ConsumerState<ManagerLeaveScreen> {
                 child: ref
                     .watch(myLeavesProvider)
                     .when(
-                      data: (leaves) {
-                        // Manager filter logic
-                        final filteredLeaves = leaves.where((leave) {
-                          switch (_currentFilter) {
-                            case LeaveFilter.team:
-                              return true; // All team leaves
-                            case LeaveFilter.pending:
-                              return leave.isPending;
-                            case LeaveFilter.approved:
-                              return leave.isApproved;
-                            case LeaveFilter.rejected:
-                              return leave.isRejected;
-                            case LeaveFilter.all:
-                            default:
-                              return true;
-                          }
-                        }).toList();
+                  data: (leaves) {
+                    // Manager filter logic
+                    final filteredLeaves = leaves.where((leave) {
+                      switch (_currentFilter) {
+                        case LeaveFilter.team:
+                          return true; // All team leaves
+                        case LeaveFilter.pending:
+                          return leave.isPending;
+                        case LeaveFilter.approved:
+                          return leave.isApproved;
+                        case LeaveFilter.rejected:
+                          return leave.isRejected;
+                        case LeaveFilter.all:
+                        default:
+                          return true;
+                      }
+                    }).toList();
 
-                        if (filteredLeaves.isEmpty) {
-                          return const Center(child: Text('No leaves found'));
-                        }
+                    if (filteredLeaves.isEmpty) {
+                      return const Center(child: Text('No leaves found'));
+                    }
 
-                        return ListView.builder(
-                          itemCount: filteredLeaves.length,
-                          itemBuilder: (context, index) {
-                            final leave = filteredLeaves[index];
-                            return LeaveCard(leave: leave, isManagerView: true);
-                          },
-                        );
+                    return ListView.builder(
+                      itemCount: filteredLeaves.length,
+                      itemBuilder: (context, index) {
+                        final leave = filteredLeaves[index];
+                        return LeaveCard(leave: leave, isManagerView: true);
                       },
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) =>
-                          Center(child: Text('Error loading leaves: $err')),
-                    ),
+                    );
+                  },
+                  loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) =>
+                      Center(child: Text('Error loading leaves: $err')),
+                ),
               ),
             ],
           ),
