@@ -21,19 +21,21 @@ ProjectModel _$ProjectModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ProjectModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String? get status => throw _privateConstructorUsedError;
-  String? get site => throw _privateConstructorUsedError;
-  String? get shift => throw _privateConstructorUsedError;
+  String get projectId => throw _privateConstructorUsedError; // PK
+  String get orgShortName => throw _privateConstructorUsedError;
+  String get projectName => throw _privateConstructorUsedError;
+  String? get projectSite => throw _privateConstructorUsedError;
   String? get clientName => throw _privateConstructorUsedError;
+  String? get clientLocation => throw _privateConstructorUsedError;
   String? get clientContact => throw _privateConstructorUsedError;
-  String? get managerName => throw _privateConstructorUsedError;
-  String? get managerEmail => throw _privateConstructorUsedError;
-  String? get managerContact => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  String? get techStack => throw _privateConstructorUsedError;
-  DateTime? get assignedDate => throw _privateConstructorUsedError;
+  String? get mngName => throw _privateConstructorUsedError;
+  String? get mngEmail => throw _privateConstructorUsedError;
+  String? get mngContact => throw _privateConstructorUsedError;
+  String? get projectDescription => throw _privateConstructorUsedError;
+  String? get projectTechstack => throw _privateConstructorUsedError;
+  String? get projectAssignedDate => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this ProjectModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,19 +55,21 @@ abstract class $ProjectModelCopyWith<$Res> {
   ) = _$ProjectModelCopyWithImpl<$Res, ProjectModel>;
   @useResult
   $Res call({
-    String id,
-    String name,
-    String? status,
-    String? site,
-    String? shift,
+    String projectId,
+    String orgShortName,
+    String projectName,
+    String? projectSite,
     String? clientName,
+    String? clientLocation,
     String? clientContact,
-    String? managerName,
-    String? managerEmail,
-    String? managerContact,
-    String? description,
-    String? techStack,
-    DateTime? assignedDate,
+    String? mngName,
+    String? mngEmail,
+    String? mngContact,
+    String? projectDescription,
+    String? projectTechstack,
+    String? projectAssignedDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
 }
 
@@ -84,73 +88,83 @@ class _$ProjectModelCopyWithImpl<$Res, $Val extends ProjectModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? status = freezed,
-    Object? site = freezed,
-    Object? shift = freezed,
+    Object? projectId = null,
+    Object? orgShortName = null,
+    Object? projectName = null,
+    Object? projectSite = freezed,
     Object? clientName = freezed,
+    Object? clientLocation = freezed,
     Object? clientContact = freezed,
-    Object? managerName = freezed,
-    Object? managerEmail = freezed,
-    Object? managerContact = freezed,
-    Object? description = freezed,
-    Object? techStack = freezed,
-    Object? assignedDate = freezed,
+    Object? mngName = freezed,
+    Object? mngEmail = freezed,
+    Object? mngContact = freezed,
+    Object? projectDescription = freezed,
+    Object? projectTechstack = freezed,
+    Object? projectAssignedDate = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
+            projectId: null == projectId
+                ? _value.projectId
+                : projectId // ignore: cast_nullable_to_non_nullable
                       as String,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
+            orgShortName: null == orgShortName
+                ? _value.orgShortName
+                : orgShortName // ignore: cast_nullable_to_non_nullable
                       as String,
-            status: freezed == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            site: freezed == site
-                ? _value.site
-                : site // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            shift: freezed == shift
-                ? _value.shift
-                : shift // ignore: cast_nullable_to_non_nullable
+            projectName: null == projectName
+                ? _value.projectName
+                : projectName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            projectSite: freezed == projectSite
+                ? _value.projectSite
+                : projectSite // ignore: cast_nullable_to_non_nullable
                       as String?,
             clientName: freezed == clientName
                 ? _value.clientName
                 : clientName // ignore: cast_nullable_to_non_nullable
                       as String?,
+            clientLocation: freezed == clientLocation
+                ? _value.clientLocation
+                : clientLocation // ignore: cast_nullable_to_non_nullable
+                      as String?,
             clientContact: freezed == clientContact
                 ? _value.clientContact
                 : clientContact // ignore: cast_nullable_to_non_nullable
                       as String?,
-            managerName: freezed == managerName
-                ? _value.managerName
-                : managerName // ignore: cast_nullable_to_non_nullable
+            mngName: freezed == mngName
+                ? _value.mngName
+                : mngName // ignore: cast_nullable_to_non_nullable
                       as String?,
-            managerEmail: freezed == managerEmail
-                ? _value.managerEmail
-                : managerEmail // ignore: cast_nullable_to_non_nullable
+            mngEmail: freezed == mngEmail
+                ? _value.mngEmail
+                : mngEmail // ignore: cast_nullable_to_non_nullable
                       as String?,
-            managerContact: freezed == managerContact
-                ? _value.managerContact
-                : managerContact // ignore: cast_nullable_to_non_nullable
+            mngContact: freezed == mngContact
+                ? _value.mngContact
+                : mngContact // ignore: cast_nullable_to_non_nullable
                       as String?,
-            description: freezed == description
-                ? _value.description
-                : description // ignore: cast_nullable_to_non_nullable
+            projectDescription: freezed == projectDescription
+                ? _value.projectDescription
+                : projectDescription // ignore: cast_nullable_to_non_nullable
                       as String?,
-            techStack: freezed == techStack
-                ? _value.techStack
-                : techStack // ignore: cast_nullable_to_non_nullable
+            projectTechstack: freezed == projectTechstack
+                ? _value.projectTechstack
+                : projectTechstack // ignore: cast_nullable_to_non_nullable
                       as String?,
-            assignedDate: freezed == assignedDate
-                ? _value.assignedDate
-                : assignedDate // ignore: cast_nullable_to_non_nullable
+            projectAssignedDate: freezed == projectAssignedDate
+                ? _value.projectAssignedDate
+                : projectAssignedDate // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
           )
           as $Val,
@@ -168,19 +182,21 @@ abstract class _$$ProjectModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
-    String name,
-    String? status,
-    String? site,
-    String? shift,
+    String projectId,
+    String orgShortName,
+    String projectName,
+    String? projectSite,
     String? clientName,
+    String? clientLocation,
     String? clientContact,
-    String? managerName,
-    String? managerEmail,
-    String? managerContact,
-    String? description,
-    String? techStack,
-    DateTime? assignedDate,
+    String? mngName,
+    String? mngEmail,
+    String? mngContact,
+    String? projectDescription,
+    String? projectTechstack,
+    String? projectAssignedDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
 }
 
@@ -198,73 +214,83 @@ class __$$ProjectModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? status = freezed,
-    Object? site = freezed,
-    Object? shift = freezed,
+    Object? projectId = null,
+    Object? orgShortName = null,
+    Object? projectName = null,
+    Object? projectSite = freezed,
     Object? clientName = freezed,
+    Object? clientLocation = freezed,
     Object? clientContact = freezed,
-    Object? managerName = freezed,
-    Object? managerEmail = freezed,
-    Object? managerContact = freezed,
-    Object? description = freezed,
-    Object? techStack = freezed,
-    Object? assignedDate = freezed,
+    Object? mngName = freezed,
+    Object? mngEmail = freezed,
+    Object? mngContact = freezed,
+    Object? projectDescription = freezed,
+    Object? projectTechstack = freezed,
+    Object? projectAssignedDate = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _$ProjectModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
+        projectId: null == projectId
+            ? _value.projectId
+            : projectId // ignore: cast_nullable_to_non_nullable
                   as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
+        orgShortName: null == orgShortName
+            ? _value.orgShortName
+            : orgShortName // ignore: cast_nullable_to_non_nullable
                   as String,
-        status: freezed == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        site: freezed == site
-            ? _value.site
-            : site // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        shift: freezed == shift
-            ? _value.shift
-            : shift // ignore: cast_nullable_to_non_nullable
+        projectName: null == projectName
+            ? _value.projectName
+            : projectName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        projectSite: freezed == projectSite
+            ? _value.projectSite
+            : projectSite // ignore: cast_nullable_to_non_nullable
                   as String?,
         clientName: freezed == clientName
             ? _value.clientName
             : clientName // ignore: cast_nullable_to_non_nullable
                   as String?,
+        clientLocation: freezed == clientLocation
+            ? _value.clientLocation
+            : clientLocation // ignore: cast_nullable_to_non_nullable
+                  as String?,
         clientContact: freezed == clientContact
             ? _value.clientContact
             : clientContact // ignore: cast_nullable_to_non_nullable
                   as String?,
-        managerName: freezed == managerName
-            ? _value.managerName
-            : managerName // ignore: cast_nullable_to_non_nullable
+        mngName: freezed == mngName
+            ? _value.mngName
+            : mngName // ignore: cast_nullable_to_non_nullable
                   as String?,
-        managerEmail: freezed == managerEmail
-            ? _value.managerEmail
-            : managerEmail // ignore: cast_nullable_to_non_nullable
+        mngEmail: freezed == mngEmail
+            ? _value.mngEmail
+            : mngEmail // ignore: cast_nullable_to_non_nullable
                   as String?,
-        managerContact: freezed == managerContact
-            ? _value.managerContact
-            : managerContact // ignore: cast_nullable_to_non_nullable
+        mngContact: freezed == mngContact
+            ? _value.mngContact
+            : mngContact // ignore: cast_nullable_to_non_nullable
                   as String?,
-        description: freezed == description
-            ? _value.description
-            : description // ignore: cast_nullable_to_non_nullable
+        projectDescription: freezed == projectDescription
+            ? _value.projectDescription
+            : projectDescription // ignore: cast_nullable_to_non_nullable
                   as String?,
-        techStack: freezed == techStack
-            ? _value.techStack
-            : techStack // ignore: cast_nullable_to_non_nullable
+        projectTechstack: freezed == projectTechstack
+            ? _value.projectTechstack
+            : projectTechstack // ignore: cast_nullable_to_non_nullable
                   as String?,
-        assignedDate: freezed == assignedDate
-            ? _value.assignedDate
-            : assignedDate // ignore: cast_nullable_to_non_nullable
+        projectAssignedDate: freezed == projectAssignedDate
+            ? _value.projectAssignedDate
+            : projectAssignedDate // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
       ),
     );
@@ -275,54 +301,61 @@ class __$$ProjectModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ProjectModelImpl extends _ProjectModel {
   const _$ProjectModelImpl({
-    required this.id,
-    required this.name,
-    this.status,
-    this.site,
-    this.shift,
+    required this.projectId,
+    required this.orgShortName,
+    required this.projectName,
+    this.projectSite,
     this.clientName,
+    this.clientLocation,
     this.clientContact,
-    this.managerName,
-    this.managerEmail,
-    this.managerContact,
-    this.description,
-    this.techStack,
-    this.assignedDate,
+    this.mngName,
+    this.mngEmail,
+    this.mngContact,
+    this.projectDescription,
+    this.projectTechstack,
+    this.projectAssignedDate,
+    this.createdAt,
+    this.updatedAt,
   }) : super._();
 
   factory _$ProjectModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProjectModelImplFromJson(json);
 
   @override
-  final String id;
+  final String projectId;
+  // PK
   @override
-  final String name;
+  final String orgShortName;
   @override
-  final String? status;
+  final String projectName;
   @override
-  final String? site;
-  @override
-  final String? shift;
+  final String? projectSite;
   @override
   final String? clientName;
   @override
+  final String? clientLocation;
+  @override
   final String? clientContact;
   @override
-  final String? managerName;
+  final String? mngName;
   @override
-  final String? managerEmail;
+  final String? mngEmail;
   @override
-  final String? managerContact;
+  final String? mngContact;
   @override
-  final String? description;
+  final String? projectDescription;
   @override
-  final String? techStack;
+  final String? projectTechstack;
   @override
-  final DateTime? assignedDate;
+  final String? projectAssignedDate;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'ProjectModel(id: $id, name: $name, status: $status, site: $site, shift: $shift, clientName: $clientName, clientContact: $clientContact, managerName: $managerName, managerEmail: $managerEmail, managerContact: $managerContact, description: $description, techStack: $techStack, assignedDate: $assignedDate)';
+    return 'ProjectModel(projectId: $projectId, orgShortName: $orgShortName, projectName: $projectName, projectSite: $projectSite, clientName: $clientName, clientLocation: $clientLocation, clientContact: $clientContact, mngName: $mngName, mngEmail: $mngEmail, mngContact: $mngContact, projectDescription: $projectDescription, projectTechstack: $projectTechstack, projectAssignedDate: $projectAssignedDate, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -330,46 +363,56 @@ class _$ProjectModelImpl extends _ProjectModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ProjectModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.status, status) || other.status == status) &&
-            (identical(other.site, site) || other.site == site) &&
-            (identical(other.shift, shift) || other.shift == shift) &&
+            (identical(other.projectId, projectId) ||
+                other.projectId == projectId) &&
+            (identical(other.orgShortName, orgShortName) ||
+                other.orgShortName == orgShortName) &&
+            (identical(other.projectName, projectName) ||
+                other.projectName == projectName) &&
+            (identical(other.projectSite, projectSite) ||
+                other.projectSite == projectSite) &&
             (identical(other.clientName, clientName) ||
                 other.clientName == clientName) &&
+            (identical(other.clientLocation, clientLocation) ||
+                other.clientLocation == clientLocation) &&
             (identical(other.clientContact, clientContact) ||
                 other.clientContact == clientContact) &&
-            (identical(other.managerName, managerName) ||
-                other.managerName == managerName) &&
-            (identical(other.managerEmail, managerEmail) ||
-                other.managerEmail == managerEmail) &&
-            (identical(other.managerContact, managerContact) ||
-                other.managerContact == managerContact) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
-            (identical(other.techStack, techStack) ||
-                other.techStack == techStack) &&
-            (identical(other.assignedDate, assignedDate) ||
-                other.assignedDate == assignedDate));
+            (identical(other.mngName, mngName) || other.mngName == mngName) &&
+            (identical(other.mngEmail, mngEmail) ||
+                other.mngEmail == mngEmail) &&
+            (identical(other.mngContact, mngContact) ||
+                other.mngContact == mngContact) &&
+            (identical(other.projectDescription, projectDescription) ||
+                other.projectDescription == projectDescription) &&
+            (identical(other.projectTechstack, projectTechstack) ||
+                other.projectTechstack == projectTechstack) &&
+            (identical(other.projectAssignedDate, projectAssignedDate) ||
+                other.projectAssignedDate == projectAssignedDate) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    id,
-    name,
-    status,
-    site,
-    shift,
+    projectId,
+    orgShortName,
+    projectName,
+    projectSite,
     clientName,
+    clientLocation,
     clientContact,
-    managerName,
-    managerEmail,
-    managerContact,
-    description,
-    techStack,
-    assignedDate,
+    mngName,
+    mngEmail,
+    mngContact,
+    projectDescription,
+    projectTechstack,
+    projectAssignedDate,
+    createdAt,
+    updatedAt,
   );
 
   /// Create a copy of ProjectModel
@@ -388,19 +431,21 @@ class _$ProjectModelImpl extends _ProjectModel {
 
 abstract class _ProjectModel extends ProjectModel {
   const factory _ProjectModel({
-    required final String id,
-    required final String name,
-    final String? status,
-    final String? site,
-    final String? shift,
+    required final String projectId,
+    required final String orgShortName,
+    required final String projectName,
+    final String? projectSite,
     final String? clientName,
+    final String? clientLocation,
     final String? clientContact,
-    final String? managerName,
-    final String? managerEmail,
-    final String? managerContact,
-    final String? description,
-    final String? techStack,
-    final DateTime? assignedDate,
+    final String? mngName,
+    final String? mngEmail,
+    final String? mngContact,
+    final String? projectDescription,
+    final String? projectTechstack,
+    final String? projectAssignedDate,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
   }) = _$ProjectModelImpl;
   const _ProjectModel._() : super._();
 
@@ -408,31 +453,35 @@ abstract class _ProjectModel extends ProjectModel {
       _$ProjectModelImpl.fromJson;
 
   @override
-  String get id;
+  String get projectId; // PK
   @override
-  String get name;
+  String get orgShortName;
   @override
-  String? get status;
+  String get projectName;
   @override
-  String? get site;
-  @override
-  String? get shift;
+  String? get projectSite;
   @override
   String? get clientName;
   @override
+  String? get clientLocation;
+  @override
   String? get clientContact;
   @override
-  String? get managerName;
+  String? get mngName;
   @override
-  String? get managerEmail;
+  String? get mngEmail;
   @override
-  String? get managerContact;
+  String? get mngContact;
   @override
-  String? get description;
+  String? get projectDescription;
   @override
-  String? get techStack;
+  String? get projectTechstack;
   @override
-  DateTime? get assignedDate;
+  String? get projectAssignedDate;
+  @override
+  DateTime? get createdAt;
+  @override
+  DateTime? get updatedAt;
 
   /// Create a copy of ProjectModel
   /// with the given fields replaced by the non-null parameter values.
@@ -442,168 +491,182 @@ abstract class _ProjectModel extends ProjectModel {
       throw _privateConstructorUsedError;
 }
 
-ProjectAnalytics _$ProjectAnalyticsFromJson(Map<String, dynamic> json) {
-  return _ProjectAnalytics.fromJson(json);
+MappedProject _$MappedProjectFromJson(Map<String, dynamic> json) {
+  return _MappedProject.fromJson(json);
 }
 
 /// @nodoc
-mixin _$ProjectAnalytics {
-  Map<String, List<double>> get graphData => throw _privateConstructorUsedError;
-  List<String> get labels => throw _privateConstructorUsedError;
-  int get totalProjects => throw _privateConstructorUsedError;
-  int get totalEmployees => throw _privateConstructorUsedError;
-  Map<String, double> get statusDistribution =>
-      throw _privateConstructorUsedError;
-  Map<String, dynamic> get additionalStats =>
-      throw _privateConstructorUsedError;
+mixin _$MappedProject {
+  String get empId => throw _privateConstructorUsedError;
+  String get projectId => throw _privateConstructorUsedError;
+  String get mappingStatus =>
+      throw _privateConstructorUsedError; // 'active' / 'deactive'
+  ProjectModel get project => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this ProjectAnalytics to a JSON map.
+  /// Serializes this MappedProject to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of ProjectAnalytics
+  /// Create a copy of MappedProject
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ProjectAnalyticsCopyWith<ProjectAnalytics> get copyWith =>
+  $MappedProjectCopyWith<MappedProject> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ProjectAnalyticsCopyWith<$Res> {
-  factory $ProjectAnalyticsCopyWith(
-    ProjectAnalytics value,
-    $Res Function(ProjectAnalytics) then,
-  ) = _$ProjectAnalyticsCopyWithImpl<$Res, ProjectAnalytics>;
+abstract class $MappedProjectCopyWith<$Res> {
+  factory $MappedProjectCopyWith(
+    MappedProject value,
+    $Res Function(MappedProject) then,
+  ) = _$MappedProjectCopyWithImpl<$Res, MappedProject>;
   @useResult
   $Res call({
-    Map<String, List<double>> graphData,
-    List<String> labels,
-    int totalProjects,
-    int totalEmployees,
-    Map<String, double> statusDistribution,
-    Map<String, dynamic> additionalStats,
+    String empId,
+    String projectId,
+    String mappingStatus,
+    ProjectModel project,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
+
+  $ProjectModelCopyWith<$Res> get project;
 }
 
 /// @nodoc
-class _$ProjectAnalyticsCopyWithImpl<$Res, $Val extends ProjectAnalytics>
-    implements $ProjectAnalyticsCopyWith<$Res> {
-  _$ProjectAnalyticsCopyWithImpl(this._value, this._then);
+class _$MappedProjectCopyWithImpl<$Res, $Val extends MappedProject>
+    implements $MappedProjectCopyWith<$Res> {
+  _$MappedProjectCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ProjectAnalytics
+  /// Create a copy of MappedProject
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? graphData = null,
-    Object? labels = null,
-    Object? totalProjects = null,
-    Object? totalEmployees = null,
-    Object? statusDistribution = null,
-    Object? additionalStats = null,
+    Object? empId = null,
+    Object? projectId = null,
+    Object? mappingStatus = null,
+    Object? project = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
-            graphData: null == graphData
-                ? _value.graphData
-                : graphData // ignore: cast_nullable_to_non_nullable
-                      as Map<String, List<double>>,
-            labels: null == labels
-                ? _value.labels
-                : labels // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
-            totalProjects: null == totalProjects
-                ? _value.totalProjects
-                : totalProjects // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalEmployees: null == totalEmployees
-                ? _value.totalEmployees
-                : totalEmployees // ignore: cast_nullable_to_non_nullable
-                      as int,
-            statusDistribution: null == statusDistribution
-                ? _value.statusDistribution
-                : statusDistribution // ignore: cast_nullable_to_non_nullable
-                      as Map<String, double>,
-            additionalStats: null == additionalStats
-                ? _value.additionalStats
-                : additionalStats // ignore: cast_nullable_to_non_nullable
-                      as Map<String, dynamic>,
+            empId: null == empId
+                ? _value.empId
+                : empId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            projectId: null == projectId
+                ? _value.projectId
+                : projectId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            mappingStatus: null == mappingStatus
+                ? _value.mappingStatus
+                : mappingStatus // ignore: cast_nullable_to_non_nullable
+                      as String,
+            project: null == project
+                ? _value.project
+                : project // ignore: cast_nullable_to_non_nullable
+                      as ProjectModel,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
   }
+
+  /// Create a copy of MappedProject
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ProjectModelCopyWith<$Res> get project {
+    return $ProjectModelCopyWith<$Res>(_value.project, (value) {
+      return _then(_value.copyWith(project: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
-abstract class _$$ProjectAnalyticsImplCopyWith<$Res>
-    implements $ProjectAnalyticsCopyWith<$Res> {
-  factory _$$ProjectAnalyticsImplCopyWith(
-    _$ProjectAnalyticsImpl value,
-    $Res Function(_$ProjectAnalyticsImpl) then,
-  ) = __$$ProjectAnalyticsImplCopyWithImpl<$Res>;
+abstract class _$$MappedProjectImplCopyWith<$Res>
+    implements $MappedProjectCopyWith<$Res> {
+  factory _$$MappedProjectImplCopyWith(
+    _$MappedProjectImpl value,
+    $Res Function(_$MappedProjectImpl) then,
+  ) = __$$MappedProjectImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
-    Map<String, List<double>> graphData,
-    List<String> labels,
-    int totalProjects,
-    int totalEmployees,
-    Map<String, double> statusDistribution,
-    Map<String, dynamic> additionalStats,
+    String empId,
+    String projectId,
+    String mappingStatus,
+    ProjectModel project,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
+
+  @override
+  $ProjectModelCopyWith<$Res> get project;
 }
 
 /// @nodoc
-class __$$ProjectAnalyticsImplCopyWithImpl<$Res>
-    extends _$ProjectAnalyticsCopyWithImpl<$Res, _$ProjectAnalyticsImpl>
-    implements _$$ProjectAnalyticsImplCopyWith<$Res> {
-  __$$ProjectAnalyticsImplCopyWithImpl(
-    _$ProjectAnalyticsImpl _value,
-    $Res Function(_$ProjectAnalyticsImpl) _then,
+class __$$MappedProjectImplCopyWithImpl<$Res>
+    extends _$MappedProjectCopyWithImpl<$Res, _$MappedProjectImpl>
+    implements _$$MappedProjectImplCopyWith<$Res> {
+  __$$MappedProjectImplCopyWithImpl(
+    _$MappedProjectImpl _value,
+    $Res Function(_$MappedProjectImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of ProjectAnalytics
+  /// Create a copy of MappedProject
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? graphData = null,
-    Object? labels = null,
-    Object? totalProjects = null,
-    Object? totalEmployees = null,
-    Object? statusDistribution = null,
-    Object? additionalStats = null,
+    Object? empId = null,
+    Object? projectId = null,
+    Object? mappingStatus = null,
+    Object? project = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
-      _$ProjectAnalyticsImpl(
-        graphData: null == graphData
-            ? _value._graphData
-            : graphData // ignore: cast_nullable_to_non_nullable
-                  as Map<String, List<double>>,
-        labels: null == labels
-            ? _value._labels
-            : labels // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
-        totalProjects: null == totalProjects
-            ? _value.totalProjects
-            : totalProjects // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalEmployees: null == totalEmployees
-            ? _value.totalEmployees
-            : totalEmployees // ignore: cast_nullable_to_non_nullable
-                  as int,
-        statusDistribution: null == statusDistribution
-            ? _value._statusDistribution
-            : statusDistribution // ignore: cast_nullable_to_non_nullable
-                  as Map<String, double>,
-        additionalStats: null == additionalStats
-            ? _value._additionalStats
-            : additionalStats // ignore: cast_nullable_to_non_nullable
-                  as Map<String, dynamic>,
+      _$MappedProjectImpl(
+        empId: null == empId
+            ? _value.empId
+            : empId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        projectId: null == projectId
+            ? _value.projectId
+            : projectId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        mappingStatus: null == mappingStatus
+            ? _value.mappingStatus
+            : mappingStatus // ignore: cast_nullable_to_non_nullable
+                  as String,
+        project: null == project
+            ? _value.project
+            : project // ignore: cast_nullable_to_non_nullable
+                  as ProjectModel,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -611,148 +674,112 @@ class __$$ProjectAnalyticsImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ProjectAnalyticsImpl implements _ProjectAnalytics {
-  const _$ProjectAnalyticsImpl({
-    required final Map<String, List<double>> graphData,
-    required final List<String> labels,
-    required this.totalProjects,
-    required this.totalEmployees,
-    required final Map<String, double> statusDistribution,
-    final Map<String, dynamic> additionalStats = const {},
-  }) : _graphData = graphData,
-       _labels = labels,
-       _statusDistribution = statusDistribution,
-       _additionalStats = additionalStats;
+class _$MappedProjectImpl extends _MappedProject {
+  const _$MappedProjectImpl({
+    required this.empId,
+    required this.projectId,
+    required this.mappingStatus,
+    required this.project,
+    this.createdAt,
+    this.updatedAt,
+  }) : super._();
 
-  factory _$ProjectAnalyticsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ProjectAnalyticsImplFromJson(json);
-
-  final Map<String, List<double>> _graphData;
-  @override
-  Map<String, List<double>> get graphData {
-    if (_graphData is EqualUnmodifiableMapView) return _graphData;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_graphData);
-  }
-
-  final List<String> _labels;
-  @override
-  List<String> get labels {
-    if (_labels is EqualUnmodifiableListView) return _labels;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_labels);
-  }
+  factory _$MappedProjectImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MappedProjectImplFromJson(json);
 
   @override
-  final int totalProjects;
+  final String empId;
   @override
-  final int totalEmployees;
-  final Map<String, double> _statusDistribution;
+  final String projectId;
   @override
-  Map<String, double> get statusDistribution {
-    if (_statusDistribution is EqualUnmodifiableMapView)
-      return _statusDistribution;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_statusDistribution);
-  }
-
-  final Map<String, dynamic> _additionalStats;
+  final String mappingStatus;
+  // 'active' / 'deactive'
   @override
-  @JsonKey()
-  Map<String, dynamic> get additionalStats {
-    if (_additionalStats is EqualUnmodifiableMapView) return _additionalStats;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_additionalStats);
-  }
+  final ProjectModel project;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'ProjectAnalytics(graphData: $graphData, labels: $labels, totalProjects: $totalProjects, totalEmployees: $totalEmployees, statusDistribution: $statusDistribution, additionalStats: $additionalStats)';
+    return 'MappedProject(empId: $empId, projectId: $projectId, mappingStatus: $mappingStatus, project: $project, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ProjectAnalyticsImpl &&
-            const DeepCollectionEquality().equals(
-              other._graphData,
-              _graphData,
-            ) &&
-            const DeepCollectionEquality().equals(other._labels, _labels) &&
-            (identical(other.totalProjects, totalProjects) ||
-                other.totalProjects == totalProjects) &&
-            (identical(other.totalEmployees, totalEmployees) ||
-                other.totalEmployees == totalEmployees) &&
-            const DeepCollectionEquality().equals(
-              other._statusDistribution,
-              _statusDistribution,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._additionalStats,
-              _additionalStats,
-            ));
+            other is _$MappedProjectImpl &&
+            (identical(other.empId, empId) || other.empId == empId) &&
+            (identical(other.projectId, projectId) ||
+                other.projectId == projectId) &&
+            (identical(other.mappingStatus, mappingStatus) ||
+                other.mappingStatus == mappingStatus) &&
+            (identical(other.project, project) || other.project == project) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    const DeepCollectionEquality().hash(_graphData),
-    const DeepCollectionEquality().hash(_labels),
-    totalProjects,
-    totalEmployees,
-    const DeepCollectionEquality().hash(_statusDistribution),
-    const DeepCollectionEquality().hash(_additionalStats),
+    empId,
+    projectId,
+    mappingStatus,
+    project,
+    createdAt,
+    updatedAt,
   );
 
-  /// Create a copy of ProjectAnalytics
+  /// Create a copy of MappedProject
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ProjectAnalyticsImplCopyWith<_$ProjectAnalyticsImpl> get copyWith =>
-      __$$ProjectAnalyticsImplCopyWithImpl<_$ProjectAnalyticsImpl>(
-        this,
-        _$identity,
-      );
+  _$$MappedProjectImplCopyWith<_$MappedProjectImpl> get copyWith =>
+      __$$MappedProjectImplCopyWithImpl<_$MappedProjectImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ProjectAnalyticsImplToJson(this);
+    return _$$MappedProjectImplToJson(this);
   }
 }
 
-abstract class _ProjectAnalytics implements ProjectAnalytics {
-  const factory _ProjectAnalytics({
-    required final Map<String, List<double>> graphData,
-    required final List<String> labels,
-    required final int totalProjects,
-    required final int totalEmployees,
-    required final Map<String, double> statusDistribution,
-    final Map<String, dynamic> additionalStats,
-  }) = _$ProjectAnalyticsImpl;
+abstract class _MappedProject extends MappedProject {
+  const factory _MappedProject({
+    required final String empId,
+    required final String projectId,
+    required final String mappingStatus,
+    required final ProjectModel project,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
+  }) = _$MappedProjectImpl;
+  const _MappedProject._() : super._();
 
-  factory _ProjectAnalytics.fromJson(Map<String, dynamic> json) =
-      _$ProjectAnalyticsImpl.fromJson;
+  factory _MappedProject.fromJson(Map<String, dynamic> json) =
+      _$MappedProjectImpl.fromJson;
 
   @override
-  Map<String, List<double>> get graphData;
+  String get empId;
   @override
-  List<String> get labels;
+  String get projectId;
   @override
-  int get totalProjects;
+  String get mappingStatus; // 'active' / 'deactive'
   @override
-  int get totalEmployees;
+  ProjectModel get project;
   @override
-  Map<String, double> get statusDistribution;
+  DateTime? get createdAt;
   @override
-  Map<String, dynamic> get additionalStats;
+  DateTime? get updatedAt;
 
-  /// Create a copy of ProjectAnalytics
+  /// Create a copy of MappedProject
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ProjectAnalyticsImplCopyWith<_$ProjectAnalyticsImpl> get copyWith =>
+  _$$MappedProjectImplCopyWith<_$MappedProjectImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -2,6 +2,7 @@
 
 import 'package:appattendance/core/providers/theme_notifier.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/auth/presentation/screens/device_verification_screen.dart';
 import 'package:appattendance/features/auth/presentation/screens/login_screen.dart';
 import 'package:appattendance/features/dashboard/presentation/screens/dashboard_screen.dart';

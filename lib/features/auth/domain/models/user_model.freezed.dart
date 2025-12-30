@@ -21,19 +21,22 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserModel {
-  String get id => throw _privateConstructorUsedError;
+  String get empId => throw _privateConstructorUsedError;
+  String get orgShortName => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  UserRole get role => throw _privateConstructorUsedError;
-  String get department => throw _privateConstructorUsedError;
-  String? get employeeId => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
-  String? get profileImage => throw _privateConstructorUsedError;
-  String? get token => throw _privateConstructorUsedError; // ← API ke liye
-  bool get biometricEnabled => throw _privateConstructorUsedError;
-  bool get mpinSet => throw _privateConstructorUsedError;
-  List<dynamic> get projects => throw _privateConstructorUsedError;
+  UserRole get role => throw _privateConstructorUsedError;
+  String? get department => throw _privateConstructorUsedError;
+  String? get designation => throw _privateConstructorUsedError;
+  DateTime? get joiningDate => throw _privateConstructorUsedError;
+  UserStatus get status => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  List<String> get assignedProjectIds => throw _privateConstructorUsedError;
+  List<String> get projectNames => throw _privateConstructorUsedError;
+  String? get shiftId => throw _privateConstructorUsedError;
+  String? get reportingManagerId => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,19 +54,22 @@ abstract class $UserModelCopyWith<$Res> {
       _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
   $Res call({
-    String id,
+    String empId,
+    String orgShortName,
     String name,
     String email,
-    UserRole role,
-    String department,
-    String? employeeId,
     String? phone,
-    String? profileImage,
-    String? token,
-    bool biometricEnabled,
-    bool mpinSet,
-    List<dynamic> projects,
+    UserRole role,
+    String? department,
+    String? designation,
+    DateTime? joiningDate,
+    UserStatus status,
     DateTime? createdAt,
+    DateTime? updatedAt,
+    List<String> assignedProjectIds,
+    List<String> projectNames,
+    String? shiftId,
+    String? reportingManagerId,
   });
 }
 
@@ -82,25 +88,32 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? empId = null,
+    Object? orgShortName = null,
     Object? name = null,
     Object? email = null,
-    Object? role = null,
-    Object? department = null,
-    Object? employeeId = freezed,
     Object? phone = freezed,
-    Object? profileImage = freezed,
-    Object? token = freezed,
-    Object? biometricEnabled = null,
-    Object? mpinSet = null,
-    Object? projects = null,
+    Object? role = null,
+    Object? department = freezed,
+    Object? designation = freezed,
+    Object? joiningDate = freezed,
+    Object? status = null,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? assignedProjectIds = null,
+    Object? projectNames = null,
+    Object? shiftId = freezed,
+    Object? reportingManagerId = freezed,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
+            empId: null == empId
+                ? _value.empId
+                : empId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            orgShortName: null == orgShortName
+                ? _value.orgShortName
+                : orgShortName // ignore: cast_nullable_to_non_nullable
                       as String,
             name: null == name
                 ? _value.name
@@ -110,46 +123,54 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
                       as String,
-            role: null == role
-                ? _value.role
-                : role // ignore: cast_nullable_to_non_nullable
-                      as UserRole,
-            department: null == department
-                ? _value.department
-                : department // ignore: cast_nullable_to_non_nullable
-                      as String,
-            employeeId: freezed == employeeId
-                ? _value.employeeId
-                : employeeId // ignore: cast_nullable_to_non_nullable
-                      as String?,
             phone: freezed == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String?,
-            profileImage: freezed == profileImage
-                ? _value.profileImage
-                : profileImage // ignore: cast_nullable_to_non_nullable
+            role: null == role
+                ? _value.role
+                : role // ignore: cast_nullable_to_non_nullable
+                      as UserRole,
+            department: freezed == department
+                ? _value.department
+                : department // ignore: cast_nullable_to_non_nullable
                       as String?,
-            token: freezed == token
-                ? _value.token
-                : token // ignore: cast_nullable_to_non_nullable
+            designation: freezed == designation
+                ? _value.designation
+                : designation // ignore: cast_nullable_to_non_nullable
                       as String?,
-            biometricEnabled: null == biometricEnabled
-                ? _value.biometricEnabled
-                : biometricEnabled // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            mpinSet: null == mpinSet
-                ? _value.mpinSet
-                : mpinSet // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            projects: null == projects
-                ? _value.projects
-                : projects // ignore: cast_nullable_to_non_nullable
-                      as List<dynamic>,
+            joiningDate: freezed == joiningDate
+                ? _value.joiningDate
+                : joiningDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as UserStatus,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            assignedProjectIds: null == assignedProjectIds
+                ? _value.assignedProjectIds
+                : assignedProjectIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            projectNames: null == projectNames
+                ? _value.projectNames
+                : projectNames // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            shiftId: freezed == shiftId
+                ? _value.shiftId
+                : shiftId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            reportingManagerId: freezed == reportingManagerId
+                ? _value.reportingManagerId
+                : reportingManagerId // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -166,19 +187,22 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
+    String empId,
+    String orgShortName,
     String name,
     String email,
-    UserRole role,
-    String department,
-    String? employeeId,
     String? phone,
-    String? profileImage,
-    String? token,
-    bool biometricEnabled,
-    bool mpinSet,
-    List<dynamic> projects,
+    UserRole role,
+    String? department,
+    String? designation,
+    DateTime? joiningDate,
+    UserStatus status,
     DateTime? createdAt,
+    DateTime? updatedAt,
+    List<String> assignedProjectIds,
+    List<String> projectNames,
+    String? shiftId,
+    String? reportingManagerId,
   });
 }
 
@@ -196,25 +220,32 @@ class __$$UserModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? empId = null,
+    Object? orgShortName = null,
     Object? name = null,
     Object? email = null,
-    Object? role = null,
-    Object? department = null,
-    Object? employeeId = freezed,
     Object? phone = freezed,
-    Object? profileImage = freezed,
-    Object? token = freezed,
-    Object? biometricEnabled = null,
-    Object? mpinSet = null,
-    Object? projects = null,
+    Object? role = null,
+    Object? department = freezed,
+    Object? designation = freezed,
+    Object? joiningDate = freezed,
+    Object? status = null,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? assignedProjectIds = null,
+    Object? projectNames = null,
+    Object? shiftId = freezed,
+    Object? reportingManagerId = freezed,
   }) {
     return _then(
       _$UserModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
+        empId: null == empId
+            ? _value.empId
+            : empId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        orgShortName: null == orgShortName
+            ? _value.orgShortName
+            : orgShortName // ignore: cast_nullable_to_non_nullable
                   as String,
         name: null == name
             ? _value.name
@@ -224,46 +255,54 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
                   as String,
-        role: null == role
-            ? _value.role
-            : role // ignore: cast_nullable_to_non_nullable
-                  as UserRole,
-        department: null == department
-            ? _value.department
-            : department // ignore: cast_nullable_to_non_nullable
-                  as String,
-        employeeId: freezed == employeeId
-            ? _value.employeeId
-            : employeeId // ignore: cast_nullable_to_non_nullable
-                  as String?,
         phone: freezed == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String?,
-        profileImage: freezed == profileImage
-            ? _value.profileImage
-            : profileImage // ignore: cast_nullable_to_non_nullable
+        role: null == role
+            ? _value.role
+            : role // ignore: cast_nullable_to_non_nullable
+                  as UserRole,
+        department: freezed == department
+            ? _value.department
+            : department // ignore: cast_nullable_to_non_nullable
                   as String?,
-        token: freezed == token
-            ? _value.token
-            : token // ignore: cast_nullable_to_non_nullable
+        designation: freezed == designation
+            ? _value.designation
+            : designation // ignore: cast_nullable_to_non_nullable
                   as String?,
-        biometricEnabled: null == biometricEnabled
-            ? _value.biometricEnabled
-            : biometricEnabled // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        mpinSet: null == mpinSet
-            ? _value.mpinSet
-            : mpinSet // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        projects: null == projects
-            ? _value._projects
-            : projects // ignore: cast_nullable_to_non_nullable
-                  as List<dynamic>,
+        joiningDate: freezed == joiningDate
+            ? _value.joiningDate
+            : joiningDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as UserStatus,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        assignedProjectIds: null == assignedProjectIds
+            ? _value._assignedProjectIds
+            : assignedProjectIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        projectNames: null == projectNames
+            ? _value._projectNames
+            : projectNames // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        shiftId: freezed == shiftId
+            ? _value.shiftId
+            : shiftId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        reportingManagerId: freezed == reportingManagerId
+            ? _value.reportingManagerId
+            : reportingManagerId // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -273,65 +312,81 @@ class __$$UserModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserModelImpl extends _UserModel {
   const _$UserModelImpl({
-    required this.id,
+    required this.empId,
+    required this.orgShortName,
     required this.name,
     required this.email,
-    required this.role,
-    required this.department,
-    this.employeeId,
     this.phone,
-    this.profileImage,
-    this.token,
-    this.biometricEnabled = false,
-    this.mpinSet = false,
-    final List<dynamic> projects = const [],
+    required this.role,
+    this.department,
+    this.designation,
+    this.joiningDate,
+    this.status = UserStatus.active,
     this.createdAt,
-  }) : _projects = projects,
+    this.updatedAt,
+    final List<String> assignedProjectIds = const [],
+    final List<String> projectNames = const [],
+    this.shiftId,
+    this.reportingManagerId,
+  }) : _assignedProjectIds = assignedProjectIds,
+       _projectNames = projectNames,
        super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
 
   @override
-  final String id;
+  final String empId;
+  @override
+  final String orgShortName;
   @override
   final String name;
   @override
   final String email;
   @override
-  final UserRole role;
-  @override
-  final String department;
-  @override
-  final String? employeeId;
-  @override
   final String? phone;
   @override
-  final String? profileImage;
+  final UserRole role;
   @override
-  final String? token;
-  // ← API ke liye
+  final String? department;
   @override
-  @JsonKey()
-  final bool biometricEnabled;
+  final String? designation;
   @override
-  @JsonKey()
-  final bool mpinSet;
-  final List<dynamic> _projects;
+  final DateTime? joiningDate;
   @override
   @JsonKey()
-  List<dynamic> get projects {
-    if (_projects is EqualUnmodifiableListView) return _projects;
+  final UserStatus status;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
+  final List<String> _assignedProjectIds;
+  @override
+  @JsonKey()
+  List<String> get assignedProjectIds {
+    if (_assignedProjectIds is EqualUnmodifiableListView)
+      return _assignedProjectIds;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_projects);
+    return EqualUnmodifiableListView(_assignedProjectIds);
+  }
+
+  final List<String> _projectNames;
+  @override
+  @JsonKey()
+  List<String> get projectNames {
+    if (_projectNames is EqualUnmodifiableListView) return _projectNames;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_projectNames);
   }
 
   @override
-  final DateTime? createdAt;
+  final String? shiftId;
+  @override
+  final String? reportingManagerId;
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, role: $role, department: $department, employeeId: $employeeId, phone: $phone, profileImage: $profileImage, token: $token, biometricEnabled: $biometricEnabled, mpinSet: $mpinSet, projects: $projects, createdAt: $createdAt)';
+    return 'UserModel(empId: $empId, orgShortName: $orgShortName, name: $name, email: $email, phone: $phone, role: $role, department: $department, designation: $designation, joiningDate: $joiningDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, assignedProjectIds: $assignedProjectIds, projectNames: $projectNames, shiftId: $shiftId, reportingManagerId: $reportingManagerId)';
   }
 
   @override
@@ -339,43 +394,57 @@ class _$UserModelImpl extends _UserModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
+            (identical(other.empId, empId) || other.empId == empId) &&
+            (identical(other.orgShortName, orgShortName) ||
+                other.orgShortName == orgShortName) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.department, department) ||
                 other.department == department) &&
-            (identical(other.employeeId, employeeId) ||
-                other.employeeId == employeeId) &&
-            (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.profileImage, profileImage) ||
-                other.profileImage == profileImage) &&
-            (identical(other.token, token) || other.token == token) &&
-            (identical(other.biometricEnabled, biometricEnabled) ||
-                other.biometricEnabled == biometricEnabled) &&
-            (identical(other.mpinSet, mpinSet) || other.mpinSet == mpinSet) &&
-            const DeepCollectionEquality().equals(other._projects, _projects) &&
+            (identical(other.designation, designation) ||
+                other.designation == designation) &&
+            (identical(other.joiningDate, joiningDate) ||
+                other.joiningDate == joiningDate) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(
+              other._assignedProjectIds,
+              _assignedProjectIds,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._projectNames,
+              _projectNames,
+            ) &&
+            (identical(other.shiftId, shiftId) || other.shiftId == shiftId) &&
+            (identical(other.reportingManagerId, reportingManagerId) ||
+                other.reportingManagerId == reportingManagerId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    id,
+    empId,
+    orgShortName,
     name,
     email,
+    phone,
     role,
     department,
-    employeeId,
-    phone,
-    profileImage,
-    token,
-    biometricEnabled,
-    mpinSet,
-    const DeepCollectionEquality().hash(_projects),
+    designation,
+    joiningDate,
+    status,
     createdAt,
+    updatedAt,
+    const DeepCollectionEquality().hash(_assignedProjectIds),
+    const DeepCollectionEquality().hash(_projectNames),
+    shiftId,
+    reportingManagerId,
   );
 
   /// Create a copy of UserModel
@@ -394,19 +463,22 @@ class _$UserModelImpl extends _UserModel {
 
 abstract class _UserModel extends UserModel {
   const factory _UserModel({
-    required final String id,
+    required final String empId,
+    required final String orgShortName,
     required final String name,
     required final String email,
-    required final UserRole role,
-    required final String department,
-    final String? employeeId,
     final String? phone,
-    final String? profileImage,
-    final String? token,
-    final bool biometricEnabled,
-    final bool mpinSet,
-    final List<dynamic> projects,
+    required final UserRole role,
+    final String? department,
+    final String? designation,
+    final DateTime? joiningDate,
+    final UserStatus status,
     final DateTime? createdAt,
+    final DateTime? updatedAt,
+    final List<String> assignedProjectIds,
+    final List<String> projectNames,
+    final String? shiftId,
+    final String? reportingManagerId,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -414,31 +486,37 @@ abstract class _UserModel extends UserModel {
       _$UserModelImpl.fromJson;
 
   @override
-  String get id;
+  String get empId;
+  @override
+  String get orgShortName;
   @override
   String get name;
   @override
   String get email;
   @override
-  UserRole get role;
-  @override
-  String get department;
-  @override
-  String? get employeeId;
-  @override
   String? get phone;
   @override
-  String? get profileImage;
+  UserRole get role;
   @override
-  String? get token; // ← API ke liye
+  String? get department;
   @override
-  bool get biometricEnabled;
+  String? get designation;
   @override
-  bool get mpinSet;
+  DateTime? get joiningDate;
   @override
-  List<dynamic> get projects;
+  UserStatus get status;
   @override
   DateTime? get createdAt;
+  @override
+  DateTime? get updatedAt;
+  @override
+  List<String> get assignedProjectIds;
+  @override
+  List<String> get projectNames;
+  @override
+  String? get shiftId;
+  @override
+  String? get reportingManagerId;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

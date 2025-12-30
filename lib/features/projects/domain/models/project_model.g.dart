@@ -8,65 +8,66 @@ part of 'project_model.dart';
 
 _$ProjectModelImpl _$$ProjectModelImplFromJson(Map<String, dynamic> json) =>
     _$ProjectModelImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      status: json['status'] as String?,
-      site: json['site'] as String?,
-      shift: json['shift'] as String?,
+      projectId: json['projectId'] as String,
+      orgShortName: json['orgShortName'] as String,
+      projectName: json['projectName'] as String,
+      projectSite: json['projectSite'] as String?,
       clientName: json['clientName'] as String?,
+      clientLocation: json['clientLocation'] as String?,
       clientContact: json['clientContact'] as String?,
-      managerName: json['managerName'] as String?,
-      managerEmail: json['managerEmail'] as String?,
-      managerContact: json['managerContact'] as String?,
-      description: json['description'] as String?,
-      techStack: json['techStack'] as String?,
-      assignedDate: json['assignedDate'] == null
+      mngName: json['mngName'] as String?,
+      mngEmail: json['mngEmail'] as String?,
+      mngContact: json['mngContact'] as String?,
+      projectDescription: json['projectDescription'] as String?,
+      projectTechstack: json['projectTechstack'] as String?,
+      projectAssignedDate: json['projectAssignedDate'] as String?,
+      createdAt: json['createdAt'] == null
           ? null
-          : DateTime.parse(json['assignedDate'] as String),
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
     );
 
 Map<String, dynamic> _$$ProjectModelImplToJson(_$ProjectModelImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'status': instance.status,
-      'site': instance.site,
-      'shift': instance.shift,
+      'projectId': instance.projectId,
+      'orgShortName': instance.orgShortName,
+      'projectName': instance.projectName,
+      'projectSite': instance.projectSite,
       'clientName': instance.clientName,
+      'clientLocation': instance.clientLocation,
       'clientContact': instance.clientContact,
-      'managerName': instance.managerName,
-      'managerEmail': instance.managerEmail,
-      'managerContact': instance.managerContact,
-      'description': instance.description,
-      'techStack': instance.techStack,
-      'assignedDate': instance.assignedDate?.toIso8601String(),
+      'mngName': instance.mngName,
+      'mngEmail': instance.mngEmail,
+      'mngContact': instance.mngContact,
+      'projectDescription': instance.projectDescription,
+      'projectTechstack': instance.projectTechstack,
+      'projectAssignedDate': instance.projectAssignedDate,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
-_$ProjectAnalyticsImpl _$$ProjectAnalyticsImplFromJson(
-  Map<String, dynamic> json,
-) => _$ProjectAnalyticsImpl(
-  graphData: (json['graphData'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(
-      k,
-      (e as List<dynamic>).map((e) => (e as num).toDouble()).toList(),
-    ),
-  ),
-  labels: (json['labels'] as List<dynamic>).map((e) => e as String).toList(),
-  totalProjects: (json['totalProjects'] as num).toInt(),
-  totalEmployees: (json['totalEmployees'] as num).toInt(),
-  statusDistribution: (json['statusDistribution'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(k, (e as num).toDouble()),
-  ),
-  additionalStats: json['additionalStats'] as Map<String, dynamic>? ?? const {},
-);
+_$MappedProjectImpl _$$MappedProjectImplFromJson(Map<String, dynamic> json) =>
+    _$MappedProjectImpl(
+      empId: json['empId'] as String,
+      projectId: json['projectId'] as String,
+      mappingStatus: json['mappingStatus'] as String,
+      project: ProjectModel.fromJson(json['project'] as Map<String, dynamic>),
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+    );
 
-Map<String, dynamic> _$$ProjectAnalyticsImplToJson(
-  _$ProjectAnalyticsImpl instance,
-) => <String, dynamic>{
-  'graphData': instance.graphData,
-  'labels': instance.labels,
-  'totalProjects': instance.totalProjects,
-  'totalEmployees': instance.totalEmployees,
-  'statusDistribution': instance.statusDistribution,
-  'additionalStats': instance.additionalStats,
-};
+Map<String, dynamic> _$$MappedProjectImplToJson(_$MappedProjectImpl instance) =>
+    <String, dynamic>{
+      'empId': instance.empId,
+      'projectId': instance.projectId,
+      'mappingStatus': instance.mappingStatus,
+      'project': instance.project,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+    };

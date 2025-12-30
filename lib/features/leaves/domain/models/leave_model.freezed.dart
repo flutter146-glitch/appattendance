@@ -21,34 +21,17 @@ LeaveModel _$LeaveModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$LeaveModel {
-  String get leaveId => throw _privateConstructorUsedError; // PK
-  String get empId =>
-      throw _privateConstructorUsedError; // FK → employee_master
-  String? get mgrEmpId =>
-      throw _privateConstructorUsedError; // Manager who approves
+  String get leaveId => throw _privateConstructorUsedError;
+  String get empId => throw _privateConstructorUsedError;
+  String get mgrEmpId => throw _privateConstructorUsedError;
   DateTime get leaveFromDate => throw _privateConstructorUsedError;
   DateTime get leaveToDate => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  TimeOfDay get fromTime => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  TimeOfDay get toTime => throw _privateConstructorUsedError;
   LeaveType get leaveType => throw _privateConstructorUsedError;
-  String get justification => throw _privateConstructorUsedError;
-  String get approvalStatus =>
-      throw _privateConstructorUsedError; // Pending/Approved/Rejected
-  DateTime get appliedDate => throw _privateConstructorUsedError;
+  String? get leaveJustification => throw _privateConstructorUsedError;
+  LeaveStatus get leaveApprovalStatus => throw _privateConstructorUsedError;
   String? get managerComments => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
-  bool? get isHalfDayFrom => throw _privateConstructorUsedError;
-  bool? get isHalfDayTo => throw _privateConstructorUsedError;
-  String? get projectName => throw _privateConstructorUsedError;
-  List<String> get supportingDocs => throw _privateConstructorUsedError;
-  String? get contactNumber => throw _privateConstructorUsedError;
-  String? get handoverPersonName => throw _privateConstructorUsedError;
-  String? get handoverPersonEmail => throw _privateConstructorUsedError;
-  String? get handoverPersonPhone => throw _privateConstructorUsedError;
-  String? get handoverPersonPhoto => throw _privateConstructorUsedError;
-  int? get totalDays => throw _privateConstructorUsedError;
 
   /// Serializes this LeaveModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -70,29 +53,15 @@ abstract class $LeaveModelCopyWith<$Res> {
   $Res call({
     String leaveId,
     String empId,
-    String? mgrEmpId,
+    String mgrEmpId,
     DateTime leaveFromDate,
     DateTime leaveToDate,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    TimeOfDay fromTime,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    TimeOfDay toTime,
     LeaveType leaveType,
-    String justification,
-    String approvalStatus,
-    DateTime appliedDate,
+    String? leaveJustification,
+    LeaveStatus leaveApprovalStatus,
     String? managerComments,
+    DateTime? createdAt,
     DateTime? updatedAt,
-    bool? isHalfDayFrom,
-    bool? isHalfDayTo,
-    String? projectName,
-    List<String> supportingDocs,
-    String? contactNumber,
-    String? handoverPersonName,
-    String? handoverPersonEmail,
-    String? handoverPersonPhone,
-    String? handoverPersonPhoto,
-    int? totalDays,
   });
 }
 
@@ -113,27 +82,15 @@ class _$LeaveModelCopyWithImpl<$Res, $Val extends LeaveModel>
   $Res call({
     Object? leaveId = null,
     Object? empId = null,
-    Object? mgrEmpId = freezed,
+    Object? mgrEmpId = null,
     Object? leaveFromDate = null,
     Object? leaveToDate = null,
-    Object? fromTime = null,
-    Object? toTime = null,
     Object? leaveType = null,
-    Object? justification = null,
-    Object? approvalStatus = null,
-    Object? appliedDate = null,
+    Object? leaveJustification = freezed,
+    Object? leaveApprovalStatus = null,
     Object? managerComments = freezed,
+    Object? createdAt = freezed,
     Object? updatedAt = freezed,
-    Object? isHalfDayFrom = freezed,
-    Object? isHalfDayTo = freezed,
-    Object? projectName = freezed,
-    Object? supportingDocs = null,
-    Object? contactNumber = freezed,
-    Object? handoverPersonName = freezed,
-    Object? handoverPersonEmail = freezed,
-    Object? handoverPersonPhone = freezed,
-    Object? handoverPersonPhoto = freezed,
-    Object? totalDays = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -145,10 +102,10 @@ class _$LeaveModelCopyWithImpl<$Res, $Val extends LeaveModel>
                 ? _value.empId
                 : empId // ignore: cast_nullable_to_non_nullable
                       as String,
-            mgrEmpId: freezed == mgrEmpId
+            mgrEmpId: null == mgrEmpId
                 ? _value.mgrEmpId
                 : mgrEmpId // ignore: cast_nullable_to_non_nullable
-                      as String?,
+                      as String,
             leaveFromDate: null == leaveFromDate
                 ? _value.leaveFromDate
                 : leaveFromDate // ignore: cast_nullable_to_non_nullable
@@ -157,78 +114,30 @@ class _$LeaveModelCopyWithImpl<$Res, $Val extends LeaveModel>
                 ? _value.leaveToDate
                 : leaveToDate // ignore: cast_nullable_to_non_nullable
                       as DateTime,
-            fromTime: null == fromTime
-                ? _value.fromTime
-                : fromTime // ignore: cast_nullable_to_non_nullable
-                      as TimeOfDay,
-            toTime: null == toTime
-                ? _value.toTime
-                : toTime // ignore: cast_nullable_to_non_nullable
-                      as TimeOfDay,
             leaveType: null == leaveType
                 ? _value.leaveType
                 : leaveType // ignore: cast_nullable_to_non_nullable
                       as LeaveType,
-            justification: null == justification
-                ? _value.justification
-                : justification // ignore: cast_nullable_to_non_nullable
-                      as String,
-            approvalStatus: null == approvalStatus
-                ? _value.approvalStatus
-                : approvalStatus // ignore: cast_nullable_to_non_nullable
-                      as String,
-            appliedDate: null == appliedDate
-                ? _value.appliedDate
-                : appliedDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
+            leaveJustification: freezed == leaveJustification
+                ? _value.leaveJustification
+                : leaveJustification // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            leaveApprovalStatus: null == leaveApprovalStatus
+                ? _value.leaveApprovalStatus
+                : leaveApprovalStatus // ignore: cast_nullable_to_non_nullable
+                      as LeaveStatus,
             managerComments: freezed == managerComments
                 ? _value.managerComments
                 : managerComments // ignore: cast_nullable_to_non_nullable
                       as String?,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             updatedAt: freezed == updatedAt
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
-            isHalfDayFrom: freezed == isHalfDayFrom
-                ? _value.isHalfDayFrom
-                : isHalfDayFrom // ignore: cast_nullable_to_non_nullable
-                      as bool?,
-            isHalfDayTo: freezed == isHalfDayTo
-                ? _value.isHalfDayTo
-                : isHalfDayTo // ignore: cast_nullable_to_non_nullable
-                      as bool?,
-            projectName: freezed == projectName
-                ? _value.projectName
-                : projectName // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            supportingDocs: null == supportingDocs
-                ? _value.supportingDocs
-                : supportingDocs // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
-            contactNumber: freezed == contactNumber
-                ? _value.contactNumber
-                : contactNumber // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            handoverPersonName: freezed == handoverPersonName
-                ? _value.handoverPersonName
-                : handoverPersonName // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            handoverPersonEmail: freezed == handoverPersonEmail
-                ? _value.handoverPersonEmail
-                : handoverPersonEmail // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            handoverPersonPhone: freezed == handoverPersonPhone
-                ? _value.handoverPersonPhone
-                : handoverPersonPhone // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            handoverPersonPhoto: freezed == handoverPersonPhoto
-                ? _value.handoverPersonPhoto
-                : handoverPersonPhoto // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            totalDays: freezed == totalDays
-                ? _value.totalDays
-                : totalDays // ignore: cast_nullable_to_non_nullable
-                      as int?,
           )
           as $Val,
     );
@@ -247,29 +156,15 @@ abstract class _$$LeaveModelImplCopyWith<$Res>
   $Res call({
     String leaveId,
     String empId,
-    String? mgrEmpId,
+    String mgrEmpId,
     DateTime leaveFromDate,
     DateTime leaveToDate,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    TimeOfDay fromTime,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    TimeOfDay toTime,
     LeaveType leaveType,
-    String justification,
-    String approvalStatus,
-    DateTime appliedDate,
+    String? leaveJustification,
+    LeaveStatus leaveApprovalStatus,
     String? managerComments,
+    DateTime? createdAt,
     DateTime? updatedAt,
-    bool? isHalfDayFrom,
-    bool? isHalfDayTo,
-    String? projectName,
-    List<String> supportingDocs,
-    String? contactNumber,
-    String? handoverPersonName,
-    String? handoverPersonEmail,
-    String? handoverPersonPhone,
-    String? handoverPersonPhoto,
-    int? totalDays,
   });
 }
 
@@ -289,27 +184,15 @@ class __$$LeaveModelImplCopyWithImpl<$Res>
   $Res call({
     Object? leaveId = null,
     Object? empId = null,
-    Object? mgrEmpId = freezed,
+    Object? mgrEmpId = null,
     Object? leaveFromDate = null,
     Object? leaveToDate = null,
-    Object? fromTime = null,
-    Object? toTime = null,
     Object? leaveType = null,
-    Object? justification = null,
-    Object? approvalStatus = null,
-    Object? appliedDate = null,
+    Object? leaveJustification = freezed,
+    Object? leaveApprovalStatus = null,
     Object? managerComments = freezed,
+    Object? createdAt = freezed,
     Object? updatedAt = freezed,
-    Object? isHalfDayFrom = freezed,
-    Object? isHalfDayTo = freezed,
-    Object? projectName = freezed,
-    Object? supportingDocs = null,
-    Object? contactNumber = freezed,
-    Object? handoverPersonName = freezed,
-    Object? handoverPersonEmail = freezed,
-    Object? handoverPersonPhone = freezed,
-    Object? handoverPersonPhoto = freezed,
-    Object? totalDays = freezed,
   }) {
     return _then(
       _$LeaveModelImpl(
@@ -321,10 +204,10 @@ class __$$LeaveModelImplCopyWithImpl<$Res>
             ? _value.empId
             : empId // ignore: cast_nullable_to_non_nullable
                   as String,
-        mgrEmpId: freezed == mgrEmpId
+        mgrEmpId: null == mgrEmpId
             ? _value.mgrEmpId
             : mgrEmpId // ignore: cast_nullable_to_non_nullable
-                  as String?,
+                  as String,
         leaveFromDate: null == leaveFromDate
             ? _value.leaveFromDate
             : leaveFromDate // ignore: cast_nullable_to_non_nullable
@@ -333,78 +216,30 @@ class __$$LeaveModelImplCopyWithImpl<$Res>
             ? _value.leaveToDate
             : leaveToDate // ignore: cast_nullable_to_non_nullable
                   as DateTime,
-        fromTime: null == fromTime
-            ? _value.fromTime
-            : fromTime // ignore: cast_nullable_to_non_nullable
-                  as TimeOfDay,
-        toTime: null == toTime
-            ? _value.toTime
-            : toTime // ignore: cast_nullable_to_non_nullable
-                  as TimeOfDay,
         leaveType: null == leaveType
             ? _value.leaveType
             : leaveType // ignore: cast_nullable_to_non_nullable
                   as LeaveType,
-        justification: null == justification
-            ? _value.justification
-            : justification // ignore: cast_nullable_to_non_nullable
-                  as String,
-        approvalStatus: null == approvalStatus
-            ? _value.approvalStatus
-            : approvalStatus // ignore: cast_nullable_to_non_nullable
-                  as String,
-        appliedDate: null == appliedDate
-            ? _value.appliedDate
-            : appliedDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
+        leaveJustification: freezed == leaveJustification
+            ? _value.leaveJustification
+            : leaveJustification // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        leaveApprovalStatus: null == leaveApprovalStatus
+            ? _value.leaveApprovalStatus
+            : leaveApprovalStatus // ignore: cast_nullable_to_non_nullable
+                  as LeaveStatus,
         managerComments: freezed == managerComments
             ? _value.managerComments
             : managerComments // ignore: cast_nullable_to_non_nullable
                   as String?,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         updatedAt: freezed == updatedAt
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
-        isHalfDayFrom: freezed == isHalfDayFrom
-            ? _value.isHalfDayFrom
-            : isHalfDayFrom // ignore: cast_nullable_to_non_nullable
-                  as bool?,
-        isHalfDayTo: freezed == isHalfDayTo
-            ? _value.isHalfDayTo
-            : isHalfDayTo // ignore: cast_nullable_to_non_nullable
-                  as bool?,
-        projectName: freezed == projectName
-            ? _value.projectName
-            : projectName // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        supportingDocs: null == supportingDocs
-            ? _value._supportingDocs
-            : supportingDocs // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
-        contactNumber: freezed == contactNumber
-            ? _value.contactNumber
-            : contactNumber // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        handoverPersonName: freezed == handoverPersonName
-            ? _value.handoverPersonName
-            : handoverPersonName // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        handoverPersonEmail: freezed == handoverPersonEmail
-            ? _value.handoverPersonEmail
-            : handoverPersonEmail // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        handoverPersonPhone: freezed == handoverPersonPhone
-            ? _value.handoverPersonPhone
-            : handoverPersonPhone // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        handoverPersonPhoto: freezed == handoverPersonPhoto
-            ? _value.handoverPersonPhoto
-            : handoverPersonPhoto // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        totalDays: freezed == totalDays
-            ? _value.totalDays
-            : totalDays // ignore: cast_nullable_to_non_nullable
-                  as int?,
       ),
     );
   }
@@ -416,98 +251,46 @@ class _$LeaveModelImpl extends _LeaveModel {
   const _$LeaveModelImpl({
     required this.leaveId,
     required this.empId,
-    this.mgrEmpId,
+    required this.mgrEmpId,
     required this.leaveFromDate,
     required this.leaveToDate,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    required this.fromTime,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    required this.toTime,
     required this.leaveType,
-    required this.justification,
-    required this.approvalStatus,
-    required this.appliedDate,
+    this.leaveJustification,
+    required this.leaveApprovalStatus,
     this.managerComments,
+    this.createdAt,
     this.updatedAt,
-    this.isHalfDayFrom,
-    this.isHalfDayTo,
-    this.projectName,
-    final List<String> supportingDocs = const [],
-    this.contactNumber,
-    this.handoverPersonName,
-    this.handoverPersonEmail,
-    this.handoverPersonPhone,
-    this.handoverPersonPhoto,
-    this.totalDays,
-  }) : _supportingDocs = supportingDocs,
-       super._();
+  }) : super._();
 
   factory _$LeaveModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$LeaveModelImplFromJson(json);
 
   @override
   final String leaveId;
-  // PK
   @override
   final String empId;
-  // FK → employee_master
   @override
-  final String? mgrEmpId;
-  // Manager who approves
+  final String mgrEmpId;
   @override
   final DateTime leaveFromDate;
   @override
   final DateTime leaveToDate;
   @override
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  final TimeOfDay fromTime;
-  @override
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  final TimeOfDay toTime;
-  @override
   final LeaveType leaveType;
   @override
-  final String justification;
+  final String? leaveJustification;
   @override
-  final String approvalStatus;
-  // Pending/Approved/Rejected
-  @override
-  final DateTime appliedDate;
+  final LeaveStatus leaveApprovalStatus;
   @override
   final String? managerComments;
   @override
+  final DateTime? createdAt;
+  @override
   final DateTime? updatedAt;
-  @override
-  final bool? isHalfDayFrom;
-  @override
-  final bool? isHalfDayTo;
-  @override
-  final String? projectName;
-  final List<String> _supportingDocs;
-  @override
-  @JsonKey()
-  List<String> get supportingDocs {
-    if (_supportingDocs is EqualUnmodifiableListView) return _supportingDocs;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_supportingDocs);
-  }
-
-  @override
-  final String? contactNumber;
-  @override
-  final String? handoverPersonName;
-  @override
-  final String? handoverPersonEmail;
-  @override
-  final String? handoverPersonPhone;
-  @override
-  final String? handoverPersonPhoto;
-  @override
-  final int? totalDays;
 
   @override
   String toString() {
-    return 'LeaveModel(leaveId: $leaveId, empId: $empId, mgrEmpId: $mgrEmpId, leaveFromDate: $leaveFromDate, leaveToDate: $leaveToDate, fromTime: $fromTime, toTime: $toTime, leaveType: $leaveType, justification: $justification, approvalStatus: $approvalStatus, appliedDate: $appliedDate, managerComments: $managerComments, updatedAt: $updatedAt, isHalfDayFrom: $isHalfDayFrom, isHalfDayTo: $isHalfDayTo, projectName: $projectName, supportingDocs: $supportingDocs, contactNumber: $contactNumber, handoverPersonName: $handoverPersonName, handoverPersonEmail: $handoverPersonEmail, handoverPersonPhone: $handoverPersonPhone, handoverPersonPhoto: $handoverPersonPhoto, totalDays: $totalDays)';
+    return 'LeaveModel(leaveId: $leaveId, empId: $empId, mgrEmpId: $mgrEmpId, leaveFromDate: $leaveFromDate, leaveToDate: $leaveToDate, leaveType: $leaveType, leaveJustification: $leaveJustification, leaveApprovalStatus: $leaveApprovalStatus, managerComments: $managerComments, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -523,73 +306,36 @@ class _$LeaveModelImpl extends _LeaveModel {
                 other.leaveFromDate == leaveFromDate) &&
             (identical(other.leaveToDate, leaveToDate) ||
                 other.leaveToDate == leaveToDate) &&
-            (identical(other.fromTime, fromTime) ||
-                other.fromTime == fromTime) &&
-            (identical(other.toTime, toTime) || other.toTime == toTime) &&
             (identical(other.leaveType, leaveType) ||
                 other.leaveType == leaveType) &&
-            (identical(other.justification, justification) ||
-                other.justification == justification) &&
-            (identical(other.approvalStatus, approvalStatus) ||
-                other.approvalStatus == approvalStatus) &&
-            (identical(other.appliedDate, appliedDate) ||
-                other.appliedDate == appliedDate) &&
+            (identical(other.leaveJustification, leaveJustification) ||
+                other.leaveJustification == leaveJustification) &&
+            (identical(other.leaveApprovalStatus, leaveApprovalStatus) ||
+                other.leaveApprovalStatus == leaveApprovalStatus) &&
             (identical(other.managerComments, managerComments) ||
                 other.managerComments == managerComments) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
-            (identical(other.isHalfDayFrom, isHalfDayFrom) ||
-                other.isHalfDayFrom == isHalfDayFrom) &&
-            (identical(other.isHalfDayTo, isHalfDayTo) ||
-                other.isHalfDayTo == isHalfDayTo) &&
-            (identical(other.projectName, projectName) ||
-                other.projectName == projectName) &&
-            const DeepCollectionEquality().equals(
-              other._supportingDocs,
-              _supportingDocs,
-            ) &&
-            (identical(other.contactNumber, contactNumber) ||
-                other.contactNumber == contactNumber) &&
-            (identical(other.handoverPersonName, handoverPersonName) ||
-                other.handoverPersonName == handoverPersonName) &&
-            (identical(other.handoverPersonEmail, handoverPersonEmail) ||
-                other.handoverPersonEmail == handoverPersonEmail) &&
-            (identical(other.handoverPersonPhone, handoverPersonPhone) ||
-                other.handoverPersonPhone == handoverPersonPhone) &&
-            (identical(other.handoverPersonPhoto, handoverPersonPhoto) ||
-                other.handoverPersonPhoto == handoverPersonPhoto) &&
-            (identical(other.totalDays, totalDays) ||
-                other.totalDays == totalDays));
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hashAll([
+  int get hashCode => Object.hash(
     runtimeType,
     leaveId,
     empId,
     mgrEmpId,
     leaveFromDate,
     leaveToDate,
-    fromTime,
-    toTime,
     leaveType,
-    justification,
-    approvalStatus,
-    appliedDate,
+    leaveJustification,
+    leaveApprovalStatus,
     managerComments,
+    createdAt,
     updatedAt,
-    isHalfDayFrom,
-    isHalfDayTo,
-    projectName,
-    const DeepCollectionEquality().hash(_supportingDocs),
-    contactNumber,
-    handoverPersonName,
-    handoverPersonEmail,
-    handoverPersonPhone,
-    handoverPersonPhoto,
-    totalDays,
-  ]);
+  );
 
   /// Create a copy of LeaveModel
   /// with the given fields replaced by the non-null parameter values.
@@ -609,29 +355,15 @@ abstract class _LeaveModel extends LeaveModel {
   const factory _LeaveModel({
     required final String leaveId,
     required final String empId,
-    final String? mgrEmpId,
+    required final String mgrEmpId,
     required final DateTime leaveFromDate,
     required final DateTime leaveToDate,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    required final TimeOfDay fromTime,
-    @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-    required final TimeOfDay toTime,
     required final LeaveType leaveType,
-    required final String justification,
-    required final String approvalStatus,
-    required final DateTime appliedDate,
+    final String? leaveJustification,
+    required final LeaveStatus leaveApprovalStatus,
     final String? managerComments,
+    final DateTime? createdAt,
     final DateTime? updatedAt,
-    final bool? isHalfDayFrom,
-    final bool? isHalfDayTo,
-    final String? projectName,
-    final List<String> supportingDocs,
-    final String? contactNumber,
-    final String? handoverPersonName,
-    final String? handoverPersonEmail,
-    final String? handoverPersonPhone,
-    final String? handoverPersonPhoto,
-    final int? totalDays,
   }) = _$LeaveModelImpl;
   const _LeaveModel._() : super._();
 
@@ -639,312 +371,32 @@ abstract class _LeaveModel extends LeaveModel {
       _$LeaveModelImpl.fromJson;
 
   @override
-  String get leaveId; // PK
+  String get leaveId;
   @override
-  String get empId; // FK → employee_master
+  String get empId;
   @override
-  String? get mgrEmpId; // Manager who approves
+  String get mgrEmpId;
   @override
   DateTime get leaveFromDate;
   @override
   DateTime get leaveToDate;
   @override
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  TimeOfDay get fromTime;
-  @override
-  @JsonKey(fromJson: _timeOfDayFromString, toJson: _timeOfDayToString)
-  TimeOfDay get toTime;
-  @override
   LeaveType get leaveType;
   @override
-  String get justification;
+  String? get leaveJustification;
   @override
-  String get approvalStatus; // Pending/Approved/Rejected
-  @override
-  DateTime get appliedDate;
+  LeaveStatus get leaveApprovalStatus;
   @override
   String? get managerComments;
   @override
+  DateTime? get createdAt;
+  @override
   DateTime? get updatedAt;
-  @override
-  bool? get isHalfDayFrom;
-  @override
-  bool? get isHalfDayTo;
-  @override
-  String? get projectName;
-  @override
-  List<String> get supportingDocs;
-  @override
-  String? get contactNumber;
-  @override
-  String? get handoverPersonName;
-  @override
-  String? get handoverPersonEmail;
-  @override
-  String? get handoverPersonPhone;
-  @override
-  String? get handoverPersonPhoto;
-  @override
-  int? get totalDays;
 
   /// Create a copy of LeaveModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LeaveModelImplCopyWith<_$LeaveModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-LeaveBalance _$LeaveBalanceFromJson(Map<String, dynamic> json) {
-  return _LeaveBalance.fromJson(json);
-}
-
-/// @nodoc
-mixin _$LeaveBalance {
-  String get employeeId => throw _privateConstructorUsedError;
-  LeaveType get leaveType => throw _privateConstructorUsedError;
-  int get totalDays => throw _privateConstructorUsedError;
-  int get usedDays => throw _privateConstructorUsedError;
-  int get year => throw _privateConstructorUsedError;
-
-  /// Serializes this LeaveBalance to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of LeaveBalance
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $LeaveBalanceCopyWith<LeaveBalance> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LeaveBalanceCopyWith<$Res> {
-  factory $LeaveBalanceCopyWith(
-    LeaveBalance value,
-    $Res Function(LeaveBalance) then,
-  ) = _$LeaveBalanceCopyWithImpl<$Res, LeaveBalance>;
-  @useResult
-  $Res call({
-    String employeeId,
-    LeaveType leaveType,
-    int totalDays,
-    int usedDays,
-    int year,
-  });
-}
-
-/// @nodoc
-class _$LeaveBalanceCopyWithImpl<$Res, $Val extends LeaveBalance>
-    implements $LeaveBalanceCopyWith<$Res> {
-  _$LeaveBalanceCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of LeaveBalance
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? employeeId = null,
-    Object? leaveType = null,
-    Object? totalDays = null,
-    Object? usedDays = null,
-    Object? year = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            employeeId: null == employeeId
-                ? _value.employeeId
-                : employeeId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            leaveType: null == leaveType
-                ? _value.leaveType
-                : leaveType // ignore: cast_nullable_to_non_nullable
-                      as LeaveType,
-            totalDays: null == totalDays
-                ? _value.totalDays
-                : totalDays // ignore: cast_nullable_to_non_nullable
-                      as int,
-            usedDays: null == usedDays
-                ? _value.usedDays
-                : usedDays // ignore: cast_nullable_to_non_nullable
-                      as int,
-            year: null == year
-                ? _value.year
-                : year // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$LeaveBalanceImplCopyWith<$Res>
-    implements $LeaveBalanceCopyWith<$Res> {
-  factory _$$LeaveBalanceImplCopyWith(
-    _$LeaveBalanceImpl value,
-    $Res Function(_$LeaveBalanceImpl) then,
-  ) = __$$LeaveBalanceImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    String employeeId,
-    LeaveType leaveType,
-    int totalDays,
-    int usedDays,
-    int year,
-  });
-}
-
-/// @nodoc
-class __$$LeaveBalanceImplCopyWithImpl<$Res>
-    extends _$LeaveBalanceCopyWithImpl<$Res, _$LeaveBalanceImpl>
-    implements _$$LeaveBalanceImplCopyWith<$Res> {
-  __$$LeaveBalanceImplCopyWithImpl(
-    _$LeaveBalanceImpl _value,
-    $Res Function(_$LeaveBalanceImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of LeaveBalance
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? employeeId = null,
-    Object? leaveType = null,
-    Object? totalDays = null,
-    Object? usedDays = null,
-    Object? year = null,
-  }) {
-    return _then(
-      _$LeaveBalanceImpl(
-        employeeId: null == employeeId
-            ? _value.employeeId
-            : employeeId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        leaveType: null == leaveType
-            ? _value.leaveType
-            : leaveType // ignore: cast_nullable_to_non_nullable
-                  as LeaveType,
-        totalDays: null == totalDays
-            ? _value.totalDays
-            : totalDays // ignore: cast_nullable_to_non_nullable
-                  as int,
-        usedDays: null == usedDays
-            ? _value.usedDays
-            : usedDays // ignore: cast_nullable_to_non_nullable
-                  as int,
-        year: null == year
-            ? _value.year
-            : year // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$LeaveBalanceImpl implements _LeaveBalance {
-  const _$LeaveBalanceImpl({
-    required this.employeeId,
-    required this.leaveType,
-    required this.totalDays,
-    required this.usedDays,
-    required this.year,
-  });
-
-  factory _$LeaveBalanceImpl.fromJson(Map<String, dynamic> json) =>
-      _$$LeaveBalanceImplFromJson(json);
-
-  @override
-  final String employeeId;
-  @override
-  final LeaveType leaveType;
-  @override
-  final int totalDays;
-  @override
-  final int usedDays;
-  @override
-  final int year;
-
-  @override
-  String toString() {
-    return 'LeaveBalance(employeeId: $employeeId, leaveType: $leaveType, totalDays: $totalDays, usedDays: $usedDays, year: $year)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$LeaveBalanceImpl &&
-            (identical(other.employeeId, employeeId) ||
-                other.employeeId == employeeId) &&
-            (identical(other.leaveType, leaveType) ||
-                other.leaveType == leaveType) &&
-            (identical(other.totalDays, totalDays) ||
-                other.totalDays == totalDays) &&
-            (identical(other.usedDays, usedDays) ||
-                other.usedDays == usedDays) &&
-            (identical(other.year, year) || other.year == year));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    employeeId,
-    leaveType,
-    totalDays,
-    usedDays,
-    year,
-  );
-
-  /// Create a copy of LeaveBalance
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LeaveBalanceImplCopyWith<_$LeaveBalanceImpl> get copyWith =>
-      __$$LeaveBalanceImplCopyWithImpl<_$LeaveBalanceImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$LeaveBalanceImplToJson(this);
-  }
-}
-
-abstract class _LeaveBalance implements LeaveBalance {
-  const factory _LeaveBalance({
-    required final String employeeId,
-    required final LeaveType leaveType,
-    required final int totalDays,
-    required final int usedDays,
-    required final int year,
-  }) = _$LeaveBalanceImpl;
-
-  factory _LeaveBalance.fromJson(Map<String, dynamic> json) =
-      _$LeaveBalanceImpl.fromJson;
-
-  @override
-  String get employeeId;
-  @override
-  LeaveType get leaveType;
-  @override
-  int get totalDays;
-  @override
-  int get usedDays;
-  @override
-  int get year;
-
-  /// Create a copy of LeaveBalance
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LeaveBalanceImplCopyWith<_$LeaveBalanceImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -21,17 +21,24 @@ AttendanceModel _$AttendanceModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AttendanceModel {
-  String get id => throw _privateConstructorUsedError;
-  String? get userId => throw _privateConstructorUsedError;
-  DateTime get timestamp => throw _privateConstructorUsedError;
-  AttendanceType get type => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-  GeofenceModel? get geofence => throw _privateConstructorUsedError;
-  double get latitude => throw _privateConstructorUsedError;
-  double get longitude => throw _privateConstructorUsedError;
-  String? get projectName => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError;
-  AttendanceStatus? get status => throw _privateConstructorUsedError;
+  String get attId => throw _privateConstructorUsedError; // att_id (PK)
+  String get empId => throw _privateConstructorUsedError; // emp_id (FK)
+  DateTime get timestamp => throw _privateConstructorUsedError; // att_timestamp
+  double? get latitude => throw _privateConstructorUsedError; // att_latitude
+  double? get longitude => throw _privateConstructorUsedError; // att_longitude
+  String? get geofenceName =>
+      throw _privateConstructorUsedError; // att_geofence_name
+  String? get projectId =>
+      throw _privateConstructorUsedError; // project_id (FK)
+  String? get notes => throw _privateConstructorUsedError; // att_notes
+  AttendanceStatus get status =>
+      throw _privateConstructorUsedError; // att_status
+  VerificationType? get verificationType =>
+      throw _privateConstructorUsedError; // verification_type
+  bool get isVerified =>
+      throw _privateConstructorUsedError; // is_verified (0/1 → bool)
+  DateTime? get createdAt => throw _privateConstructorUsedError; // created_at
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this AttendanceModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,20 +58,20 @@ abstract class $AttendanceModelCopyWith<$Res> {
   ) = _$AttendanceModelCopyWithImpl<$Res, AttendanceModel>;
   @useResult
   $Res call({
-    String id,
-    String? userId,
+    String attId,
+    String empId,
     DateTime timestamp,
-    AttendanceType type,
-    @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-    GeofenceModel? geofence,
-    double latitude,
-    double longitude,
-    String? projectName,
+    double? latitude,
+    double? longitude,
+    String? geofenceName,
+    String? projectId,
     String? notes,
-    AttendanceStatus? status,
+    AttendanceStatus status,
+    VerificationType? verificationType,
+    bool isVerified,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
-
-  $GeofenceModelCopyWith<$Res>? get geofence;
 }
 
 /// @nodoc
@@ -82,76 +89,77 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? userId = freezed,
+    Object? attId = null,
+    Object? empId = null,
     Object? timestamp = null,
-    Object? type = null,
-    Object? geofence = freezed,
-    Object? latitude = null,
-    Object? longitude = null,
-    Object? projectName = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? geofenceName = freezed,
+    Object? projectId = freezed,
     Object? notes = freezed,
-    Object? status = freezed,
+    Object? status = null,
+    Object? verificationType = freezed,
+    Object? isVerified = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
+            attId: null == attId
+                ? _value.attId
+                : attId // ignore: cast_nullable_to_non_nullable
                       as String,
-            userId: freezed == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as String?,
+            empId: null == empId
+                ? _value.empId
+                : empId // ignore: cast_nullable_to_non_nullable
+                      as String,
             timestamp: null == timestamp
                 ? _value.timestamp
                 : timestamp // ignore: cast_nullable_to_non_nullable
                       as DateTime,
-            type: null == type
-                ? _value.type
-                : type // ignore: cast_nullable_to_non_nullable
-                      as AttendanceType,
-            geofence: freezed == geofence
-                ? _value.geofence
-                : geofence // ignore: cast_nullable_to_non_nullable
-                      as GeofenceModel?,
-            latitude: null == latitude
+            latitude: freezed == latitude
                 ? _value.latitude
                 : latitude // ignore: cast_nullable_to_non_nullable
-                      as double,
-            longitude: null == longitude
+                      as double?,
+            longitude: freezed == longitude
                 ? _value.longitude
                 : longitude // ignore: cast_nullable_to_non_nullable
-                      as double,
-            projectName: freezed == projectName
-                ? _value.projectName
-                : projectName // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            geofenceName: freezed == geofenceName
+                ? _value.geofenceName
+                : geofenceName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            projectId: freezed == projectId
+                ? _value.projectId
+                : projectId // ignore: cast_nullable_to_non_nullable
                       as String?,
             notes: freezed == notes
                 ? _value.notes
                 : notes // ignore: cast_nullable_to_non_nullable
                       as String?,
-            status: freezed == status
+            status: null == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
-                      as AttendanceStatus?,
+                      as AttendanceStatus,
+            verificationType: freezed == verificationType
+                ? _value.verificationType
+                : verificationType // ignore: cast_nullable_to_non_nullable
+                      as VerificationType?,
+            isVerified: null == isVerified
+                ? _value.isVerified
+                : isVerified // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
-  }
-
-  /// Create a copy of AttendanceModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $GeofenceModelCopyWith<$Res>? get geofence {
-    if (_value.geofence == null) {
-      return null;
-    }
-
-    return $GeofenceModelCopyWith<$Res>(_value.geofence!, (value) {
-      return _then(_value.copyWith(geofence: value) as $Val);
-    });
   }
 }
 
@@ -165,21 +173,20 @@ abstract class _$$AttendanceModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
-    String? userId,
+    String attId,
+    String empId,
     DateTime timestamp,
-    AttendanceType type,
-    @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-    GeofenceModel? geofence,
-    double latitude,
-    double longitude,
-    String? projectName,
+    double? latitude,
+    double? longitude,
+    String? geofenceName,
+    String? projectId,
     String? notes,
-    AttendanceStatus? status,
+    AttendanceStatus status,
+    VerificationType? verificationType,
+    bool isVerified,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
-
-  @override
-  $GeofenceModelCopyWith<$Res>? get geofence;
 }
 
 /// @nodoc
@@ -196,59 +203,74 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? userId = freezed,
+    Object? attId = null,
+    Object? empId = null,
     Object? timestamp = null,
-    Object? type = null,
-    Object? geofence = freezed,
-    Object? latitude = null,
-    Object? longitude = null,
-    Object? projectName = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? geofenceName = freezed,
+    Object? projectId = freezed,
     Object? notes = freezed,
-    Object? status = freezed,
+    Object? status = null,
+    Object? verificationType = freezed,
+    Object? isVerified = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _$AttendanceModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
+        attId: null == attId
+            ? _value.attId
+            : attId // ignore: cast_nullable_to_non_nullable
                   as String,
-        userId: freezed == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as String?,
+        empId: null == empId
+            ? _value.empId
+            : empId // ignore: cast_nullable_to_non_nullable
+                  as String,
         timestamp: null == timestamp
             ? _value.timestamp
             : timestamp // ignore: cast_nullable_to_non_nullable
                   as DateTime,
-        type: null == type
-            ? _value.type
-            : type // ignore: cast_nullable_to_non_nullable
-                  as AttendanceType,
-        geofence: freezed == geofence
-            ? _value.geofence
-            : geofence // ignore: cast_nullable_to_non_nullable
-                  as GeofenceModel?,
-        latitude: null == latitude
+        latitude: freezed == latitude
             ? _value.latitude
             : latitude // ignore: cast_nullable_to_non_nullable
-                  as double,
-        longitude: null == longitude
+                  as double?,
+        longitude: freezed == longitude
             ? _value.longitude
             : longitude // ignore: cast_nullable_to_non_nullable
-                  as double,
-        projectName: freezed == projectName
-            ? _value.projectName
-            : projectName // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        geofenceName: freezed == geofenceName
+            ? _value.geofenceName
+            : geofenceName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        projectId: freezed == projectId
+            ? _value.projectId
+            : projectId // ignore: cast_nullable_to_non_nullable
                   as String?,
         notes: freezed == notes
             ? _value.notes
             : notes // ignore: cast_nullable_to_non_nullable
                   as String?,
-        status: freezed == status
+        status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as AttendanceStatus?,
+                  as AttendanceStatus,
+        verificationType: freezed == verificationType
+            ? _value.verificationType
+            : verificationType // ignore: cast_nullable_to_non_nullable
+                  as VerificationType?,
+        isVerified: null == isVerified
+            ? _value.isVerified
+            : isVerified // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -258,47 +280,67 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AttendanceModelImpl extends _AttendanceModel {
   const _$AttendanceModelImpl({
-    required this.id,
-    this.userId,
+    required this.attId,
+    required this.empId,
     required this.timestamp,
-    required this.type,
-    @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-    this.geofence,
-    required this.latitude,
-    required this.longitude,
-    this.projectName,
+    this.latitude,
+    this.longitude,
+    this.geofenceName,
+    this.projectId,
     this.notes,
-    this.status,
+    required this.status,
+    this.verificationType,
+    this.isVerified = false,
+    this.createdAt,
+    this.updatedAt,
   }) : super._();
 
   factory _$AttendanceModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AttendanceModelImplFromJson(json);
 
   @override
-  final String id;
+  final String attId;
+  // att_id (PK)
   @override
-  final String? userId;
+  final String empId;
+  // emp_id (FK)
   @override
   final DateTime timestamp;
+  // att_timestamp
   @override
-  final AttendanceType type;
+  final double? latitude;
+  // att_latitude
   @override
-  @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-  final GeofenceModel? geofence;
+  final double? longitude;
+  // att_longitude
   @override
-  final double latitude;
+  final String? geofenceName;
+  // att_geofence_name
   @override
-  final double longitude;
-  @override
-  final String? projectName;
+  final String? projectId;
+  // project_id (FK)
   @override
   final String? notes;
+  // att_notes
   @override
-  final AttendanceStatus? status;
+  final AttendanceStatus status;
+  // att_status
+  @override
+  final VerificationType? verificationType;
+  // verification_type
+  @override
+  @JsonKey()
+  final bool isVerified;
+  // is_verified (0/1 → bool)
+  @override
+  final DateTime? createdAt;
+  // created_at
+  @override
+  final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'AttendanceModel(id: $id, userId: $userId, timestamp: $timestamp, type: $type, geofence: $geofence, latitude: $latitude, longitude: $longitude, projectName: $projectName, notes: $notes, status: $status)';
+    return 'AttendanceModel(attId: $attId, empId: $empId, timestamp: $timestamp, latitude: $latitude, longitude: $longitude, geofenceName: $geofenceName, projectId: $projectId, notes: $notes, status: $status, verificationType: $verificationType, isVerified: $isVerified, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -306,37 +348,47 @@ class _$AttendanceModelImpl extends _AttendanceModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AttendanceModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.attId, attId) || other.attId == attId) &&
+            (identical(other.empId, empId) || other.empId == empId) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            (identical(other.type, type) || other.type == type) &&
-            (identical(other.geofence, geofence) ||
-                other.geofence == geofence) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.projectName, projectName) ||
-                other.projectName == projectName) &&
+            (identical(other.geofenceName, geofenceName) ||
+                other.geofenceName == geofenceName) &&
+            (identical(other.projectId, projectId) ||
+                other.projectId == projectId) &&
             (identical(other.notes, notes) || other.notes == notes) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.verificationType, verificationType) ||
+                other.verificationType == verificationType) &&
+            (identical(other.isVerified, isVerified) ||
+                other.isVerified == isVerified) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    id,
-    userId,
+    attId,
+    empId,
     timestamp,
-    type,
-    geofence,
     latitude,
     longitude,
-    projectName,
+    geofenceName,
+    projectId,
     notes,
     status,
+    verificationType,
+    isVerified,
+    createdAt,
+    updatedAt,
   );
 
   /// Create a copy of AttendanceModel
@@ -358,17 +410,19 @@ class _$AttendanceModelImpl extends _AttendanceModel {
 
 abstract class _AttendanceModel extends AttendanceModel {
   const factory _AttendanceModel({
-    required final String id,
-    final String? userId,
+    required final String attId,
+    required final String empId,
     required final DateTime timestamp,
-    required final AttendanceType type,
-    @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-    final GeofenceModel? geofence,
-    required final double latitude,
-    required final double longitude,
-    final String? projectName,
+    final double? latitude,
+    final double? longitude,
+    final String? geofenceName,
+    final String? projectId,
     final String? notes,
-    final AttendanceStatus? status,
+    required final AttendanceStatus status,
+    final VerificationType? verificationType,
+    final bool isVerified,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
   }) = _$AttendanceModelImpl;
   const _AttendanceModel._() : super._();
 
@@ -376,307 +430,36 @@ abstract class _AttendanceModel extends AttendanceModel {
       _$AttendanceModelImpl.fromJson;
 
   @override
-  String get id;
+  String get attId; // att_id (PK)
   @override
-  String? get userId;
+  String get empId; // emp_id (FK)
   @override
-  DateTime get timestamp;
+  DateTime get timestamp; // att_timestamp
   @override
-  AttendanceType get type;
+  double? get latitude; // att_latitude
   @override
-  @JsonKey(fromJson: _geofenceFromJson, toJson: _geofenceToJson)
-  GeofenceModel? get geofence;
+  double? get longitude; // att_longitude
   @override
-  double get latitude;
+  String? get geofenceName; // att_geofence_name
   @override
-  double get longitude;
+  String? get projectId; // project_id (FK)
   @override
-  String? get projectName;
+  String? get notes; // att_notes
   @override
-  String? get notes;
+  AttendanceStatus get status; // att_status
   @override
-  AttendanceStatus? get status;
+  VerificationType? get verificationType; // verification_type
+  @override
+  bool get isVerified; // is_verified (0/1 → bool)
+  @override
+  DateTime? get createdAt; // created_at
+  @override
+  DateTime? get updatedAt;
 
   /// Create a copy of AttendanceModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AttendanceModelImplCopyWith<_$AttendanceModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-AttendanceStats _$AttendanceStatsFromJson(Map<String, dynamic> json) {
-  return _AttendanceStats.fromJson(json);
-}
-
-/// @nodoc
-mixin _$AttendanceStats {
-  int get present => throw _privateConstructorUsedError;
-  int get absent => throw _privateConstructorUsedError;
-  int get late => throw _privateConstructorUsedError;
-  int get leave => throw _privateConstructorUsedError;
-  int get totalDays => throw _privateConstructorUsedError;
-  int get attendancePercentage => throw _privateConstructorUsedError;
-
-  /// Serializes this AttendanceStats to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AttendanceStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $AttendanceStatsCopyWith<AttendanceStats> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $AttendanceStatsCopyWith<$Res> {
-  factory $AttendanceStatsCopyWith(
-    AttendanceStats value,
-    $Res Function(AttendanceStats) then,
-  ) = _$AttendanceStatsCopyWithImpl<$Res, AttendanceStats>;
-  @useResult
-  $Res call({
-    int present,
-    int absent,
-    int late,
-    int leave,
-    int totalDays,
-    int attendancePercentage,
-  });
-}
-
-/// @nodoc
-class _$AttendanceStatsCopyWithImpl<$Res, $Val extends AttendanceStats>
-    implements $AttendanceStatsCopyWith<$Res> {
-  _$AttendanceStatsCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of AttendanceStats
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? present = null,
-    Object? absent = null,
-    Object? late = null,
-    Object? leave = null,
-    Object? totalDays = null,
-    Object? attendancePercentage = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            present: null == present
-                ? _value.present
-                : present // ignore: cast_nullable_to_non_nullable
-                      as int,
-            absent: null == absent
-                ? _value.absent
-                : absent // ignore: cast_nullable_to_non_nullable
-                      as int,
-            late: null == late
-                ? _value.late
-                : late // ignore: cast_nullable_to_non_nullable
-                      as int,
-            leave: null == leave
-                ? _value.leave
-                : leave // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalDays: null == totalDays
-                ? _value.totalDays
-                : totalDays // ignore: cast_nullable_to_non_nullable
-                      as int,
-            attendancePercentage: null == attendancePercentage
-                ? _value.attendancePercentage
-                : attendancePercentage // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$AttendanceStatsImplCopyWith<$Res>
-    implements $AttendanceStatsCopyWith<$Res> {
-  factory _$$AttendanceStatsImplCopyWith(
-    _$AttendanceStatsImpl value,
-    $Res Function(_$AttendanceStatsImpl) then,
-  ) = __$$AttendanceStatsImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    int present,
-    int absent,
-    int late,
-    int leave,
-    int totalDays,
-    int attendancePercentage,
-  });
-}
-
-/// @nodoc
-class __$$AttendanceStatsImplCopyWithImpl<$Res>
-    extends _$AttendanceStatsCopyWithImpl<$Res, _$AttendanceStatsImpl>
-    implements _$$AttendanceStatsImplCopyWith<$Res> {
-  __$$AttendanceStatsImplCopyWithImpl(
-    _$AttendanceStatsImpl _value,
-    $Res Function(_$AttendanceStatsImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AttendanceStats
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? present = null,
-    Object? absent = null,
-    Object? late = null,
-    Object? leave = null,
-    Object? totalDays = null,
-    Object? attendancePercentage = null,
-  }) {
-    return _then(
-      _$AttendanceStatsImpl(
-        present: null == present
-            ? _value.present
-            : present // ignore: cast_nullable_to_non_nullable
-                  as int,
-        absent: null == absent
-            ? _value.absent
-            : absent // ignore: cast_nullable_to_non_nullable
-                  as int,
-        late: null == late
-            ? _value.late
-            : late // ignore: cast_nullable_to_non_nullable
-                  as int,
-        leave: null == leave
-            ? _value.leave
-            : leave // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalDays: null == totalDays
-            ? _value.totalDays
-            : totalDays // ignore: cast_nullable_to_non_nullable
-                  as int,
-        attendancePercentage: null == attendancePercentage
-            ? _value.attendancePercentage
-            : attendancePercentage // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$AttendanceStatsImpl implements _AttendanceStats {
-  const _$AttendanceStatsImpl({
-    required this.present,
-    required this.absent,
-    required this.late,
-    required this.leave,
-    required this.totalDays,
-    required this.attendancePercentage,
-  });
-
-  factory _$AttendanceStatsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AttendanceStatsImplFromJson(json);
-
-  @override
-  final int present;
-  @override
-  final int absent;
-  @override
-  final int late;
-  @override
-  final int leave;
-  @override
-  final int totalDays;
-  @override
-  final int attendancePercentage;
-
-  @override
-  String toString() {
-    return 'AttendanceStats(present: $present, absent: $absent, late: $late, leave: $leave, totalDays: $totalDays, attendancePercentage: $attendancePercentage)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$AttendanceStatsImpl &&
-            (identical(other.present, present) || other.present == present) &&
-            (identical(other.absent, absent) || other.absent == absent) &&
-            (identical(other.late, late) || other.late == late) &&
-            (identical(other.leave, leave) || other.leave == leave) &&
-            (identical(other.totalDays, totalDays) ||
-                other.totalDays == totalDays) &&
-            (identical(other.attendancePercentage, attendancePercentage) ||
-                other.attendancePercentage == attendancePercentage));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    present,
-    absent,
-    late,
-    leave,
-    totalDays,
-    attendancePercentage,
-  );
-
-  /// Create a copy of AttendanceStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$AttendanceStatsImplCopyWith<_$AttendanceStatsImpl> get copyWith =>
-      __$$AttendanceStatsImplCopyWithImpl<_$AttendanceStatsImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AttendanceStatsImplToJson(this);
-  }
-}
-
-abstract class _AttendanceStats implements AttendanceStats {
-  const factory _AttendanceStats({
-    required final int present,
-    required final int absent,
-    required final int late,
-    required final int leave,
-    required final int totalDays,
-    required final int attendancePercentage,
-  }) = _$AttendanceStatsImpl;
-
-  factory _AttendanceStats.fromJson(Map<String, dynamic> json) =
-      _$AttendanceStatsImpl.fromJson;
-
-  @override
-  int get present;
-  @override
-  int get absent;
-  @override
-  int get late;
-  @override
-  int get leave;
-  @override
-  int get totalDays;
-  @override
-  int get attendancePercentage;
-
-  /// Create a copy of AttendanceStats
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AttendanceStatsImplCopyWith<_$AttendanceStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

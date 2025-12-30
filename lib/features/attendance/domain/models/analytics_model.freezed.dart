@@ -15,101 +15,151 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-AnalyticsData _$AnalyticsDataFromJson(Map<String, dynamic> json) {
-  return _AnalyticsData.fromJson(json);
+AnalyticsModel _$AnalyticsModelFromJson(Map<String, dynamic> json) {
+  return _AnalyticsModel.fromJson(json);
 }
 
 /// @nodoc
-mixin _$AnalyticsData {
-  int get present => throw _privateConstructorUsedError;
-  int get absent => throw _privateConstructorUsedError;
-  int get late => throw _privateConstructorUsedError;
-  int get halfDay => throw _privateConstructorUsedError;
-  double get avgHours => throw _privateConstructorUsedError;
-  DateTime? get start => throw _privateConstructorUsedError;
-  DateTime? get end => throw _privateConstructorUsedError;
+mixin _$AnalyticsModel {
+  AnalyticsPeriod get period => throw _privateConstructorUsedError;
+  DateTime get startDate => throw _privateConstructorUsedError;
+  DateTime get endDate => throw _privateConstructorUsedError;
+  int get totalDays => throw _privateConstructorUsedError;
+  int get presentDays => throw _privateConstructorUsedError;
+  int get absentDays => throw _privateConstructorUsedError;
+  int get leaveDays => throw _privateConstructorUsedError;
+  int get lateDays => throw _privateConstructorUsedError;
+  int get onTimeDays => throw _privateConstructorUsedError;
+  double get dailyAvgHours => throw _privateConstructorUsedError;
+  double get monthlyAvgHours => throw _privateConstructorUsedError;
+  int get pendingRegularisations =>
+      throw _privateConstructorUsedError; // Manager only
+  int get pendingLeaves => throw _privateConstructorUsedError; // Manager only
+  String? get periodTitle => throw _privateConstructorUsedError;
 
-  /// Serializes this AnalyticsData to a JSON map.
+  /// Serializes this AnalyticsModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of AnalyticsData
+  /// Create a copy of AnalyticsModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $AnalyticsDataCopyWith<AnalyticsData> get copyWith =>
+  $AnalyticsModelCopyWith<AnalyticsModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $AnalyticsDataCopyWith<$Res> {
-  factory $AnalyticsDataCopyWith(
-    AnalyticsData value,
-    $Res Function(AnalyticsData) then,
-  ) = _$AnalyticsDataCopyWithImpl<$Res, AnalyticsData>;
+abstract class $AnalyticsModelCopyWith<$Res> {
+  factory $AnalyticsModelCopyWith(
+    AnalyticsModel value,
+    $Res Function(AnalyticsModel) then,
+  ) = _$AnalyticsModelCopyWithImpl<$Res, AnalyticsModel>;
   @useResult
   $Res call({
-    int present,
-    int absent,
-    int late,
-    int halfDay,
-    double avgHours,
-    DateTime? start,
-    DateTime? end,
+    AnalyticsPeriod period,
+    DateTime startDate,
+    DateTime endDate,
+    int totalDays,
+    int presentDays,
+    int absentDays,
+    int leaveDays,
+    int lateDays,
+    int onTimeDays,
+    double dailyAvgHours,
+    double monthlyAvgHours,
+    int pendingRegularisations,
+    int pendingLeaves,
+    String? periodTitle,
   });
 }
 
 /// @nodoc
-class _$AnalyticsDataCopyWithImpl<$Res, $Val extends AnalyticsData>
-    implements $AnalyticsDataCopyWith<$Res> {
-  _$AnalyticsDataCopyWithImpl(this._value, this._then);
+class _$AnalyticsModelCopyWithImpl<$Res, $Val extends AnalyticsModel>
+    implements $AnalyticsModelCopyWith<$Res> {
+  _$AnalyticsModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnalyticsData
+  /// Create a copy of AnalyticsModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? present = null,
-    Object? absent = null,
-    Object? late = null,
-    Object? halfDay = null,
-    Object? avgHours = null,
-    Object? start = freezed,
-    Object? end = freezed,
+    Object? period = null,
+    Object? startDate = null,
+    Object? endDate = null,
+    Object? totalDays = null,
+    Object? presentDays = null,
+    Object? absentDays = null,
+    Object? leaveDays = null,
+    Object? lateDays = null,
+    Object? onTimeDays = null,
+    Object? dailyAvgHours = null,
+    Object? monthlyAvgHours = null,
+    Object? pendingRegularisations = null,
+    Object? pendingLeaves = null,
+    Object? periodTitle = freezed,
   }) {
     return _then(
       _value.copyWith(
-            present: null == present
-                ? _value.present
-                : present // ignore: cast_nullable_to_non_nullable
+            period: null == period
+                ? _value.period
+                : period // ignore: cast_nullable_to_non_nullable
+                      as AnalyticsPeriod,
+            startDate: null == startDate
+                ? _value.startDate
+                : startDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            endDate: null == endDate
+                ? _value.endDate
+                : endDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            totalDays: null == totalDays
+                ? _value.totalDays
+                : totalDays // ignore: cast_nullable_to_non_nullable
                       as int,
-            absent: null == absent
-                ? _value.absent
-                : absent // ignore: cast_nullable_to_non_nullable
+            presentDays: null == presentDays
+                ? _value.presentDays
+                : presentDays // ignore: cast_nullable_to_non_nullable
                       as int,
-            late: null == late
-                ? _value.late
-                : late // ignore: cast_nullable_to_non_nullable
+            absentDays: null == absentDays
+                ? _value.absentDays
+                : absentDays // ignore: cast_nullable_to_non_nullable
                       as int,
-            halfDay: null == halfDay
-                ? _value.halfDay
-                : halfDay // ignore: cast_nullable_to_non_nullable
+            leaveDays: null == leaveDays
+                ? _value.leaveDays
+                : leaveDays // ignore: cast_nullable_to_non_nullable
                       as int,
-            avgHours: null == avgHours
-                ? _value.avgHours
-                : avgHours // ignore: cast_nullable_to_non_nullable
+            lateDays: null == lateDays
+                ? _value.lateDays
+                : lateDays // ignore: cast_nullable_to_non_nullable
+                      as int,
+            onTimeDays: null == onTimeDays
+                ? _value.onTimeDays
+                : onTimeDays // ignore: cast_nullable_to_non_nullable
+                      as int,
+            dailyAvgHours: null == dailyAvgHours
+                ? _value.dailyAvgHours
+                : dailyAvgHours // ignore: cast_nullable_to_non_nullable
                       as double,
-            start: freezed == start
-                ? _value.start
-                : start // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            end: freezed == end
-                ? _value.end
-                : end // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
+            monthlyAvgHours: null == monthlyAvgHours
+                ? _value.monthlyAvgHours
+                : monthlyAvgHours // ignore: cast_nullable_to_non_nullable
+                      as double,
+            pendingRegularisations: null == pendingRegularisations
+                ? _value.pendingRegularisations
+                : pendingRegularisations // ignore: cast_nullable_to_non_nullable
+                      as int,
+            pendingLeaves: null == pendingLeaves
+                ? _value.pendingLeaves
+                : pendingLeaves // ignore: cast_nullable_to_non_nullable
+                      as int,
+            periodTitle: freezed == periodTitle
+                ? _value.periodTitle
+                : periodTitle // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -117,77 +167,119 @@ class _$AnalyticsDataCopyWithImpl<$Res, $Val extends AnalyticsData>
 }
 
 /// @nodoc
-abstract class _$$AnalyticsDataImplCopyWith<$Res>
-    implements $AnalyticsDataCopyWith<$Res> {
-  factory _$$AnalyticsDataImplCopyWith(
-    _$AnalyticsDataImpl value,
-    $Res Function(_$AnalyticsDataImpl) then,
-  ) = __$$AnalyticsDataImplCopyWithImpl<$Res>;
+abstract class _$$AnalyticsModelImplCopyWith<$Res>
+    implements $AnalyticsModelCopyWith<$Res> {
+  factory _$$AnalyticsModelImplCopyWith(
+    _$AnalyticsModelImpl value,
+    $Res Function(_$AnalyticsModelImpl) then,
+  ) = __$$AnalyticsModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
-    int present,
-    int absent,
-    int late,
-    int halfDay,
-    double avgHours,
-    DateTime? start,
-    DateTime? end,
+    AnalyticsPeriod period,
+    DateTime startDate,
+    DateTime endDate,
+    int totalDays,
+    int presentDays,
+    int absentDays,
+    int leaveDays,
+    int lateDays,
+    int onTimeDays,
+    double dailyAvgHours,
+    double monthlyAvgHours,
+    int pendingRegularisations,
+    int pendingLeaves,
+    String? periodTitle,
   });
 }
 
 /// @nodoc
-class __$$AnalyticsDataImplCopyWithImpl<$Res>
-    extends _$AnalyticsDataCopyWithImpl<$Res, _$AnalyticsDataImpl>
-    implements _$$AnalyticsDataImplCopyWith<$Res> {
-  __$$AnalyticsDataImplCopyWithImpl(
-    _$AnalyticsDataImpl _value,
-    $Res Function(_$AnalyticsDataImpl) _then,
+class __$$AnalyticsModelImplCopyWithImpl<$Res>
+    extends _$AnalyticsModelCopyWithImpl<$Res, _$AnalyticsModelImpl>
+    implements _$$AnalyticsModelImplCopyWith<$Res> {
+  __$$AnalyticsModelImplCopyWithImpl(
+    _$AnalyticsModelImpl _value,
+    $Res Function(_$AnalyticsModelImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of AnalyticsData
+  /// Create a copy of AnalyticsModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? present = null,
-    Object? absent = null,
-    Object? late = null,
-    Object? halfDay = null,
-    Object? avgHours = null,
-    Object? start = freezed,
-    Object? end = freezed,
+    Object? period = null,
+    Object? startDate = null,
+    Object? endDate = null,
+    Object? totalDays = null,
+    Object? presentDays = null,
+    Object? absentDays = null,
+    Object? leaveDays = null,
+    Object? lateDays = null,
+    Object? onTimeDays = null,
+    Object? dailyAvgHours = null,
+    Object? monthlyAvgHours = null,
+    Object? pendingRegularisations = null,
+    Object? pendingLeaves = null,
+    Object? periodTitle = freezed,
   }) {
     return _then(
-      _$AnalyticsDataImpl(
-        present: null == present
-            ? _value.present
-            : present // ignore: cast_nullable_to_non_nullable
+      _$AnalyticsModelImpl(
+        period: null == period
+            ? _value.period
+            : period // ignore: cast_nullable_to_non_nullable
+                  as AnalyticsPeriod,
+        startDate: null == startDate
+            ? _value.startDate
+            : startDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        endDate: null == endDate
+            ? _value.endDate
+            : endDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        totalDays: null == totalDays
+            ? _value.totalDays
+            : totalDays // ignore: cast_nullable_to_non_nullable
                   as int,
-        absent: null == absent
-            ? _value.absent
-            : absent // ignore: cast_nullable_to_non_nullable
+        presentDays: null == presentDays
+            ? _value.presentDays
+            : presentDays // ignore: cast_nullable_to_non_nullable
                   as int,
-        late: null == late
-            ? _value.late
-            : late // ignore: cast_nullable_to_non_nullable
+        absentDays: null == absentDays
+            ? _value.absentDays
+            : absentDays // ignore: cast_nullable_to_non_nullable
                   as int,
-        halfDay: null == halfDay
-            ? _value.halfDay
-            : halfDay // ignore: cast_nullable_to_non_nullable
+        leaveDays: null == leaveDays
+            ? _value.leaveDays
+            : leaveDays // ignore: cast_nullable_to_non_nullable
                   as int,
-        avgHours: null == avgHours
-            ? _value.avgHours
-            : avgHours // ignore: cast_nullable_to_non_nullable
+        lateDays: null == lateDays
+            ? _value.lateDays
+            : lateDays // ignore: cast_nullable_to_non_nullable
+                  as int,
+        onTimeDays: null == onTimeDays
+            ? _value.onTimeDays
+            : onTimeDays // ignore: cast_nullable_to_non_nullable
+                  as int,
+        dailyAvgHours: null == dailyAvgHours
+            ? _value.dailyAvgHours
+            : dailyAvgHours // ignore: cast_nullable_to_non_nullable
                   as double,
-        start: freezed == start
-            ? _value.start
-            : start // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        end: freezed == end
-            ? _value.end
-            : end // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+        monthlyAvgHours: null == monthlyAvgHours
+            ? _value.monthlyAvgHours
+            : monthlyAvgHours // ignore: cast_nullable_to_non_nullable
+                  as double,
+        pendingRegularisations: null == pendingRegularisations
+            ? _value.pendingRegularisations
+            : pendingRegularisations // ignore: cast_nullable_to_non_nullable
+                  as int,
+        pendingLeaves: null == pendingLeaves
+            ? _value.pendingLeaves
+            : pendingLeaves // ignore: cast_nullable_to_non_nullable
+                  as int,
+        periodTitle: freezed == periodTitle
+            ? _value.periodTitle
+            : periodTitle // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -195,115 +287,190 @@ class __$$AnalyticsDataImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$AnalyticsDataImpl implements _AnalyticsData {
-  const _$AnalyticsDataImpl({
-    required this.present,
-    required this.absent,
-    required this.late,
-    required this.halfDay,
-    required this.avgHours,
-    this.start,
-    this.end,
-  });
+class _$AnalyticsModelImpl extends _AnalyticsModel {
+  const _$AnalyticsModelImpl({
+    required this.period,
+    required this.startDate,
+    required this.endDate,
+    required this.totalDays,
+    required this.presentDays,
+    required this.absentDays,
+    required this.leaveDays,
+    required this.lateDays,
+    required this.onTimeDays,
+    required this.dailyAvgHours,
+    required this.monthlyAvgHours,
+    this.pendingRegularisations = 0,
+    this.pendingLeaves = 0,
+    this.periodTitle,
+  }) : super._();
 
-  factory _$AnalyticsDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AnalyticsDataImplFromJson(json);
+  factory _$AnalyticsModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AnalyticsModelImplFromJson(json);
 
   @override
-  final int present;
+  final AnalyticsPeriod period;
   @override
-  final int absent;
+  final DateTime startDate;
   @override
-  final int late;
+  final DateTime endDate;
   @override
-  final int halfDay;
+  final int totalDays;
   @override
-  final double avgHours;
+  final int presentDays;
   @override
-  final DateTime? start;
+  final int absentDays;
   @override
-  final DateTime? end;
+  final int leaveDays;
+  @override
+  final int lateDays;
+  @override
+  final int onTimeDays;
+  @override
+  final double dailyAvgHours;
+  @override
+  final double monthlyAvgHours;
+  @override
+  @JsonKey()
+  final int pendingRegularisations;
+  // Manager only
+  @override
+  @JsonKey()
+  final int pendingLeaves;
+  // Manager only
+  @override
+  final String? periodTitle;
 
   @override
   String toString() {
-    return 'AnalyticsData(present: $present, absent: $absent, late: $late, halfDay: $halfDay, avgHours: $avgHours, start: $start, end: $end)';
+    return 'AnalyticsModel(period: $period, startDate: $startDate, endDate: $endDate, totalDays: $totalDays, presentDays: $presentDays, absentDays: $absentDays, leaveDays: $leaveDays, lateDays: $lateDays, onTimeDays: $onTimeDays, dailyAvgHours: $dailyAvgHours, monthlyAvgHours: $monthlyAvgHours, pendingRegularisations: $pendingRegularisations, pendingLeaves: $pendingLeaves, periodTitle: $periodTitle)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AnalyticsDataImpl &&
-            (identical(other.present, present) || other.present == present) &&
-            (identical(other.absent, absent) || other.absent == absent) &&
-            (identical(other.late, late) || other.late == late) &&
-            (identical(other.halfDay, halfDay) || other.halfDay == halfDay) &&
-            (identical(other.avgHours, avgHours) ||
-                other.avgHours == avgHours) &&
-            (identical(other.start, start) || other.start == start) &&
-            (identical(other.end, end) || other.end == end));
+            other is _$AnalyticsModelImpl &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.totalDays, totalDays) ||
+                other.totalDays == totalDays) &&
+            (identical(other.presentDays, presentDays) ||
+                other.presentDays == presentDays) &&
+            (identical(other.absentDays, absentDays) ||
+                other.absentDays == absentDays) &&
+            (identical(other.leaveDays, leaveDays) ||
+                other.leaveDays == leaveDays) &&
+            (identical(other.lateDays, lateDays) ||
+                other.lateDays == lateDays) &&
+            (identical(other.onTimeDays, onTimeDays) ||
+                other.onTimeDays == onTimeDays) &&
+            (identical(other.dailyAvgHours, dailyAvgHours) ||
+                other.dailyAvgHours == dailyAvgHours) &&
+            (identical(other.monthlyAvgHours, monthlyAvgHours) ||
+                other.monthlyAvgHours == monthlyAvgHours) &&
+            (identical(other.pendingRegularisations, pendingRegularisations) ||
+                other.pendingRegularisations == pendingRegularisations) &&
+            (identical(other.pendingLeaves, pendingLeaves) ||
+                other.pendingLeaves == pendingLeaves) &&
+            (identical(other.periodTitle, periodTitle) ||
+                other.periodTitle == periodTitle));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    present,
-    absent,
-    late,
-    halfDay,
-    avgHours,
-    start,
-    end,
+    period,
+    startDate,
+    endDate,
+    totalDays,
+    presentDays,
+    absentDays,
+    leaveDays,
+    lateDays,
+    onTimeDays,
+    dailyAvgHours,
+    monthlyAvgHours,
+    pendingRegularisations,
+    pendingLeaves,
+    periodTitle,
   );
 
-  /// Create a copy of AnalyticsData
+  /// Create a copy of AnalyticsModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$AnalyticsDataImplCopyWith<_$AnalyticsDataImpl> get copyWith =>
-      __$$AnalyticsDataImplCopyWithImpl<_$AnalyticsDataImpl>(this, _$identity);
+  _$$AnalyticsModelImplCopyWith<_$AnalyticsModelImpl> get copyWith =>
+      __$$AnalyticsModelImplCopyWithImpl<_$AnalyticsModelImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AnalyticsDataImplToJson(this);
+    return _$$AnalyticsModelImplToJson(this);
   }
 }
 
-abstract class _AnalyticsData implements AnalyticsData {
-  const factory _AnalyticsData({
-    required final int present,
-    required final int absent,
-    required final int late,
-    required final int halfDay,
-    required final double avgHours,
-    final DateTime? start,
-    final DateTime? end,
-  }) = _$AnalyticsDataImpl;
+abstract class _AnalyticsModel extends AnalyticsModel {
+  const factory _AnalyticsModel({
+    required final AnalyticsPeriod period,
+    required final DateTime startDate,
+    required final DateTime endDate,
+    required final int totalDays,
+    required final int presentDays,
+    required final int absentDays,
+    required final int leaveDays,
+    required final int lateDays,
+    required final int onTimeDays,
+    required final double dailyAvgHours,
+    required final double monthlyAvgHours,
+    final int pendingRegularisations,
+    final int pendingLeaves,
+    final String? periodTitle,
+  }) = _$AnalyticsModelImpl;
+  const _AnalyticsModel._() : super._();
 
-  factory _AnalyticsData.fromJson(Map<String, dynamic> json) =
-      _$AnalyticsDataImpl.fromJson;
+  factory _AnalyticsModel.fromJson(Map<String, dynamic> json) =
+      _$AnalyticsModelImpl.fromJson;
 
   @override
-  int get present;
+  AnalyticsPeriod get period;
   @override
-  int get absent;
+  DateTime get startDate;
   @override
-  int get late;
+  DateTime get endDate;
   @override
-  int get halfDay;
+  int get totalDays;
   @override
-  double get avgHours;
+  int get presentDays;
   @override
-  DateTime? get start;
+  int get absentDays;
   @override
-  DateTime? get end;
+  int get leaveDays;
+  @override
+  int get lateDays;
+  @override
+  int get onTimeDays;
+  @override
+  double get dailyAvgHours;
+  @override
+  double get monthlyAvgHours;
+  @override
+  int get pendingRegularisations; // Manager only
+  @override
+  int get pendingLeaves; // Manager only
+  @override
+  String? get periodTitle;
 
-  /// Create a copy of AnalyticsData
+  /// Create a copy of AnalyticsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AnalyticsDataImplCopyWith<_$AnalyticsDataImpl> get copyWith =>
+  _$$AnalyticsModelImplCopyWith<_$AnalyticsModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

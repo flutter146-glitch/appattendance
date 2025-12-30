@@ -1,4 +1,5 @@
 // lib/core/database/db_helper.dart
+
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
@@ -20,11 +21,30 @@ class DBHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _createDB,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   Future<void> _createDB(Database db, int version) async {
-    // 1. user table
+    // Create tables as per your latest schema (aligned with dummy_data.json)
+    await db.execute('''
+      CREATE TABLE organization_master (
+        org_id TEXT PRIMARY KEY,
+        org_short_name TEXT UNIQUE,
+        org_name TEXT NOT NULL,
+        org_email TEXT,
+        office_start_hrs TEXT,
+        office_end_hrs TEXT,
+        working_hrs_in_number INTEGER,
+        created_at TEXT,
+        updated_at TEXT
+      )
+    ''');
+
     await db.execute('''
       CREATE TABLE user (
         emp_id TEXT PRIMARY KEY,
@@ -32,51 +52,39 @@ class DBHelper {
         password TEXT,
         mpin TEXT,
         otp TEXT,
-        otp_expiry_time INTEGER,
-        emp_status TEXT, -- active / deactive
+        otp_expiry_time TEXT,
+        emp_status TEXT,
         created_at TEXT,
         updated_at TEXT
       )
     ''');
 
-    // 2. organization_master
-    await db.execute('''
-      CREATE TABLE organization_master (
-        org_id TEXT PRIMARY KEY,
-        org_name TEXT,
-        org_email TEXT UNIQUE,
-        created_at TEXT NOT NULL,
-        updated_at TEXT
-      )
-    ''');
-
-    // 3. employee_master
     await db.execute('''
       CREATE TABLE employee_master (
         emp_id TEXT PRIMARY KEY,
-        org_id TEXT NOT NULL,
+        org_short_name TEXT,
         emp_name TEXT NOT NULL,
-        emp_email TEXT UNIQUE NOT NULL,
+        emp_email TEXT UNIQUE,
         emp_role TEXT,
         emp_department TEXT,
         emp_phone TEXT,
-        check_in_out_status TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT
+        emp_status TEXT,
+        emp_joining_date TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (org_short_name) REFERENCES organization_master(org_short_name)
       )
     ''');
 
-    // 4. project_master
     await db.execute('''
       CREATE TABLE project_master (
         project_id TEXT PRIMARY KEY,
+        org_short_name TEXT,
         project_name TEXT NOT NULL,
         project_site TEXT,
         client_name TEXT,
         client_location TEXT,
         client_contact TEXT,
-        project_site_lat TEXT,
-        project_site_long TEXT,
         mng_name TEXT,
         mng_email TEXT,
         mng_contact TEXT,
@@ -84,117 +92,132 @@ class DBHelper {
         project_techstack TEXT,
         project_assigned_date TEXT,
         created_at TEXT,
-        updated_at TEXT
+        updated_at TEXT,
+        FOREIGN KEY (org_short_name) REFERENCES organization_master(org_short_name)
       )
     ''');
 
-    // 5. employee_attendance
+    await db.execute('''
+      CREATE TABLE project_site_mapping (
+        project_site_id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        project_site_name TEXT,
+        project_site_lat TEXT,
+        project_site_long TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (project_id) REFERENCES project_master(project_id)
+      )
+    ''');
+
     await db.execute('''
       CREATE TABLE employee_attendance (
         att_id TEXT PRIMARY KEY,
         emp_id TEXT NOT NULL,
-        att_date TEXT NOT NULL,
         att_timestamp TEXT NOT NULL,
         att_latitude REAL,
         att_longitude REAL,
-        att_geofence_name TEXT, -- geofence name like nic office, nutantekoffice
-        att_project_id TEXT,
+        att_geofence_name TEXT,
+        project_id TEXT,
         att_notes TEXT,
-        att_status TEXT, -- checkin / checkout
+        att_status TEXT CHECK(att_status IN ('checkIn', 'checkOut')),
         verification_type TEXT,
-        is_verified INTEGER, -- 0/1
+        is_verified INTEGER DEFAULT 0,
         created_at TEXT,
-        updated_at TEXT
+        updated_at TEXT,
+        FOREIGN KEY (emp_id) REFERENCES user(emp_id),
+        FOREIGN KEY (project_id) REFERENCES project_master(project_id)
       )
     ''');
 
-    // 6. employee_regularization
     await db.execute('''
-  CREATE TABLE employee_regularization (
-    reg_id TEXT PRIMARY KEY,
-    emp_id TEXT NOT NULL,
-    reg_applied_for_date TEXT NOT NULL,        -- Date jiske liye regularization
-    reg_date_applied TEXT NOT NULL,            -- Kab apply kiya gaya
-    reg_type TEXT NOT NULL,                    -- 'Full Day', 'Check-in Only', 'Check-out Only'
-    reg_justification TEXT NOT NULL,           -- Employee ka reason
-    checkin_time TEXT,                         -- Agar partial hai toh actual checkin time
-    checkout_time TEXT,                        -- Agar partial hai toh actual checkout time
-    shortfall_time TEXT,                       -- Kitna late/shortfall
-    reg_approval_status TEXT DEFAULT 'pending', -- pending / approved / rejected
-    manager_remarks TEXT,                      -- Manager ka comment (approve/reject pe)
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    FOREIGN KEY (emp_id) REFERENCES employee_master (emp_id) ON DELETE CASCADE
-  )
-''');
+      CREATE TABLE employee_regularization (
+        reg_id TEXT PRIMARY KEY,
+        emp_id TEXT NOT NULL,
+        mgr_emp_id TEXT,
+        reg_date_applied TEXT,
+        reg_applied_for_date TEXT,
+        reg_justification TEXT,
+        reg_first_check_in TEXT,
+        reg_last_check_out TEXT,
+        shortfall_hrs TEXT,
+        reg_approval_status TEXT CHECK(reg_approval_status IN ('pending', 'approved', 'rejected')),
+        mgr_comments TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (emp_id) REFERENCES user(emp_id),
+        FOREIGN KEY (mgr_emp_id) REFERENCES user(emp_id)
+      )
+    ''');
 
-    // 7. employee_leaves
     await db.execute('''
       CREATE TABLE employee_leaves (
         leave_id TEXT PRIMARY KEY,
         emp_id TEXT NOT NULL,
+        mgr_emp_id TEXT,
         leave_from_date TEXT,
         leave_to_date TEXT,
         leave_type TEXT,
-        leave_approval_status TEXT,
         leave_justification TEXT,
-        manager_comments TEXT
+        leave_approval_status TEXT,
+        manager_comments TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (emp_id) REFERENCES user(emp_id),
+        FOREIGN KEY (mgr_emp_id) REFERENCES user(emp_id)
       )
     ''');
 
-    // 8. user_roles
-    await db.execute('''
-      CREATE TABLE user_roles (
-        role_id INTEGER PRIMARY KEY, -- No AUTOINCREMENT as per document
-        role_name TEXT NOT NULL
-      )
-    ''');
-
-    // 9. employee_mapped_projects
     await db.execute('''
       CREATE TABLE employee_mapped_projects (
         emp_id TEXT NOT NULL,
         project_id TEXT NOT NULL,
-        mapping_status TEXT -- active / deactive
+        mapping_status TEXT CHECK(mapping_status IN ('active', 'deactive')),
+        created_at TEXT,
+        updated_at TEXT,
+        PRIMARY KEY (emp_id, project_id),
+        FOREIGN KEY (emp_id) REFERENCES user(emp_id),
+        FOREIGN KEY (project_id) REFERENCES project_master(project_id)
       )
     ''');
 
-    // 10. employee_shifts
-    await db.execute('''
-      CREATE TABLE employee_shifts (
-        emp_id TEXT NOT NULL,
-        shift_id TEXT
-      )
-    ''');
-
-    // 11. employee_roles_mapping
-    await db.execute('''
-      CREATE TABLE employee_roles_mapping (
-        emp_id TEXT NOT NULL,
-        role_id TEXT
-      )
-    ''');
-
-    // 12. shift_master
-    await db.execute('''
-      CREATE TABLE shift_master (
-        shift_id TEXT PRIMARY KEY,
-        shift_name TEXT,
-        shift_start_time TEXT,
-        shift_end_time TEXT
-      )
-    ''');
-
-    // 13. current_user (for login session)
+    // Current user session table
     await db.execute('''
       CREATE TABLE current_user (
         id INTEGER PRIMARY KEY,
-        user_data TEXT
+        user_data TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     ''');
 
-    // Seed dummy data from JSON
+    // In DBHelper onCreate
+    await db.execute('''
+  CREATE TABLE geofence_master (
+    geo_id TEXT PRIMARY KEY,
+    goe_name TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    radius_meters REAL NOT NULL,
+    is_active INTEGER DEFAULT 1,
+    address TEXT,
+    created_at TEXT,
+    updated_at TEXT
+  )
+''');
+
+    // Seed dummy data
     await _seedFromJson(db);
+    // await seedGeofences(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // Future upgrade logic (add columns, migrate data)
+    if (oldVersion < 2) {
+      // Example: add new column
+      await db.execute(
+        'ALTER TABLE employee_regularization ADD COLUMN supporting_docs TEXT',
+      );
+    }
   }
 
   Future<void> _seedFromJson(Database db) async {
@@ -204,84 +227,77 @@ class DBHelper {
       );
       final Map<String, dynamic> data = jsonDecode(jsonString);
 
-      // Insert data for each table
-      await _insertTableData(db, 'user', data['user']);
       await _insertTableData(
         db,
         'organization_master',
-        data['organization_master'],
+        data['organization_master'] ?? [],
       );
-      await _insertTableData(db, 'employee_master', data['employee_master']);
-      await _insertTableData(db, 'project_master', data['project_master']);
+      await _insertTableData(db, 'user', data['user'] ?? []);
+      await _insertTableData(
+        db,
+        'employee_master',
+        data['employee_master'] ?? [],
+      );
+      await _insertTableData(
+        db,
+        'project_master',
+        data['project_master'] ?? [],
+      );
       await _insertTableData(
         db,
         'employee_attendance',
-        data['employee_attendance'],
+        data['employee_attendance'] ?? [],
       );
       await _insertTableData(
         db,
         'employee_regularization',
-        data['employee_regularization'],
+        data['employee_regularization'] ?? [],
       );
-      await _insertTableData(db, 'employee_leaves', data['employee_leaves']);
-      await _insertTableData(db, 'user_roles', data['user_roles']);
+      await _insertTableData(
+        db,
+        'employee_leaves',
+        data['employee_leaves'] ?? [],
+      );
       await _insertTableData(
         db,
         'employee_mapped_projects',
-        data['employee_mapped_projects'],
+        data['employee_mapped_projects'] ?? [],
       );
-      await _insertTableData(db, 'employee_shifts', data['employee_shifts']);
       await _insertTableData(
         db,
-        'employee_roles_mapping',
-        data['employee_roles_mapping'],
+        'running_serial_number',
+        data['running_serial_number'] ?? [],
       );
-      await _insertTableData(db, 'shift_master', data['shift_master']);
+
+      await _insertTableData(
+        db,
+        'geofence_master',
+        data['geofence_master'] ?? [],
+      );
 
       print("✅ All tables seeded successfully from dummy_data.json!");
     } catch (e) {
       print("❌ Error seeding data: $e");
-      await _manualFallbackSeed(db);
     }
   }
 
   Future<void> _insertTableData(
     Database db,
     String tableName,
-    List<dynamic>? dataList,
+    List<dynamic> dataList,
   ) async {
-    if (dataList == null || dataList.isEmpty) return;
-
     for (var item in dataList) {
       try {
+        final Map<String, Object?> row = Map<String, Object?>.from(item);
         await db.insert(
           tableName,
-          item,
+          row,
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       } catch (e) {
-        print("Error inserting $tableName: $e");
+        print("Error inserting into $tableName: $e");
       }
     }
-  }
-
-  Future<void> _manualFallbackSeed(Database db) async {
-    // Minimal fallback data if JSON fails
-    await db.insert('user', {
-      'emp_id': 'EMP001',
-      'email_id': 'samal@nutantek.com',
-      'password': 'pass123',
-      'emp_status': 'active',
-    });
-
-    await db.insert('employee_master', {
-      'emp_id': 'EMP001',
-      'org_id': 'ORG001',
-      'emp_name': 'Vainyala Samal',
-      'emp_email': 'samal@nutantek.com',
-      'emp_role': 'Employee',
-      'emp_department': 'Mobile Development',
-    });
   }
 
   // Save logged in user session
@@ -312,30 +328,346 @@ class DBHelper {
     final db = await database;
     await db.delete('current_user');
   }
-
-  // Helper: Get user by emp_id
-  Future<Map<String, dynamic>?> getUserByEmpId(String empId) async {
-    final db = await database;
-    final user = await db.query(
-      'user',
-      where: 'emp_id = ?',
-      whereArgs: [empId],
-    );
-    if (user.isNotEmpty) {
-      final empDetails = await db.query(
-        'employee_master',
-        where: 'emp_id = ?',
-        whereArgs: [empId],
-      );
-      if (empDetails.isNotEmpty) {
-        final userData = user.first;
-        userData.addAll(empDetails.first);
-        return userData;
-      }
-    }
-    return null;
-  }
 }
+
+// // lib/core/database/db_helper.dart
+// import 'dart:convert';
+// import 'package:flutter/services.dart';
+// import 'package:sqflite/sqflite.dart';
+// import 'package:path/path.dart';
+
+// class DBHelper {
+//   static final DBHelper instance = DBHelper._init();
+//   static Database? _database;
+
+//   DBHelper._init();
+
+//   Future<Database> get database async {
+//     if (_database != null) return _database!;
+//     _database = await _initDB('nutantek.db');
+//     return _database!;
+//   }
+
+//   Future<Database> _initDB(String fileName) async {
+//     final dbPath = await getDatabasesPath();
+//     final path = join(dbPath, fileName);
+
+//     return await openDatabase(path, version: 1, onCreate: _createDB);
+//   }
+
+//   Future<void> _createDB(Database db, int version) async {
+//     // 1. user table
+//     await db.execute('''
+//       CREATE TABLE user (
+//         emp_id TEXT PRIMARY KEY,
+//         email_id TEXT UNIQUE NOT NULL,
+//         password TEXT,
+//         mpin TEXT,
+//         otp TEXT,
+//         otp_expiry_time INTEGER,
+//         emp_status TEXT, -- active / deactive
+//         created_at TEXT,
+//         updated_at TEXT
+//       )
+//     ''');
+
+//     // 2. organization_master
+//     await db.execute('''
+//       CREATE TABLE organization_master (
+//         org_id TEXT PRIMARY KEY,
+//         org_name TEXT,
+//         org_email TEXT UNIQUE,
+//         created_at TEXT NOT NULL,
+//         updated_at TEXT
+//       )
+//     ''');
+
+//     // 3. employee_master
+//     await db.execute('''
+//       CREATE TABLE employee_master (
+//         emp_id TEXT PRIMARY KEY,
+//         org_id TEXT NOT NULL,
+//         emp_name TEXT NOT NULL,
+//         emp_email TEXT UNIQUE NOT NULL,
+//         emp_role TEXT,
+//         emp_department TEXT,
+//         emp_phone TEXT,
+//         check_in_out_status TEXT,
+//         created_at TEXT NOT NULL,
+//         updated_at TEXT
+//       )
+//     ''');
+
+//     // 4. project_master
+//     await db.execute('''
+//       CREATE TABLE project_master (
+//         project_id TEXT PRIMARY KEY,
+//         project_name TEXT NOT NULL,
+//         project_site TEXT,
+//         client_name TEXT,
+//         client_location TEXT,
+//         client_contact TEXT,
+//         project_site_lat TEXT,
+//         project_site_long TEXT,
+//         mng_name TEXT,
+//         mng_email TEXT,
+//         mng_contact TEXT,
+//         project_description TEXT,
+//         project_techstack TEXT,
+//         project_assigned_date TEXT,
+//         created_at TEXT,
+//         updated_at TEXT
+//       )
+//     ''');
+
+//     // 5. employee_attendance
+//     await db.execute('''
+//       CREATE TABLE employee_attendance (
+//         att_id TEXT PRIMARY KEY,
+//         emp_id TEXT NOT NULL,
+//         att_date TEXT NOT NULL,
+//         att_timestamp TEXT NOT NULL,
+//         att_latitude REAL,
+//         att_longitude REAL,
+//         att_geofence_name TEXT, -- geofence name like nic office, nutantekoffice
+//         att_project_id TEXT,
+//         att_notes TEXT,
+//         att_status TEXT, -- checkin / checkout
+//         verification_type TEXT,
+//         is_verified INTEGER, -- 0/1
+//         created_at TEXT,
+//         updated_at TEXT
+//       )
+//     ''');
+
+//     // 6. employee_regularization
+//     await db.execute('''
+//   CREATE TABLE employee_regularization (
+//     reg_id TEXT PRIMARY KEY,
+//     emp_id TEXT NOT NULL,
+//     reg_applied_for_date TEXT NOT NULL,        -- Date jiske liye regularization
+//     reg_date_applied TEXT NOT NULL,            -- Kab apply kiya gaya
+//     reg_type TEXT NOT NULL,                    -- 'Full Day', 'Check-in Only', 'Check-out Only'
+//     reg_justification TEXT NOT NULL,           -- Employee ka reason
+//     checkin_time TEXT,                         -- Agar partial hai toh actual checkin time
+//     checkout_time TEXT,                        -- Agar partial hai toh actual checkout time
+//     shortfall_time TEXT,                       -- Kitna late/shortfall
+//     reg_approval_status TEXT DEFAULT 'pending', -- pending / approved / rejected
+//     manager_remarks TEXT,                      -- Manager ka comment (approve/reject pe)
+//     created_at TEXT NOT NULL,
+//     updated_at TEXT NOT NULL,
+//     FOREIGN KEY (emp_id) REFERENCES employee_master (emp_id) ON DELETE CASCADE
+//   )
+// ''');
+
+//     // 7. employee_leaves
+//     await db.execute('''
+//       CREATE TABLE employee_leaves (
+//         leave_id TEXT PRIMARY KEY,
+//         emp_id TEXT NOT NULL,
+//         leave_from_date TEXT,
+//         leave_to_date TEXT,
+//         leave_type TEXT,
+//         leave_approval_status TEXT,
+//         leave_justification TEXT,
+//         manager_comments TEXT
+//       )
+//     ''');
+
+//     // 8. user_roles
+//     await db.execute('''
+//       CREATE TABLE user_roles (
+//         role_id INTEGER PRIMARY KEY, -- No AUTOINCREMENT as per document
+//         role_name TEXT NOT NULL
+//       )
+//     ''');
+
+//     // 9. employee_mapped_projects
+//     await db.execute('''
+//       CREATE TABLE employee_mapped_projects (
+//         emp_id TEXT NOT NULL,
+//         project_id TEXT NOT NULL,
+//         mapping_status TEXT -- active / deactive
+//       )
+//     ''');
+
+//     // 10. employee_shifts
+//     await db.execute('''
+//       CREATE TABLE employee_shifts (
+//         emp_id TEXT NOT NULL,
+//         shift_id TEXT
+//       )
+//     ''');
+
+//     // 11. employee_roles_mapping
+//     await db.execute('''
+//       CREATE TABLE employee_roles_mapping (
+//         emp_id TEXT NOT NULL,
+//         role_id TEXT
+//       )
+//     ''');
+
+//     // 12. shift_master
+//     await db.execute('''
+//       CREATE TABLE shift_master (
+//         shift_id TEXT PRIMARY KEY,
+//         shift_name TEXT,
+//         shift_start_time TEXT,
+//         shift_end_time TEXT
+//       )
+//     ''');
+
+//     // 13. current_user (for login session)
+//     await db.execute('''
+//       CREATE TABLE current_user (
+//         id INTEGER PRIMARY KEY,
+//         user_data TEXT
+//       )
+//     ''');
+
+//     // Seed dummy data from JSON
+//     await _seedFromJson(db);
+//   }
+
+//   Future<void> _seedFromJson(Database db) async {
+//     try {
+//       final String jsonString = await rootBundle.loadString(
+//         'assets/data/dummy_data.json',
+//       );
+//       final Map<String, dynamic> data = jsonDecode(jsonString);
+
+//       // Insert data for each table
+//       await _insertTableData(db, 'user', data['user']);
+//       await _insertTableData(
+//         db,
+//         'organization_master',
+//         data['organization_master'],
+//       );
+//       await _insertTableData(db, 'employee_master', data['employee_master']);
+//       await _insertTableData(db, 'project_master', data['project_master']);
+//       await _insertTableData(
+//         db,
+//         'employee_attendance',
+//         data['employee_attendance'],
+//       );
+//       await _insertTableData(
+//         db,
+//         'employee_regularization',
+//         data['employee_regularization'],
+//       );
+//       await _insertTableData(db, 'employee_leaves', data['employee_leaves']);
+//       await _insertTableData(db, 'user_roles', data['user_roles']);
+//       await _insertTableData(
+//         db,
+//         'employee_mapped_projects',
+//         data['employee_mapped_projects'],
+//       );
+//       await _insertTableData(db, 'employee_shifts', data['employee_shifts']);
+//       await _insertTableData(
+//         db,
+//         'employee_roles_mapping',
+//         data['employee_roles_mapping'],
+//       );
+//       await _insertTableData(db, 'shift_master', data['shift_master']);
+
+//       print("✅ All tables seeded successfully from dummy_data.json!");
+//     } catch (e) {
+//       print("❌ Error seeding data: $e");
+//       await _manualFallbackSeed(db);
+//     }
+//   }
+
+//   Future<void> _insertTableData(
+//     Database db,
+//     String tableName,
+//     List<dynamic>? dataList,
+//   ) async {
+//     if (dataList == null || dataList.isEmpty) return;
+
+//     for (var item in dataList) {
+//       try {
+//         await db.insert(
+//           tableName,
+//           item,
+//           conflictAlgorithm: ConflictAlgorithm.replace,
+//         );
+//       } catch (e) {
+//         print("Error inserting $tableName: $e");
+//       }
+//     }
+//   }
+
+//   Future<void> _manualFallbackSeed(Database db) async {
+//     // Minimal fallback data if JSON fails
+//     await db.insert('user', {
+//       'emp_id': 'EMP001',
+//       'email_id': 'samal@nutantek.com',
+//       'password': 'pass123',
+//       'emp_status': 'active',
+//     });
+
+//     await db.insert('employee_master', {
+//       'emp_id': 'EMP001',
+//       'org_id': 'ORG001',
+//       'emp_name': 'Vainyala Samal',
+//       'emp_email': 'samal@nutantek.com',
+//       'emp_role': 'Employee',
+//       'emp_department': 'Mobile Development',
+//     });
+//   }
+
+//   // Save logged in user session
+//   Future<void> saveCurrentUser(Map<String, dynamic> user) async {
+//     final db = await database;
+//     await db.insert('current_user', {
+//       'id': 1,
+//       'user_data': jsonEncode(user),
+//     }, conflictAlgorithm: ConflictAlgorithm.replace);
+//   }
+
+//   // Get logged in user
+//   Future<Map<String, dynamic>?> getCurrentUser() async {
+//     final db = await database;
+//     final result = await db.query(
+//       'current_user',
+//       where: 'id = ?',
+//       whereArgs: [1],
+//     );
+//     if (result.isNotEmpty) {
+//       return jsonDecode(result.first['user_data'] as String);
+//     }
+//     return null;
+//   }
+
+//   // Clear login session
+//   Future<void> clearCurrentUser() async {
+//     final db = await database;
+//     await db.delete('current_user');
+//   }
+
+//   // Helper: Get user by emp_id
+//   Future<Map<String, dynamic>?> getUserByEmpId(String empId) async {
+//     final db = await database;
+//     final user = await db.query(
+//       'user',
+//       where: 'emp_id = ?',
+//       whereArgs: [empId],
+//     );
+//     if (user.isNotEmpty) {
+//       final empDetails = await db.query(
+//         'employee_master',
+//         where: 'emp_id = ?',
+//         whereArgs: [empId],
+//       );
+//       if (empDetails.isNotEmpty) {
+//         final userData = user.first;
+//         userData.addAll(empDetails.first);
+//         return userData;
+//       }
+//     }
+//     return null;
+//   }
+// }
 
 // // lib/core/database/db_helper.dart
 // import 'dart:convert';

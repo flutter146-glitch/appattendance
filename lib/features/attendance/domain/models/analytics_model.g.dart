@@ -6,26 +6,47 @@ part of 'analytics_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AnalyticsDataImpl _$$AnalyticsDataImplFromJson(Map<String, dynamic> json) =>
-    _$AnalyticsDataImpl(
-      present: (json['present'] as num).toInt(),
-      absent: (json['absent'] as num).toInt(),
-      late: (json['late'] as num).toInt(),
-      halfDay: (json['halfDay'] as num).toInt(),
-      avgHours: (json['avgHours'] as num).toDouble(),
-      start: json['start'] == null
-          ? null
-          : DateTime.parse(json['start'] as String),
-      end: json['end'] == null ? null : DateTime.parse(json['end'] as String),
+_$AnalyticsModelImpl _$$AnalyticsModelImplFromJson(Map<String, dynamic> json) =>
+    _$AnalyticsModelImpl(
+      period: $enumDecode(_$AnalyticsPeriodEnumMap, json['period']),
+      startDate: DateTime.parse(json['startDate'] as String),
+      endDate: DateTime.parse(json['endDate'] as String),
+      totalDays: (json['totalDays'] as num).toInt(),
+      presentDays: (json['presentDays'] as num).toInt(),
+      absentDays: (json['absentDays'] as num).toInt(),
+      leaveDays: (json['leaveDays'] as num).toInt(),
+      lateDays: (json['lateDays'] as num).toInt(),
+      onTimeDays: (json['onTimeDays'] as num).toInt(),
+      dailyAvgHours: (json['dailyAvgHours'] as num).toDouble(),
+      monthlyAvgHours: (json['monthlyAvgHours'] as num).toDouble(),
+      pendingRegularisations:
+          (json['pendingRegularisations'] as num?)?.toInt() ?? 0,
+      pendingLeaves: (json['pendingLeaves'] as num?)?.toInt() ?? 0,
+      periodTitle: json['periodTitle'] as String?,
     );
 
-Map<String, dynamic> _$$AnalyticsDataImplToJson(_$AnalyticsDataImpl instance) =>
-    <String, dynamic>{
-      'present': instance.present,
-      'absent': instance.absent,
-      'late': instance.late,
-      'halfDay': instance.halfDay,
-      'avgHours': instance.avgHours,
-      'start': instance.start?.toIso8601String(),
-      'end': instance.end?.toIso8601String(),
-    };
+Map<String, dynamic> _$$AnalyticsModelImplToJson(
+  _$AnalyticsModelImpl instance,
+) => <String, dynamic>{
+  'period': _$AnalyticsPeriodEnumMap[instance.period]!,
+  'startDate': instance.startDate.toIso8601String(),
+  'endDate': instance.endDate.toIso8601String(),
+  'totalDays': instance.totalDays,
+  'presentDays': instance.presentDays,
+  'absentDays': instance.absentDays,
+  'leaveDays': instance.leaveDays,
+  'lateDays': instance.lateDays,
+  'onTimeDays': instance.onTimeDays,
+  'dailyAvgHours': instance.dailyAvgHours,
+  'monthlyAvgHours': instance.monthlyAvgHours,
+  'pendingRegularisations': instance.pendingRegularisations,
+  'pendingLeaves': instance.pendingLeaves,
+  'periodTitle': instance.periodTitle,
+};
+
+const _$AnalyticsPeriodEnumMap = {
+  AnalyticsPeriod.daily: 'daily',
+  AnalyticsPeriod.weekly: 'weekly',
+  AnalyticsPeriod.monthly: 'monthly',
+  AnalyticsPeriod.quarterly: 'quarterly',
+};

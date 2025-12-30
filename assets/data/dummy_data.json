@@ -1,78 +1,167 @@
 {
   "user": [
     {
-      "emp_id": "EMP001",
-      "email_id": "samal@nutantek.com",
-      "password": "pass123",
-      "mpin": "1234",
+      "emp_id": "NUTANTEKE20250601",
+      "email_id": "emp1@nutantek.com",
+      "password": "emp123",
+      "mpin": "1111",
       "otp": null,
       "otp_expiry_time": null,
       "emp_status": "active",
-      "created_at": "2025-12-16T10:00:00Z",
-      "updated_at": "2025-12-16T10:00:00Z"
+      "created_at": "2025-06-01T09:00:00Z",
+      "updated_at": "2025-06-01T09:00:00Z"
     },
     {
-      "emp_id": "EMP002",
-      "email_id": "raj@nutantek.com",
-      "password": "manager123",
-      "mpin": "5678",
+      "emp_id": "NUTANTEKE20250602",
+      "email_id": "emp2@nutantek.com",
+      "password": "emp123",
+      "mpin": "2222",
       "otp": null,
       "otp_expiry_time": null,
       "emp_status": "active",
-      "created_at": "2025-12-16T10:00:00Z",
-      "updated_at": "2025-12-16T10:00:00Z"
+      "created_at": "2025-06-02T09:00:00Z",
+      "updated_at": "2025-06-02T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKE20250603",
+      "email_id": "emp3@nutantek.com",
+      "password": "emp123",
+      "mpin": "3333",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-06-03T09:00:00Z",
+      "updated_at": "2025-06-03T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKE20250604",
+      "email_id": "emp4@nutantek.com",
+      "password": "emp123",
+      "mpin": "4444",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-06-04T09:00:00Z",
+      "updated_at": "2025-06-04T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKE20250605",
+      "email_id": "emp5@nutantek.com",
+      "password": "emp123",
+      "mpin": "5555",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-06-05T09:00:00Z",
+      "updated_at": "2025-06-05T09:00:00Z"
+    },
+
+    {
+      "emp_id": "NUTANTEKM20250501",
+      "email_id": "mgr1@nutantek.com",
+      "password": "Manager@123",
+      "mpin": "9001",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-05-01T09:00:00Z",
+      "updated_at": "2025-05-01T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKM20250502",
+      "email_id": "mgr2@nutantek.com",
+      "password": "Manager@123",
+      "mpin": "9002",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-05-02T09:00:00Z",
+      "updated_at": "2025-05-02T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKM20250503",
+      "email_id": "mgr3@nutantek.com",
+      "password": "Manager@123",
+      "mpin": "9003",
+      "otp": null,
+      "otp_expiry_time": null,
+      "emp_status": "active",
+      "created_at": "2025-05-03T09:00:00Z",
+      "updated_at": "2025-05-03T09:00:00Z"
     }
   ],
 
+  
   "organization_master": [
     {
-      "org_id": "ORG001",
+      "org_id": "NUTANTEK",
+      "org_short_name": "NUTANTEK",
       "org_name": "Nutantek Solutions",
       "org_email": "info@nutantek.com",
+      "office_start_hrs": "09:00",
+      "office_end_hrs": "18:00",
+      "working_hrs_in_number": 9,
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-12-16T00:00:00Z"
     }
   ],
 
+
+  
+
   "employee_master": [
     {
-      "emp_id": "EMP001",
-      "org_id": "ORG001",
+      "emp_id": "NUTANTEKE20250601",
+      "org_short_name": "NUTANTEK",
       "emp_name": "Vainyala Samal",
-      "emp_email": "samal@nutantek.com",
+      "emp_email": "emp0@nutantek.com",
       "emp_role": "Employee",
       "emp_department": "Mobile Development",
       "emp_phone": "9876543210",
-      "check_in_out_status": "checked_in",
+      "emp_status": "in-active",
+      "emp_joining_date": "2025-06-01",
       "created_at": "2025-12-16T10:00:00Z",
       "updated_at": "2025-12-16T10:00:00Z"
     },
     {
-      "emp_id": "EMP002",
-      "org_id": "ORG001",
+      "emp_id": "NUTANTEKE20250602",
+      "org_short_name": "NUTANTEK",
+      "emp_name": "Amit Kumar",
+      "emp_email": "emp1@nutantek.com",
+      "emp_role": "Employee",
+      "emp_department": "Mobile",
+      "emp_phone": "9000000001",
+      "emp_status": "active",
+      "emp_joining_date": "2025-06-01",
+      "created_at": "2025-06-01T09:00:00Z",
+      "updated_at": "2025-06-01T09:00:00Z"
+    },
+    {
+      "emp_id": "NUTANTEKM20250501",
+      "org_short_name": "NUTANTEK",
       "emp_name": "Raj Sharma",
-      "emp_email": "raj@nutantek.com",
+      "emp_email": "mgr1@nutantek.com",
       "emp_role": "Manager",
-      "emp_department": "Management",
-      "emp_phone": "9123456780",
-      "check_in_out_status": "checked_in",
-      "created_at": "2025-12-16T10:00:00Z",
-      "updated_at": "2025-12-16T10:00:00Z"
+      "emp_department": "Operations",
+      "emp_phone": "9111111111",
+      "emp_status": "active",
+      "emp_joining_date": "2025-05-01",
+      "created_at": "2025-05-01T09:00:00Z",
+      "updated_at": "2025-05-01T09:00:00Z"
     }
   ],
 
   "project_master": [
     {
-      "project_id": "P001",
+      "project_id": "NUTANTEKP10001",
+      "org_short_name": "NUTANTEK",
       "project_name": "Nutantek Office App",
       "project_site": "Nutantek Head Office",
       "client_name": "Nutantek Internal",
       "client_location": "Bhubaneswar",
       "client_contact": "7894561230",
-      "project_site_lat": "20.2961",
-      "project_site_long": "85.8245",
       "mng_name": "Raj Sharma",
-      "mng_email": "raj@nutantek.com",
+      "mng_email": "mgr1@nutantek.com",
       "mng_contact": "9123456780",
       "project_description": "Internal attendance and HR management app",
       "project_techstack": "Flutter, Node.js, MariaDB",
@@ -81,113 +170,492 @@
       "updated_at": "2025-12-16T00:00:00Z"
     },
     {
-      "project_id": "P002",
+      "project_id": "NUTANTEKP10002",
+      "org_short_name": "NUTANTEK",
       "project_name": "E-Commerce Platform",
       "project_site": "Client Site - Delhi",
       "client_name": "ABC Corp",
       "client_location": "New Delhi",
       "client_contact": "9998887776",
-      "project_site_lat": "28.7041",
-      "project_site_long": "77.1025",
       "mng_name": "Raj Sharma",
-      "mng_email": "raj@nutantek.com",
+      "mng_email": "mgr1@nutantek.com",
       "mng_contact": "9123456780",
       "project_description": "Full-stack e-commerce solution for retail",
       "project_techstack": "React, Node.js, MongoDB",
       "project_assigned_date": "2025-10-15",
       "created_at": "2025-10-15T00:00:00Z",
       "updated_at": "2025-12-16T00:00:00Z"
+    },
+    {
+      "project_id": "NUTANTEKP10003",
+      "org_short_name": "NUTANTEK",
+      "project_name": "Payroll System",
+      "project_site": "Remote",
+      "client_name": "Internal",
+      "client_contact": "7777777777",
+      "mng_name": "Kunal Verma",
+      "mng_email": "mgr2@nutantek.com",
+      "mng_contact": "9222222222",
+      "project_description": "Salary & payroll automation",
+      "project_techstack": "Spring Boot, MySQL",
+      "project_assigned_date": "2025-05-01",
+      "created_at": "2025-05-01T00:00:00Z",
+      "updated_at": "2025-12-16T00:00:00Z"
+    },
+    {
+      "project_id": "NUTANTEKP10004",
+      "org_short_name": "NUTANTEK",
+      "project_name": "Attendance App",
+      "project_site": "Remote",
+      "client_name": "Internal",
+      "client_contact": "7777777777",
+      "mng_name": "Suresh Gupta",
+      "mng_email": "mgr3@nutantek.com",
+      "mng_contact": "9222222233",
+      "project_description": "Internal attendance and HR management app",
+      "project_techstack": "Spring Boot, MySQL",
+      "project_assigned_date": "2025-05-01",
+      "created_at": "2025-05-01T00:00:00Z",
+      "updated_at": "2025-12-16T00:00:00Z"
     }
+  ],
+  "project_site_mapping":[
+     {
+    "project_site_id": "NUTANTEKPS001",
+    "project_id": "NUTANTEKP10001",
+    "project_site_name": "Nutantek Head Office",
+    "project_site_lat": "20.296100",
+    "project_site_long": "85.824500",
+    "created_at": "2025-04-01T09:00:00Z",
+    "updated_at": "2025-12-16T09:00:00Z"
+  },
+  {
+    "project_site_id": "NUTANTEKPS002",
+    "project_id": "NUTANTEKP10001",
+    "project_site_name": "Client Site – Bhubaneswar",
+    "project_site_lat": "20.270000",
+    "project_site_long": "85.840000",
+    "created_at": "2025-04-05T09:00:00Z",
+    "updated_at": "2025-12-16T09:00:00Z"
+  },
+  {
+    "project_site_id": "NUTANTEKPS003",
+    "project_id": "NUTANTEKP10002",
+    "project_site_name": "Client Site – New Delhi",
+    "project_site_lat": "28.704100",
+    "project_site_long": "77.102500",
+    "created_at": "2025-05-01T09:00:00Z",
+    "updated_at": "2025-12-16T09:00:00Z"
+  },
+  {
+    "project_site_id": "NUTANTEKPS004",
+    "project_id": "NUTANTEKP10003",
+    "project_site_name": "Remote Office – Bangalore",
+    "project_site_lat": "12.971600",
+    "project_site_long": "77.594600",
+    "created_at": "2025-05-10T09:00:00Z",
+    "updated_at": "2025-12-16T09:00:00Z"
+  },
+  {
+    "project_site_id": "NUTANTEKPS005",
+    "project_id": "NUTANTEKP10004",
+    "project_site_name": "Client Warehouse – Pune",
+    "project_site_lat": "18.520400",
+    "project_site_long": "73.856700",
+    "created_at": "2025-06-01T09:00:00Z",
+    "updated_at": "2025-12-16T09:00:00Z"
+  }
   ],
 
   "employee_attendance": [
-    {
-      "att_id": "ATT001",
-      "emp_id": "EMP001",
-      "att_date": "2025-12-16",
-      "att_timestamp": "2025-12-16T09:15:00Z",
-      "att_latitude": 20.2961,
-      "att_longitude": 85.8245,
-      "att_geofence_name": "nutantekoffice",
-      "att_project_id": "P001",
-      "att_notes": "On time",
-      "att_status": "checkin",
-      "verification_type": "face",
-      "is_verified": 1,
-      "created_at": "2025-12-16T09:15:00Z",
-      "updated_at": "2025-12-16T09:15:00Z"
-    },
-    {
-      "att_id": "ATT002",
-      "emp_id": "EMP001",
-      "att_date": "2025-12-15",
-      "att_timestamp": "2025-12-15T09:45:00Z",
-      "att_latitude": 20.2961,
-      "att_longitude": 85.8245,
-      "att_geofence_name": "nutantekoffice",
-      "att_project_id": "P001",
-      "att_notes": "Late due to traffic",
-      "att_status": "checkin",
-      "verification_type": "face",
-      "is_verified": 1,
-      "created_at": "2025-12-15T09:45:00Z",
-      "updated_at": "2025-12-15T09:45:00Z"
-    },
-    {
-      "att_id": "ATT003",
-      "emp_id": "EMP002",
-      "att_date": "2025-12-16",
-      "att_timestamp": "2025-12-16T08:50:00Z",
-      "att_latitude": 20.2961,
-      "att_longitude": 85.8245,
-      "att_geofence_name": "nutantekoffice",
-      "att_project_id": "P001",
-      "att_notes": "Early arrival",
-      "att_status": "checkin",
-      "verification_type": "face",
-      "is_verified": 1,
-      "created_at": "2025-12-16T08:50:00Z",
-      "updated_at": "2025-12-16T08:50:00Z"
-    }
+     {
+    "att_id": "NUTANTEKA20251201",
+    "emp_id": "NUTANTEKE20250601",
+    "att_timestamp": "2025-12-01T09:05:00Z",
+    "att_latitude": 20.296100,
+    "att_longitude": 85.824500,
+    "att_geofence_name": "NutantekOffice",
+    "project_id": "NUTANTEKP10001",
+    "att_notes": "On time",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-01T09:05:00Z",
+    "updated_at": "2025-12-01T09:05:00Z"
+  },
+  {
+    "att_id": "NUTANTEKA20251202",
+    "emp_id": "NUTANTEKE20250601",
+    "att_timestamp": "2025-12-02T09:10:00Z",
+    "att_latitude": 20.296100,
+    "att_longitude": 85.824500,
+    "att_geofence_name": "NutantekOffice",
+    "project_id": "NUTANTEKP10001",
+    "att_notes": "Slightly late",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-02T09:10:00Z",
+    "updated_at": "2025-12-02T09:10:00Z"
+  },
+  {
+    "att_id": "NUTANTEKA20251203",
+    "emp_id": "NUTANTEKE20250601",
+    "att_timestamp": "2025-12-03T09:00:00Z",
+    "att_latitude": 20.296100,
+    "att_longitude": 85.824500,
+    "att_geofence_name": "NutantekOffice",
+    "project_id": "NUTANTEKP10001",
+    "att_notes": "On time",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-03T09:00:00Z",
+    "updated_at": "2025-12-03T09:00:00Z"
+  },
+  {
+    "att_id": "NUTANTEKA20251204",
+    "emp_id": "NUTANTEKE20250601",
+    "att_timestamp": "2025-12-04T09:20:00Z",
+    "att_latitude": 20.296100,
+    "att_longitude": 85.824500,
+    "att_geofence_name": "NutantekOffice",
+    "project_id": "NUTANTEKP10001",
+    "att_notes": "Traffic delay",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-04T09:20:00Z",
+    "updated_at": "2025-12-04T09:20:00Z"
+  },
+  {
+    "att_id": "NUTANTEKA20251205",
+    "emp_id": "NUTANTEKE20250601",
+    "att_timestamp": "2025-12-05T09:00:00Z",
+    "att_latitude": 20.296100,
+    "att_longitude": 85.824500,
+    "att_geofence_name": "NutantekOffice",
+    "project_id": "NUTANTEKP10001",
+    "att_notes": "Perfect timing",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-05T09:00:00Z",
+    "updated_at": "2025-12-05T09:00:00Z"
+  },
+
+  {
+    "att_id": "NUTANTEKA20251206",
+    "emp_id": "NUTANTEKE20250602",
+    "att_timestamp": "2025-12-01T09:00:00Z",
+    "att_latitude": 20.270000,
+    "att_longitude": 85.840000,
+    "att_geofence_name": "ClientSiteBBSR",
+    "project_id": "NUTANTEKP10002",
+    "att_notes": "Client visit",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-01T09:00:00Z",
+    "updated_at": "2025-12-01T09:00:00Z"
+  },
+
+  {
+    "att_id": "NUTANTEKA20251207",
+    "emp_id": "NUTANTEKE20250602",
+    "att_timestamp": "2025-12-02T09:15:00Z",
+    "att_latitude": 20.270000,
+    "att_longitude": 85.840000,
+    "att_geofence_name": "ClientSiteBBSR",
+    "project_id": "NUTANTEKP10002",
+    "att_notes": "Late due to rain",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-02T09:15:00Z",
+    "updated_at": "2025-12-02T09:15:00Z"
+  },
+
+  {
+    "att_id": "NUTANTEKA20251208",
+    "emp_id": "NUTANTEKE20250603",
+    "att_timestamp": "2025-12-01T08:55:00Z",
+    "att_latitude": 28.704100,
+    "att_longitude": 77.102500,
+    "att_geofence_name": "DelhiClientOffice",
+    "project_id": "NUTANTEKP10003",
+    "att_notes": "Early arrival",
+    "att_status": "checkIn",
+    "verification_type": "fingerprint",
+    "is_verified": true,
+    "created_at": "2025-12-01T08:55:00Z",
+    "updated_at": "2025-12-01T08:55:00Z"
+  },
+
+  {
+    "att_id": "NUTANTEKA20251209",
+    "emp_id": "NUTANTEKE20250604",
+    "att_timestamp": "2025-12-01T09:30:00Z",
+    "att_latitude": 12.971600,
+    "att_longitude": 77.594600,
+    "att_geofence_name": "BangaloreRemote",
+    "project_id": "NUTANTEKP10004",
+    "att_notes": "Network delay",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-01T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+
+  {
+    "att_id": "NUTANTEKA20251210",
+    "emp_id": "NUTANTEKE20250605",
+    "att_timestamp": "2025-12-01T09:00:00Z",
+    "att_latitude": 18.520400,
+    "att_longitude": 73.856700,
+    "att_geofence_name": "PuneWarehouse",
+    "project_id": "NUTANTEKP10005",
+    "att_notes": "Warehouse inspection",
+    "att_status": "checkIn",
+    "verification_type": "faceauth",
+    "is_verified": true,
+    "created_at": "2025-12-01T09:00:00Z",
+    "updated_at": "2025-12-01T09:00:00Z"
+  }
   ],
 
   "employee_regularization": [
     {
-      "reg_id": "REG001",
-      "emp_id": "EMP001",
-      "reg_applied_for_date": "2025-12-08",
-      "reg_date_applied": "2025-12-10",
+      "reg_id": "REG20251201",
+      "emp_id": "NUTANTEKE20250601",
+      "mgr_emp_id": "NUTANTEKE20250610",
+      "reg_date_applied": "2025-12-03T11:00:00Z",
+      "reg_applied_for_date": "2025-12-02",
       "reg_justification": "Was sick, forgot to apply leave in advance",
-      "reg_approval_status": "pending",
-      "reg_type": "Full Day",
-      "checkin_time": "9:00 AM",
-      "checkout_time": "12:00 PM",
-      "shortfall_time": "1h 30m"
-    },
-    {
-      "reg_id": "REG002",
-      "emp_id": "EMP001",
-      "reg_applied_for_date": "2025-12-15",
-      "reg_date_applied": "2025-12-15",
-      "reg_justification": "Traffic jam due to accident on the highway. Had to take alternate route which took extra time.",
-      "reg_approval_status": "pending",
-      "reg_type": "Check-in Only",
-      "checkin_time": "10:30 AM",
-      "checkout_time": "03:00 PM",
-      "shortfall_time": "1h 30m"
-    },
-    {
-      "reg_id": "REG003",
-      "emp_id": "EMP001",
-      "reg_applied_for_date": "2025-12-12",
-      "reg_date_applied": "2025-12-13",
-      "reg_justification": "Doctor appointment in the morning",
+      "reg_first_check_in": "11:30",
+      "reg_last_check_out": "18:00",
+      "shortfall_hrs": "02:30",
       "reg_approval_status": "approved",
-      "reg_type": "Full Day",
-      "checkin_time": "12:00 PM",
-      "checkout_time": "04:00 PM",
-      "shortfall_time": "2h 30m"
-    }
+      "mgr_comments": "Approved considering medical reason",
+      "created_at": "2025-12-03T11:00:00Z",
+      "updated_at": "2025-12-03T12:30:00Z"
+    },
+    {
+    "reg_id": "REG20251202",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "reg_date_applied": "2025-12-02T10:15:00Z",
+    "reg_applied_for_date": "2025-12-01",
+    "reg_justification": "Late arrival due to traffic congestion",
+    "reg_first_check_in": "09:45",
+    "reg_last_check_out": "18:00",
+    "shortfall_hrs": "00:45",
+    "reg_approval_status": "pending",
+    "mgr_comments": null,
+    "created_at": "2025-12-02T10:15:00Z",
+    "updated_at": "2025-12-02T10:15:00Z"
+  },
+  {
+    "reg_id": "REG20251203",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "reg_date_applied": "2025-12-03T11:00:00Z",
+    "reg_applied_for_date": "2025-12-02",
+    "reg_justification": "Doctor appointment in the morning",
+    "reg_first_check_in": "11:30",
+    "reg_last_check_out": "18:00",
+    "shortfall_hrs": "02:30",
+    "reg_approval_status": "approved",
+    "mgr_comments": "Approved considering medical reason",
+    "created_at": "2025-12-03T11:00:00Z",
+    "updated_at": "2025-12-03T12:30:00Z"
+  },
+  {
+    "reg_id": "REG20251204",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "reg_date_applied": "2025-12-04T10:40:00Z",
+    "reg_applied_for_date": "2025-12-03",
+    "reg_justification": "System issue during check-in",
+    "reg_first_check_in": "09:20",
+    "reg_last_check_out": "18:00",
+    "shortfall_hrs": "00:20",
+    "reg_approval_status": "rejected",
+    "mgr_comments": "System logs do not match",
+    "created_at": "2025-12-04T10:40:00Z",
+    "updated_at": "2025-12-04T11:10:00Z"
+  },
+
+  {
+    "reg_id": "REG20251205",
+    "emp_id": "NUTANTEKE20250602",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "reg_date_applied": "2025-12-02T09:50:00Z",
+    "reg_applied_for_date": "2025-12-01",
+    "reg_justification": "Client meeting extended",
+    "reg_first_check_in": "10:00",
+    "reg_last_check_out": "19:30",
+    "shortfall_hrs": "01:00",
+    "reg_approval_status": "approved",
+    "mgr_comments": "Valid client engagement",
+    "created_at": "2025-12-02T09:50:00Z",
+    "updated_at": "2025-12-02T10:20:00Z"
+  },
+
+  {
+    "reg_id": "REG20251206",
+    "emp_id": "NUTANTEKE20250602",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "reg_date_applied": "2025-12-03T10:10:00Z",
+    "reg_applied_for_date": "2025-12-02",
+    "reg_justification": "Public transport strike",
+    "reg_first_check_in": "10:30",
+    "reg_last_check_out": "18:30",
+    "shortfall_hrs": "01:30",
+    "reg_approval_status": "pending",
+    "mgr_comments": null,
+    "created_at": "2025-12-03T10:10:00Z",
+    "updated_at": "2025-12-03T10:10:00Z"
+  },
+    {
+  "reg_id": "REG20251206",
+  "emp_id": "NUTANTEKE20250603",
+  "mgr_emp_id": "NUTANTEKE20250611",
+  "reg_date_applied": "2025-12-02T09:40:00Z",
+  "reg_applied_for_date": "2025-12-01",
+  "reg_justification": "Metro delay due to technical fault",
+  "reg_first_check_in": "09:50",
+  "reg_last_check_out": "18:00",
+  "shortfall_hrs": "00:50",
+  "reg_approval_status": "approved",
+  "mgr_comments": "Metro issue confirmed",
+  "created_at": "2025-12-02T09:40:00Z",
+  "updated_at": "2025-12-02T10:10:00Z"
+},
+{
+  "reg_id": "REG20251207",
+  "emp_id": "NUTANTEKE20250603",
+  "mgr_emp_id": "NUTANTEKE20250611",
+  "reg_date_applied": "2025-12-03T10:20:00Z",
+  "reg_applied_for_date": "2025-12-02",
+  "reg_justification": "Laptop boot issue",
+  "reg_first_check_in": "09:25",
+  "reg_last_check_out": "18:10",
+  "shortfall_hrs": "00:25",
+  "reg_approval_status": "pending",
+  "mgr_comments": null,
+  "created_at": "2025-12-03T10:20:00Z",
+  "updated_at": "2025-12-03T10:20:00Z"
+},
+{
+  "reg_id": "REG20251208",
+  "emp_id": "NUTANTEKE20250603",
+  "mgr_emp_id": "NUTANTEKE20250611",
+  "reg_date_applied": "2025-12-04T11:00:00Z",
+  "reg_applied_for_date": "2025-12-03",
+  "reg_justification": "Internet outage in locality",
+  "reg_first_check_in": "10:10",
+  "reg_last_check_out": "18:30",
+  "shortfall_hrs": "01:10",
+  "reg_approval_status": "rejected",
+  "mgr_comments": "No outage proof shared",
+  "created_at": "2025-12-04T11:00:00Z",
+  "updated_at": "2025-12-04T11:20:00Z"
+},
+
+{
+  "reg_id": "REG20251209",
+  "emp_id": "NUTANTEKE20250604",
+  "mgr_emp_id": "NUTANTEKE20250612",
+  "reg_date_applied": "2025-12-02T09:30:00Z",
+  "reg_applied_for_date": "2025-12-01",
+  "reg_justification": "School drop for child",
+  "reg_first_check_in": "09:40",
+  "reg_last_check_out": "18:00",
+  "shortfall_hrs": "00:40",
+  "reg_approval_status": "approved",
+  "mgr_comments": "Valid family reason",
+  "created_at": "2025-12-02T09:30:00Z",
+  "updated_at": "2025-12-02T10:00:00Z"
+},
+{
+  "reg_id": "REG20251210",
+  "emp_id": "NUTANTEKE20250604",
+  "mgr_emp_id": "NUTANTEKE20250612",
+  "reg_date_applied": "2025-12-03T10:10:00Z",
+  "reg_applied_for_date": "2025-12-02",
+  "reg_justification": "Vehicle breakdown",
+  "reg_first_check_in": "10:00",
+  "reg_last_check_out": "18:15",
+  "shortfall_hrs": "01:00",
+  "reg_approval_status": "pending",
+  "mgr_comments": null,
+  "created_at": "2025-12-03T10:10:00Z",
+  "updated_at": "2025-12-03T10:10:00Z"
+},
+{
+  "reg_id": "REG20251211",
+  "emp_id": "NUTANTEKE20250604",
+  "mgr_emp_id": "NUTANTEKE20250612",
+  "reg_date_applied": "2025-12-04T11:30:00Z",
+  "reg_applied_for_date": "2025-12-03",
+  "reg_justification": "Forgot to check-in",
+  "reg_first_check_in": "09:00",
+  "reg_last_check_out": "18:00",
+  "shortfall_hrs": "00:00",
+  "reg_approval_status": "approved",
+  "mgr_comments": "Attendance logs verified",
+  "created_at": "2025-12-04T11:30:00Z",
+  "updated_at": "2025-12-04T12:00:00Z"
+},
+
+{
+  "reg_id": "REG20251212",
+  "emp_id": "NUTANTEKE20250605",
+  "mgr_emp_id": "NUTANTEKE20250610",
+  "reg_date_applied": "2025-12-02T09:20:00Z",
+  "reg_applied_for_date": "2025-12-01",
+  "reg_justification": "Medical checkup",
+  "reg_first_check_in": "11:00",
+  "reg_last_check_out": "18:00",
+  "shortfall_hrs": "02:00",
+  "reg_approval_status": "approved",
+  "mgr_comments": "Medical proof submitted",
+  "created_at": "2025-12-02T09:20:00Z",
+  "updated_at": "2025-12-02T10:00:00Z"
+},
+{
+  "reg_id": "REG20251213",
+  "emp_id": "NUTANTEKE20250605",
+  "mgr_emp_id": "NUTANTEKE20250610",
+  "reg_date_applied": "2025-12-03T10:00:00Z",
+  "reg_applied_for_date": "2025-12-02",
+  "reg_justification": "System auto-logout issue",
+  "reg_first_check_in": "09:15",
+  "reg_last_check_out": "18:05",
+  "shortfall_hrs": "00:15",
+  "reg_approval_status": "pending",
+  "mgr_comments": null,
+  "created_at": "2025-12-03T10:00:00Z",
+  "updated_at": "2025-12-03T10:00:00Z"
+},
+{
+  "reg_id": "REG20251214",
+  "emp_id": "NUTANTEKE20250605",
+  "mgr_emp_id": "NUTANTEKE20250610",
+  "reg_date_applied": "2025-12-04T11:15:00Z",
+  "reg_applied_for_date": "2025-12-03",
+  "reg_justification": "Power cut in area",
+  "reg_first_check_in": "10:30",
+  "reg_last_check_out": "18:30",
+  "shortfall_hrs": "01:30",
+  "reg_approval_status": "rejected",
+  "mgr_comments": "No power cut record",
+  "created_at": "2025-12-04T11:15:00Z",
+  "updated_at": "2025-12-04T11:40:00Z"
+}
+
   ],
 
   "stats": {
@@ -198,80 +666,499 @@
   },
 
   "employee_leaves": [
-    {
-      "leave_id": "L001",
-      "emp_id": "EMP001",
-      "leave_from_date": "2025-12-25",
-      "leave_to_date": "2025-12-26",
-      "leave_type": "Casual Leave",
-      "leave_approval_status": "pending",
-      "leave_justification": "Family function",
-      "manager_comments": null
-    }
-  ],
+  {
+    "leave_id": "LEV20251201",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-01",
+    "leave_to_date": "2025-12-01",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Personal work",
+    "leave_approval_status": "approved",
+    "manager_comments": "Approved",
+    "created_at": "2025-11-30T10:00:00Z",
+    "updated_at": "2025-11-30T10:30:00Z"
+  },
+  {
+    "leave_id": "LEV20251202",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-02",
+    "leave_to_date": "2025-12-02",
+    "leave_type": "Sick Leave",
+    "leave_justification": "Fever",
+    "leave_approval_status": "pending",
+    "manager_comments": null,
+    "created_at": "2025-12-01T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "leave_id": "LEV20251203",
+    "emp_id": "NUTANTEKE20250601",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-03",
+    "leave_to_date": "2025-12-03",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Bank work",
+    "leave_approval_status": "rejected",
+    "manager_comments": "Late application",
+    "created_at": "2025-12-02T11:00:00Z",
+    "updated_at": "2025-12-02T11:20:00Z"
+  },
 
-  "user_roles": [
-    {
-      "role_id": 1,
-      "role_name": "Employee"
-    },
-    {
-      "role_id": 2,
-      "role_name": "Manager"
-    },
-    {
-      "role_id": 3,
-      "role_name": "Admin"
-    }
-  ],
+  {
+    "leave_id": "LEV20251204",
+    "emp_id": "NUTANTEKE20250602",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-01",
+    "leave_to_date": "2025-12-01",
+    "leave_type": "Sick Leave",
+    "leave_justification": "Migraine",
+    "leave_approval_status": "approved",
+    "manager_comments": "Take care",
+    "created_at": "2025-11-30T09:45:00Z",
+    "updated_at": "2025-11-30T10:10:00Z"
+  },
+  {
+    "leave_id": "LEV20251205",
+    "emp_id": "NUTANTEKE20250602",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-02",
+    "leave_to_date": "2025-12-02",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Family visit",
+    "leave_approval_status": "pending",
+    "manager_comments": null,
+    "created_at": "2025-12-01T10:20:00Z",
+    "updated_at": "2025-12-01T10:20:00Z"
+  },
+  {
+    "leave_id": "LEV20251206",
+    "emp_id": "NUTANTEKE20250602",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-03",
+    "leave_to_date": "2025-12-03",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Travel",
+    "leave_approval_status": "rejected",
+    "manager_comments": "Work deadline",
+    "created_at": "2025-12-02T12:00:00Z",
+    "updated_at": "2025-12-02T12:20:00Z"
+  },
 
-  "employee_mapped_projects": [
-    {
-      "emp_id": "EMP001",
-      "project_id": "P001",
-      "mapping_status": "active"
-    },
-    {
-      "emp_id": "EMP001",
-      "project_id": "P002",
-      "mapping_status": "active"
-    },
-    {
-      "emp_id": "EMP002",
-      "project_id": "P001",
-      "mapping_status": "active"
-    }
-  ],
+  {
+    "leave_id": "LEV20251207",
+    "emp_id": "NUTANTEKE20250603",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-01",
+    "leave_to_date": "2025-12-01",
+    "leave_type": "Sick Leave",
+    "leave_justification": "Cold & cough",
+    "leave_approval_status": "approved",
+    "manager_comments": "Approved",
+    "created_at": "2025-11-30T09:00:00Z",
+    "updated_at": "2025-11-30T09:25:00Z"
+  },
+  {
+    "leave_id": "LEV20251208",
+    "emp_id": "NUTANTEKE20250603",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-02",
+    "leave_to_date": "2025-12-02",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Home repair",
+    "leave_approval_status": "pending",
+    "manager_comments": null,
+    "created_at": "2025-12-01T10:00:00Z",
+    "updated_at": "2025-12-01T10:00:00Z"
+  },
+  {
+    "leave_id": "LEV20251209",
+    "emp_id": "NUTANTEKE20250603",
+    "mgr_emp_id": "NUTANTEKE20250611",
+    "leave_from_date": "2025-12-03",
+    "leave_to_date": "2025-12-03",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Personal errand",
+    "leave_approval_status": "approved",
+    "manager_comments": "Approved",
+    "created_at": "2025-12-02T11:40:00Z",
+    "updated_at": "2025-12-02T12:00:00Z"
+  },
+
+  {
+    "leave_id": "LEV20251210",
+    "emp_id": "NUTANTEKE20250604",
+    "mgr_emp_id": "NUTANTEKE20250612",
+    "leave_from_date": "2025-12-01",
+    "leave_to_date": "2025-12-01",
+    "leave_type": "Sick Leave",
+    "leave_justification": "Doctor visit",
+    "leave_approval_status": "approved",
+    "manager_comments": "Medical reason valid",
+    "created_at": "2025-11-30T10:15:00Z",
+    "updated_at": "2025-11-30T10:45:00Z"
+  },
+  {
+    "leave_id": "LEV20251211",
+    "emp_id": "NUTANTEKE20250604",
+    "mgr_emp_id": "NUTANTEKE20250612",
+    "leave_from_date": "2025-12-02",
+    "leave_to_date": "2025-12-02",
+    "leave_type": "Casual Leave",
+    "leave_justification": "School work",
+    "leave_approval_status": "pending",
+    "manager_comments": null,
+    "created_at": "2025-12-01T09:50:00Z",
+    "updated_at": "2025-12-01T09:50:00Z"
+  },
+  {
+    "leave_id": "LEV20251212",
+    "emp_id": "NUTANTEKE20250604",
+    "mgr_emp_id": "NUTANTEKE20250612",
+    "leave_from_date": "2025-12-03",
+    "leave_to_date": "2025-12-03",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Outstation travel",
+    "leave_approval_status": "rejected",
+    "manager_comments": "Sprint delivery",
+    "created_at": "2025-12-02T12:30:00Z",
+    "updated_at": "2025-12-02T12:50:00Z"
+  },
+
+  {
+    "leave_id": "LEV20251213",
+    "emp_id": "NUTANTEKE20250605",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-01",
+    "leave_to_date": "2025-12-01",
+    "leave_type": "Sick Leave",
+    "leave_justification": "Headache",
+    "leave_approval_status": "approved",
+    "manager_comments": "Approved",
+    "created_at": "2025-11-30T09:20:00Z",
+    "updated_at": "2025-11-30T09:45:00Z"
+  },
+  {
+    "leave_id": "LEV20251214",
+    "emp_id": "NUTANTEKE20250605",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-02",
+    "leave_to_date": "2025-12-02",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Personal work",
+    "leave_approval_status": "pending",
+    "manager_comments": null,
+    "created_at": "2025-12-01T10:10:00Z",
+    "updated_at": "2025-12-01T10:10:00Z"
+  },
+  {
+    "leave_id": "LEV20251215",
+    "emp_id": "NUTANTEKE20250605",
+    "mgr_emp_id": "NUTANTEKE20250610",
+    "leave_from_date": "2025-12-03",
+    "leave_to_date": "2025-12-03",
+    "leave_type": "Casual Leave",
+    "leave_justification": "Family emergency",
+    "leave_approval_status": "approved",
+    "manager_comments": "Approved",
+    "created_at": "2025-12-02T11:50:00Z",
+    "updated_at": "2025-12-02T12:10:00Z"
+  }
+],
+
+"user_roles": [
+  {
+    "role_id": "R01",
+    "role_name": "Employee",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R02",
+    "role_name": "Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R03",
+    "role_name": "HR Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R04",
+    "role_name": "ADMIN",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R05",
+    "role_name": "Operations Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R06",
+    "role_name": "Sr. Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R07",
+    "role_name": "Project Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "role_id": "R08",
+    "role_name": "Finance Manager",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+],
+
+
+  "project_manager_mapping": [
+  {
+    "emp_id": "NUTANTEKM20250610",
+    "project_id": "NUTANTEKP10001",
+    "mapping_status": "active",
+    "created_at": "2025-11-01T10:00:00Z",
+    "updated_at": "2025-12-01T10:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250610",
+    "project_id": "NUTANTEKP10002",
+    "mapping_status": "active",
+    "created_at": "2025-11-05T10:00:00Z",
+    "updated_at": "2025-12-01T10:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250611",
+    "project_id": "NUTANTEKP10003",
+    "mapping_status": "active",
+    "created_at": "2025-11-10T10:00:00Z",
+    "updated_at": "2025-12-01T10:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250611",
+    "project_id": "NUTANTEKP10004",
+    "mapping_status": "deactive",
+    "created_at": "2025-10-20T10:00:00Z",
+    "updated_at": "2025-11-15T10:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250612",
+    "project_id": "NUTANTEKP10005",
+    "mapping_status": "active",
+    "created_at": "2025-11-15T10:00:00Z",
+    "updated_at": "2025-12-01T10:00:00Z"
+  }
+],
+
+"employee_mapped_projects":  [
+  {
+    "emp_id": "NUTANTEKE20250601",
+    "project_id": "NUTANTEKP10001",
+    "mapping_status": "active",
+    "created_at": "2025-11-01T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250601",
+    "project_id": "NUTANTEKP10002",
+    "mapping_status": "active",
+    "created_at": "2025-11-05T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250602",
+    "project_id": "NUTANTEKP10003",
+    "mapping_status": "active",
+    "created_at": "2025-11-10T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250603",
+    "project_id": "NUTANTEKP10001",
+    "mapping_status": "active",
+    "created_at": "2025-11-01T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250603",
+    "project_id": "NUTANTEKP10004",
+    "mapping_status": "deactive",
+    "created_at": "2025-10-15T09:30:00Z",
+    "updated_at": "2025-11-20T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250604",
+    "project_id": "NUTANTEKP10005",
+    "mapping_status": "active",
+    "created_at": "2025-11-15T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250605",
+    "project_id": "NUTANTEKP10002",
+    "mapping_status": "active",
+    "created_at": "2025-11-05T09:30:00Z",
+    "updated_at": "2025-12-01T09:30:00Z"
+  }
+],
 
   "employee_shifts": [
-    {
-      "emp_id": "EMP001",
-      "shift_id": "SHIFT001"
-    },
-    {
-      "emp_id": "EMP002",
-      "shift_id": "SHIFT001"
-    }
-  ],
+  {
+    "emp_id": "NUTANTEKE20250601",
+    "shift_id": "NUTANTEKS01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250602",
+    "shift_id": "NUTANTEKS01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250603",
+    "shift_id": "NUTANTEKS01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250604",
+    "shift_id": "NUTANTEKS02",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250605",
+    "shift_id": "NUTANTEKS03",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  }
+],
 
   "employee_roles_mapping": [
-    {
-      "emp_id": "EMP001",
-      "role_id": "1"
-    },
-    {
-      "emp_id": "EMP002",
-      "role_id": "2"
-    }
-  ],
+  {
+    "emp_id": "NUTANTEKE20250601",
+    "role_id": "R01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250602",
+    "role_id": "R01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250603",
+    "role_id": "R01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250604",
+    "role_id": "R01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKE20250605",
+    "role_id": "R01",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250501",
+    "role_id": "R02",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250502",
+    "role_id": "R02",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  },
+  {
+    "emp_id": "NUTANTEKM20250503",
+    "role_id": "R02",
+    "created_at": "2025-06-17T09:00:00Z",
+    "updated_at": "2025-06-17T09:00:00Z"
+  }
+],
+
 
   "shift_master": [
-    {
-      "shift_id": "SHIFT001",
-      "shift_name": "Morning Shift",
-      "shift_start_time": "09:00",
-      "shift_end_time": "18:00"
-    }
-  ]
+  {
+    "shift_id": "NUTANTEKS01",
+    "org_short_name": "NUTANTEK",
+    "shift_name": "Morning Shift",
+    "shift_start_time": "09:00",
+    "shift_end_time": "18:00",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  },
+  {
+    "shift_id": "NUTANTEKS02",
+    "org_short_name": "NUTANTEK",
+    "shift_name": "Regular Shift",
+    "shift_start_time": "10:00",
+    "shift_end_time": "19:00",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  },
+  {
+    "shift_id": "NUTANTEKS03",
+    "org_short_name": "NUTANTEK",
+    "shift_name": "Night Shift",
+    "shift_start_time": "21:00",
+    "shift_end_time": "06:00",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+],
+"running_serial_number": [
+  {
+    "org_id": "NUTANTEK",
+    "project_last_serial_number": 5,
+    "emp_last_serial_number": 5,
+    "att_last_serial_number": 15,
+    "reg_last_serial_number": 15,
+    "leave_last_serial_number": 15,
+    "shift_last_serial_number": 3,
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-12-16T00:00:00Z"
+  }
+],
+"geofence_master": [
   
+      {
+      "geo_id": "OFFICE_MAIN",
+      "geo_name": "Main Office - Mumbai",
+      "latitude": 19.0760,
+      "longitude": 72.8777,
+      "radius_meters": 150.0,
+      "is_active": 1,
+      "address": "Andheri East, Mumbai",
+      "created_at": "2025-12-29T10:00:00Z",
+      "updated_at": "2025-12-29T10:00:00Z"
+    },
+    {
+      "geo_id": "CLIENT_SITE_A",
+      "geo_name": "CLIENT_SITE_A",
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "radius_meters": 200.0,
+      "is_active": 1,
+      "address": "Hinjewadi, Pune",
+      "created_at": "2025-12-29T10:00:00Z",
+      "updated_at": "2025-12-29T10:00:00Z"
+    }
+]  
 }

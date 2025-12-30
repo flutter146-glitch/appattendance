@@ -1,101 +1,160 @@
 // lib/features/auth/presentation/providers/auth_notifier.dart
-
-import 'dart:convert';
-
+import 'package:appattendance/core/database/db_helper.dart';
+import 'package:appattendance/features/auth/data/repositories/auth_repository.dart';
+import 'package:appattendance/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
-  AuthNotifier() : super(const AsyncData(null)) {
-    checkLoginStatus();
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl(); // Abhi Dio nahi chahiye, toh null pass
+});
+
+class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
+  final Ref ref;
+  final AuthRepository repository;
+
+  AuthNotifier(this.ref, this.repository) : super(const AsyncData(null)) {
+    _checkCurrentUser();
   }
 
-  String? _token;
-  String? get token => _token;
-
-  // Helper methods — login_screen ke liye
-  void setLoading(bool loading) {
-    if (loading) {
-      state = const AsyncLoading();
+  /// App start pe check karta hai ki user already logged in hai ya nahi
+  Future<void> _checkCurrentUser() async {
+    state = const AsyncLoading();
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      final user = await repo.getCurrentUser();
+      state = AsyncData(user);
+    } catch (e, stack) {
+      state = AsyncError(e, stack);
     }
   }
 
-  void setUser(Map<String, dynamic> user) {
-    state = AsyncData(user);
-  }
-
-  void setError(String error) {
-    state = AsyncError(error, StackTrace.current);
-  }
-
-  // Login
+  /// Login logic - email/password se
   Future<void> login(String email, String password) async {
-    setLoading(true);
-
+    state = const AsyncLoading();
     try {
-      final response = await http.post(
-        Uri.parse("http://192.168.125.110:3000/api/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email.trim().toLowerCase(),
-          "password": password,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data['success'] == true) {
-        final user = data['user'] as Map<String, dynamic>;
-        final token = data['token'] as String;
-
-        _token = token;
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
-        await prefs.setString('user_data', jsonEncode(user));
-
-        setUser(user);
-      } else {
-        setError(data['message'] ?? "Invalid email or password");
-      }
-    } catch (e) {
-      setError("No internet connection");
+      final repo = ref.read(authRepositoryProvider);
+      final user = await repo.login(email.trim(), password);
+      state = AsyncData(user);
+    } catch (e, stack) {
+      state = AsyncError(e, stack);
     }
   }
 
-  // Auto login
-  Future<void> checkLoginStatus() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      final userJson = prefs.getString('user_data');
-
-      if (token != null && userJson != null) {
-        _token = token;
-        final user = jsonDecode(userJson) as Map<String, dynamic>;
-        state = AsyncData(user);
-      }
-    } catch (e) {
-      state = const AsyncData(null);
-    }
-  }
-
-  // Logout
+  /// Logout - session clear
   Future<void> logout() async {
-    _token = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    state = const AsyncData(null);
+    state = const AsyncLoading();
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      await repo.logout();
+      state = const AsyncData(null);
+    } catch (e, stack) {
+      state = AsyncError(e, stack);
+    }
   }
 }
 
-final authProvider =
-    StateNotifierProvider<AuthNotifier, AsyncValue<Map<String, dynamic>?>>((
-      ref,
-    ) {
-      return AuthNotifier();
-    });
+
+
+// // lib/features/auth/presentation/providers/auth_notifier.dart
+
+// import 'dart:convert';
+
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
+
+// class AuthNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
+//   AuthNotifier() : super(const AsyncData(null)) {
+//     checkLoginStatus();
+//   }
+
+//   String? _token;
+//   String? get token => _token;
+
+//   // Helper methods — login_screen ke liye
+//   void setLoading(bool loading) {
+//     if (loading) {
+//       state = const AsyncLoading();
+//     }
+//   }
+
+//   void setUser(Map<String, dynamic> user) {
+//     state = AsyncData(user);
+//   }
+
+//   void setError(String error) {
+//     state = AsyncError(error, StackTrace.current);
+//   }
+
+//   // Login
+//   Future<void> login(String email, String password) async {
+//     setLoading(true);
+
+//     try {
+//       final response = await http.post(
+//         Uri.parse("http://192.168.125.110:3000/api/login"),
+//         headers: {"Content-Type": "application/json"},
+//         body: jsonEncode({
+//           "email": email.trim().toLowerCase(),
+//           "password": password,
+//         }),
+//       );
+
+//       final data = jsonDecode(response.body);
+
+//       if (response.statusCode == 200 && data['success'] == true) {
+//         final user = data['user'] as Map<String, dynamic>;
+//         final token = data['token'] as String;
+
+//         _token = token;
+
+//         final prefs = await SharedPreferences.getInstance();
+//         await prefs.setString('auth_token', token);
+//         await prefs.setString('user_data', jsonEncode(user));
+
+//         setUser(user);
+//       } else {
+//         setError(data['message'] ?? "Invalid email or password");
+//       }
+//     } catch (e) {
+//       setError("No internet connection");
+//     }
+//   }
+
+//   // Auto login
+//   Future<void> checkLoginStatus() async {
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('auth_token');
+//       final userJson = prefs.getString('user_data');
+
+//       if (token != null && userJson != null) {
+//         _token = token;
+//         final user = jsonDecode(userJson) as Map<String, dynamic>;
+//         state = AsyncData(user);
+//       }
+//     } catch (e) {
+//       state = const AsyncData(null);
+//     }
+//   }
+
+//   // Logout
+//   Future<void> logout() async {
+//     _token = null;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.clear();
+//     state = const AsyncData(null);
+//   }
+// }
+
+// final authProvider =
+//     StateNotifierProvider<AuthNotifier, AsyncValue<Map<String, dynamic>?>>((
+//       ref,
+//     ) {
+//       return AuthNotifier();
+//     });
 
 // // lib/features/auth/presentation/providers/auth_notifier.dart
 

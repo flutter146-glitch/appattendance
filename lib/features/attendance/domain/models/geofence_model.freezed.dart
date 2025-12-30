@@ -21,14 +21,18 @@ GeofenceModel _$GeofenceModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GeofenceModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  String get id =>
+      throw _privateConstructorUsedError; // e.g., "OFFICE_MAIN" or UUID
+  String get name =>
+      throw _privateConstructorUsedError; // "Main Office", "Client Site A"
   double get latitude => throw _privateConstructorUsedError;
   double get longitude => throw _privateConstructorUsedError;
-  double get radius => throw _privateConstructorUsedError;
-  GeofenceType get type => throw _privateConstructorUsedError;
+  double get radiusMeters => throw _privateConstructorUsedError; // e.g., 100.0
   bool get isActive => throw _privateConstructorUsedError;
+  String? get address =>
+      throw _privateConstructorUsedError; // Optional description
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this GeofenceModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,10 +56,11 @@ abstract class $GeofenceModelCopyWith<$Res> {
     String name,
     double latitude,
     double longitude,
-    double radius,
-    GeofenceType type,
+    double radiusMeters,
     bool isActive,
+    String? address,
     DateTime? createdAt,
+    DateTime? updatedAt,
   });
 }
 
@@ -78,10 +83,11 @@ class _$GeofenceModelCopyWithImpl<$Res, $Val extends GeofenceModel>
     Object? name = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? radius = null,
-    Object? type = null,
+    Object? radiusMeters = null,
     Object? isActive = null,
+    Object? address = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -101,21 +107,25 @@ class _$GeofenceModelCopyWithImpl<$Res, $Val extends GeofenceModel>
                 ? _value.longitude
                 : longitude // ignore: cast_nullable_to_non_nullable
                       as double,
-            radius: null == radius
-                ? _value.radius
-                : radius // ignore: cast_nullable_to_non_nullable
+            radiusMeters: null == radiusMeters
+                ? _value.radiusMeters
+                : radiusMeters // ignore: cast_nullable_to_non_nullable
                       as double,
-            type: null == type
-                ? _value.type
-                : type // ignore: cast_nullable_to_non_nullable
-                      as GeofenceType,
             isActive: null == isActive
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            address: freezed == address
+                ? _value.address
+                : address // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
           )
           as $Val,
@@ -137,10 +147,11 @@ abstract class _$$GeofenceModelImplCopyWith<$Res>
     String name,
     double latitude,
     double longitude,
-    double radius,
-    GeofenceType type,
+    double radiusMeters,
     bool isActive,
+    String? address,
     DateTime? createdAt,
+    DateTime? updatedAt,
   });
 }
 
@@ -162,10 +173,11 @@ class __$$GeofenceModelImplCopyWithImpl<$Res>
     Object? name = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? radius = null,
-    Object? type = null,
+    Object? radiusMeters = null,
     Object? isActive = null,
+    Object? address = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _$GeofenceModelImpl(
@@ -185,21 +197,25 @@ class __$$GeofenceModelImplCopyWithImpl<$Res>
             ? _value.longitude
             : longitude // ignore: cast_nullable_to_non_nullable
                   as double,
-        radius: null == radius
-            ? _value.radius
-            : radius // ignore: cast_nullable_to_non_nullable
+        radiusMeters: null == radiusMeters
+            ? _value.radiusMeters
+            : radiusMeters // ignore: cast_nullable_to_non_nullable
                   as double,
-        type: null == type
-            ? _value.type
-            : type // ignore: cast_nullable_to_non_nullable
-                  as GeofenceType,
         isActive: null == isActive
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        address: freezed == address
+            ? _value.address
+            : address // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
       ),
     );
@@ -208,41 +224,49 @@ class __$$GeofenceModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$GeofenceModelImpl implements _GeofenceModel {
+class _$GeofenceModelImpl extends _GeofenceModel {
   const _$GeofenceModelImpl({
     required this.id,
     required this.name,
     required this.latitude,
     required this.longitude,
-    required this.radius,
-    required this.type,
-    required this.isActive,
+    required this.radiusMeters,
+    this.isActive = true,
+    this.address,
     this.createdAt,
-  });
+    this.updatedAt,
+  }) : super._();
 
   factory _$GeofenceModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$GeofenceModelImplFromJson(json);
 
   @override
   final String id;
+  // e.g., "OFFICE_MAIN" or UUID
   @override
   final String name;
+  // "Main Office", "Client Site A"
   @override
   final double latitude;
   @override
   final double longitude;
   @override
-  final double radius;
+  final double radiusMeters;
+  // e.g., 100.0
   @override
-  final GeofenceType type;
-  @override
+  @JsonKey()
   final bool isActive;
   @override
+  final String? address;
+  // Optional description
+  @override
   final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'GeofenceModel(id: $id, name: $name, latitude: $latitude, longitude: $longitude, radius: $radius, type: $type, isActive: $isActive, createdAt: $createdAt)';
+    return 'GeofenceModel(id: $id, name: $name, latitude: $latitude, longitude: $longitude, radiusMeters: $radiusMeters, isActive: $isActive, address: $address, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -256,12 +280,15 @@ class _$GeofenceModelImpl implements _GeofenceModel {
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.radius, radius) || other.radius == radius) &&
-            (identical(other.type, type) || other.type == type) &&
+            (identical(other.radiusMeters, radiusMeters) ||
+                other.radiusMeters == radiusMeters) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -272,10 +299,11 @@ class _$GeofenceModelImpl implements _GeofenceModel {
     name,
     latitude,
     longitude,
-    radius,
-    type,
+    radiusMeters,
     isActive,
+    address,
     createdAt,
+    updatedAt,
   );
 
   /// Create a copy of GeofenceModel
@@ -292,37 +320,41 @@ class _$GeofenceModelImpl implements _GeofenceModel {
   }
 }
 
-abstract class _GeofenceModel implements GeofenceModel {
+abstract class _GeofenceModel extends GeofenceModel {
   const factory _GeofenceModel({
     required final String id,
     required final String name,
     required final double latitude,
     required final double longitude,
-    required final double radius,
-    required final GeofenceType type,
-    required final bool isActive,
+    required final double radiusMeters,
+    final bool isActive,
+    final String? address,
     final DateTime? createdAt,
+    final DateTime? updatedAt,
   }) = _$GeofenceModelImpl;
+  const _GeofenceModel._() : super._();
 
   factory _GeofenceModel.fromJson(Map<String, dynamic> json) =
       _$GeofenceModelImpl.fromJson;
 
   @override
-  String get id;
+  String get id; // e.g., "OFFICE_MAIN" or UUID
   @override
-  String get name;
+  String get name; // "Main Office", "Client Site A"
   @override
   double get latitude;
   @override
   double get longitude;
   @override
-  double get radius;
-  @override
-  GeofenceType get type;
+  double get radiusMeters; // e.g., 100.0
   @override
   bool get isActive;
   @override
+  String? get address; // Optional description
+  @override
   DateTime? get createdAt;
+  @override
+  DateTime? get updatedAt;
 
   /// Create a copy of GeofenceModel
   /// with the given fields replaced by the non-null parameter values.
