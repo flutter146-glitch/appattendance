@@ -225,7 +225,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 }
 
 
-
 // // lib/features/auth/presentation/screens/login_screen.dart
 // // Final production-ready Login Screen (updated for your current setup)
 // // Uses SQLite (dummy_data.json + db_helper.dart) for login
@@ -1043,7 +1042,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 //     // Show loading
 //     ref.read(authProvider.notifier).setLoading(true);
 
-//     // Simulate network delay
+//     // Simulate
 //     await Future.delayed(const Duration(seconds: 1));
 
 //     // Dummy users based on our DB schema
@@ -2416,3 +2415,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 //     );
 //   }
 // }
+//DEBUG

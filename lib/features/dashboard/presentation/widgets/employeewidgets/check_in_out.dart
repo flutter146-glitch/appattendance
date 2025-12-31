@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../attendance/data/services/geofence_service.dart';
+import '../../../../attendance/data/services/location_service.dart';
+
 class CheckInOutWidget extends ConsumerWidget {
   final bool hasCheckedInToday;
   final bool isInGeofence;
@@ -103,49 +106,90 @@ class CheckInOutWidget extends ConsumerWidget {
                   isEnabled: !hasCheckedInToday && isInGeofence,
                   onPressed: !hasCheckedInToday && isInGeofence
                       ? () async {
-                          await ref
-                              .read(attendanceProvider.notifier)
-                              .performCheckIn(
-                                latitude:
-                                    19.0760, // Dummy - replace with real location
-                                longitude: 72.8777,
-                                verificationType: VerificationType.gps,
-                                geofenceName: 'Office Zone',
-                                projectId: 'P001',
-                                notes: 'Office entry',
-                              );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Check-In Successful!'),
-                            ),
-                          );
-                        }
+                    final position = await LocationService.getCurrentLocation();
+
+                    final geofenceName = GeofenceService.getGeofenceName(
+                      position.latitude,
+                      position.longitude,
+                    );
+
+                    final allowed =
+                    GeofenceService.isInAllowedZone(geofenceName);
+
+                    if (!allowed) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You are outside allowed location'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    await ref
+                        .read(attendanceProvider.notifier)
+                        .performCheckIn(
+                      latitude: position.latitude,
+                      longitude: position.longitude,
+                      verificationType: VerificationType.gps,
+                      geofenceName: geofenceName,
+                      projectId: 'AUTO', // later from mapped project
+                      notes: geofenceName == 'WFH'
+                          ? 'Work from home'
+                          : 'Office entry',
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Check-In Successful')),
+                    );
+                  }
                       : null,
+
                 ),
                 _ActionButton(
                   label: 'Check-Out',
                   icon: Icons.logout,
                   color: Colors.orange,
                   isEnabled: hasCheckedInToday && isInGeofence,
-                  onPressed: hasCheckedInToday && isInGeofence
+                  onPressed: !hasCheckedInToday && isInGeofence
                       ? () async {
-                          await ref
-                              .read(attendanceProvider.notifier)
-                              .performCheckOut(
-                                latitude: 19.0760,
-                                longitude: 72.8777,
-                                verificationType: VerificationType.gps,
-                                geofenceName: 'Office Zone',
-                                projectId: 'P001',
-                                notes: 'Office exit',
-                              );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Check-Out Successful!'),
-                            ),
-                          );
-                        }
+                    final position = await LocationService.getCurrentLocation();
+
+                    final geofenceName = GeofenceService.getGeofenceName(
+                      position.latitude,
+                      position.longitude,
+                    );
+
+                    final allowed =
+                    GeofenceService.isInAllowedZone(geofenceName);
+
+                    if (!allowed) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You are outside allowed location'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    await ref
+                        .read(attendanceProvider.notifier)
+                        .performCheckOut(
+                      latitude: position.latitude,
+                      longitude: position.longitude,
+                      verificationType: VerificationType.gps,
+                      geofenceName: geofenceName,
+                      projectId: 'AUTO', // later from mapped project
+                      notes: geofenceName == 'WFH'
+                          ? 'Work from home'
+                          : 'Office entry',
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Check-In Successful')),
+                    );
+                  }
                       : null,
+
                 ),
               ],
             ),

@@ -1,197 +1,203 @@
-// lib/features/projects/presentation/widgets/projectwidgets/mapped_projects_widget.dart
-// Final upgraded version: Real data from projectProvider + role-based
-// Shows employee own mapped projects or manager team projects
-// Loading/error + dark mode + beautiful horizontal cards
+// // lib/features/projects/presentation/widgets/projectwidgets/mapped_projects_widget.dart
+// // Final upgraded version: Real data from projectProvider + role-based
+// // Shows employee own mapped projects or manager team projects
+// // Loading/error + dark mode + beautiful horizontal cards
+//
+// import 'package:appattendance/core/utils/app_colors.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+//
+// import '../../providers/project_provider.dart';
+//
+// class MappedProjectsWidget extends ConsumerWidget {
+//   const MappedProjectsWidget({super.key});
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
+//
+//     // Decide provider based on role (employee vs manager)
+//     final projectsAsync = ref.watch(mappedProjectProvider); // Default employee
+//     // For manager team projects: ref.watch(teamProjectProvider)
+//     return Card(
+//       elevation: 8,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+//       color: isDark ? Colors.grey.shade800 : Colors.white,
+//       child: Padding(
+//         padding: const EdgeInsets.all(20),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Mapped Projects",
+//               style: TextStyle(
+//                 fontSize: 20,
+//                 fontWeight: FontWeight.bold,
+//                 color: isDark ? Colors.white : Colors.black87,
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//
+//             projectsAsync.when(
+//               data: (mappedProjects) {
+//                 if (mappedProjects.isEmpty) {
+//                   return const Center(
+//                     child: Padding(
+//                       padding: EdgeInsets.all(16),
+//                       child: Text(
+//                         "No projects mapped yet",
+//                         style: TextStyle(fontSize: 16, color: Colors.grey),
+//                       ),
+//                     ),
+//                   );
+//                 }
+//
+//                 return SizedBox(
+//                   height: 180, // Safe height for horizontal cards
+//                   child: ListView.builder(
+//                     scrollDirection: Axis.horizontal,
+//                     padding: const EdgeInsets.symmetric(horizontal: 0),
+//                     itemCount: mappedProjects.length,
+//                     itemBuilder: (context, index) {
+//                       final mapped = mappedProjects[index];
+//                       final project = mapped.project;
+//
+//                       return Container(
+//                         width: 280,
+//                         margin: const EdgeInsets.only(right: 16),
+//                         decoration: BoxDecoration(
+//                           color: isDark
+//                               ? Colors.grey.shade700
+//                               : AppColors.warning.withOpacity(0.1),
+//                           borderRadius: BorderRadius.circular(24),
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: Colors.black.withOpacity(
+//                                 isDark ? 0.4 : 0.1,
+//                               ),
+//                               blurRadius: 12,
+//                               offset: const Offset(0, 6),
+//                             ),
+//                           ],
+//                         ),
+//                         child: SingleChildScrollView(
+//                           padding: const EdgeInsets.all(20),
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             mainAxisSize: MainAxisSize.min,
+//                             children: [
+//                               // Project Icon + Name
+//                               Row(
+//                                 children: [
+//                                   Container(
+//                                     padding: const EdgeInsets.all(12),
+//                                     decoration: BoxDecoration(
+//                                       color: Colors.blue.withOpacity(0.1),
+//                                       borderRadius: BorderRadius.circular(16),
+//                                     ),
+//                                     child: const Icon(
+//                                       Icons.work_rounded,
+//                                       color: AppColors.primary,
+//                                       size: 16,
+//                                     ),
+//                                   ),
+//                                   const SizedBox(width: 16),
+//                                   Expanded(
+//                                     child: Text(
+//                                       project.projectName,
+//                                       style: TextStyle(
+//                                         fontSize: 18,
+//                                         fontWeight: FontWeight.bold,
+//                                         color: isDark
+//                                             ? Colors.white
+//                                             : Colors.black87,
+//                                       ),
+//                                       overflow: TextOverflow.ellipsis,
+//                                       maxLines: 2,
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//
+//                               const SizedBox(height: 10),
+//
+//                               _projectDetailRow(
+//                                 "Site",
+//                                 project.projectSite ?? 'N/A',
+//                                 isDark,
+//                               ),
+//                               _projectDetailRow(
+//                                 "Client",
+//                                 project.clientName ?? 'Internal',
+//                                 isDark,
+//                               ),
+//
+//                               const SizedBox(height: 16),
+//
+//                               // Manager-specific details (if needed)
+//                               if (mapped.mappingStatus == 'active')
+//                                 _projectDetailRow("Status", "Active", isDark),
+//                             ],
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 );
+//               },
+//               loading: () => const Center(child: CircularProgressIndicator()),
+//               error: (err, stack) => Center(
+//                 child: Text(
+//                   "Error loading projects: $err",
+//                   style: const TextStyle(color: Colors.red),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _projectDetailRow(String label, String value, bool isDark) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 6),
+//       child: Row(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           SizedBox(
+//             width: 80,
+//             child: Text(
+//               "$label:",
+//               style: TextStyle(
+//                 fontSize: 14,
+//                 fontWeight: FontWeight.w600,
+//                 color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+//               ),
+//             ),
+//           ),
+//           Expanded(
+//             child: Text(
+//               value,
+//               style: TextStyle(
+//                 fontSize: 14,
+//                 color: isDark ? Colors.white : Colors.black87,
+//               ),
+//               softWrap: true,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+//
+//
 
-import 'package:appattendance/core/utils/app_colors.dart';
-import 'package:appattendance/features/project/domain/models/project_model.dart';
-import 'package:appattendance/features/project/presentation/providers/project_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MappedProjectsWidget extends ConsumerWidget {
-  const MappedProjectsWidget({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Decide provider based on role (employee vs manager)
-    final projectsAsync = ref.watch(mappedProjectProvider); // Default employee
-    // For manager team projects: ref.watch(teamProjectProvider)
 
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      color: isDark ? Colors.grey.shade800 : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Mapped Projects",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            projectsAsync.when(
-              data: (mappedProjects) {
-                if (mappedProjects.isEmpty) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        "No projects mapped yet",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    ),
-                  );
-                }
-
-                return SizedBox(
-                  height: 180, // Safe height for horizontal cards
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    itemCount: mappedProjects.length,
-                    itemBuilder: (context, index) {
-                      final mapped = mappedProjects[index];
-                      final project = mapped.project;
-
-                      return Container(
-                        width: 280,
-                        margin: const EdgeInsets.only(right: 16),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.grey.shade700
-                              : AppColors.warning.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(
-                                isDark ? 0.4 : 0.1,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Project Icon + Name
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: const Icon(
-                                      Icons.work_rounded,
-                                      color: AppColors.primary,
-                                      size: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Text(
-                                      project.projectName,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black87,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              _projectDetailRow(
-                                "Site",
-                                project.projectSite ?? 'N/A',
-                                isDark,
-                              ),
-                              _projectDetailRow(
-                                "Client",
-                                project.clientName ?? 'Internal',
-                                isDark,
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Manager-specific details (if needed)
-                              if (mapped.mappingStatus == 'active')
-                                _projectDetailRow("Status", "Active", isDark),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(
-                child: Text(
-                  "Error loading projects: $err",
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _projectDetailRow(String label, String value, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              "$label:",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              softWrap: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // // lib/features/dashboard/presentation/widgets/common/mapped_projects_widget.dart
 

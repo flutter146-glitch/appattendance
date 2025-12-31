@@ -1,5 +1,6 @@
 // lib/features/project/domain/repositories/project_repository.dart
-import 'package:appattendance/features/project/domain/models/project_model.dart';
+
+import '../../../domain/models/project_model.dart';
 
 abstract class ProjectRepository {
   /// Employee ke mapped projects

@@ -1,8 +1,9 @@
 // lib/features/leaves/data/repositories/leave_repository_impl.dart
 import 'package:appattendance/core/database/db_helper.dart';
-import 'package:appattendance/features/leaves/data/repository/leave_repository.dart';
 import 'package:appattendance/features/leaves/domain/models/leave_model.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'leave_repository.dart';
 
 class LeaveRepositoryImpl implements LeaveRepository {
   @override

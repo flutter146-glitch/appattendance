@@ -125,64 +125,64 @@ class PresentDashboardCardSection extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: isManagerial
                     ? [
-                        _statItem(
-                          "Team",
-                          state.teamSize.toString(),
-                          Icons.people_alt_rounded,
-                        ),
-                        _statItem(
-                          "Present",
-                          state.presentToday.toString(),
-                          Icons.verified_user_rounded,
-                        ),
-                        _statItem(
-                          "Pending Leaves",
-                          pendingLeaves.toString(),
-                          Icons.beach_access_rounded,
-                        ),
-                        _statItem(
-                          "Absent",
-                          (state.teamSize - state.presentToday).toString(),
-                          Icons.person_off_rounded,
-                        ),
-                        _statItem(
-                          "Overall %",
-                          "${(state.presentToday / state.teamSize * 100).round()}%",
-                          Icons.trending_up_rounded,
-                        ),
-                      ]
+                  _statItem(
+                    "Team",
+                    state.teamSize.toString(),
+                    Icons.people_alt_rounded,
+                  ),
+                  _statItem(
+                    "Present",
+                    state.presentToday.toString(),
+                    Icons.verified_user_rounded,
+                  ),
+                  _statItem(
+                    "Pending Leaves",
+                    pendingLeaves.toString(),
+                    Icons.beach_access_rounded,
+                  ),
+                  _statItem(
+                    "Absent",
+                    (state.teamSize - state.presentToday).toString(),
+                    Icons.person_off_rounded,
+                  ),
+                  _statItem(
+                    "Overall %",
+                    "${(state.presentToday / state.teamSize * 100).round()}%",
+                    Icons.trending_up_rounded,
+                  ),
+                ]
                     : [
-                        _statItem(
-                          "Total Days",
-                          totalDaysInMonth.toString(),
-                          Icons.calendar_today_rounded,
-                        ),
-                        _statItem(
-                          "Present",
-                          present.toString(),
-                          Icons.check_circle_rounded,
-                        ),
-                        _statItem(
-                          "Leave",
-                          leave.toString(),
-                          Icons.beach_access_rounded,
-                        ),
-                        _statItem(
-                          "Absent",
-                          absent.toString(),
-                          Icons.cancel_rounded,
-                        ),
-                        _statItem(
-                          "On-Time",
-                          onTime.toString(),
-                          Icons.access_time_rounded,
-                        ),
-                        _statItem(
-                          "Late",
-                          late.toString(),
-                          Icons.hourglass_full_rounded,
-                        ),
-                      ],
+                  _statItem(
+                    "Total Days",
+                    totalDaysInMonth.toString(),
+                    Icons.calendar_today_rounded,
+                  ),
+                  _statItem(
+                    "Present",
+                    present.toString(),
+                    Icons.check_circle_rounded,
+                  ),
+                  _statItem(
+                    "Leave",
+                    leave.toString(),
+                    Icons.beach_access_rounded,
+                  ),
+                  _statItem(
+                    "Absent",
+                    absent.toString(),
+                    Icons.cancel_rounded,
+                  ),
+                  _statItem(
+                    "On-Time",
+                    onTime.toString(),
+                    Icons.access_time_rounded,
+                  ),
+                  _statItem(
+                    "Late",
+                    late.toString(),
+                    Icons.hourglass_full_rounded,
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               Divider(color: isDark ? Colors.white24 : Colors.grey[300]),

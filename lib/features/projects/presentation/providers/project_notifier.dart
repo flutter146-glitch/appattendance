@@ -65,6 +65,10 @@ final projectRepositoryProvider = Provider<ProjectRepository>((ref) {
   return ProjectRepositoryImpl();
 });
 
+
+
+
+
 // // lib/features/project/presentation/providers/project_notifier.dart
 // import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 // import 'package:appattendance/features/projects/data/services/repository/project_repository.dart';

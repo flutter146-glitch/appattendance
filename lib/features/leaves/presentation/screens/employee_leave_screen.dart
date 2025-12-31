@@ -103,7 +103,7 @@ class _EmployeeLeaveScreenState extends ConsumerState<EmployeeLeaveScreen> {
                     );
                   },
                   loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  const Center(child: CircularProgressIndicator()),
                   error: (err, stack) =>
                       Center(child: Text('Error loading leaves: $err')),
                 ),

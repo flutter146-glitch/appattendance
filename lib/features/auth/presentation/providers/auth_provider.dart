@@ -48,6 +48,12 @@ final canViewTeamAttendanceProvider = Provider<bool>((ref) {
   return user?.canViewTeamAttendance ?? false;
 });
 
+
+
+Map<String, dynamic> _getDefaultAnalytics() {
+  return {'present': 0, 'leave': 0, 'absent': 0, 'on_time': 0, 'late': 0};
+}
+
 final canApproveLeavesProvider = Provider<bool>((ref) {
   final user = ref.watch(authProvider).value;
   return user?.canApproveLeaves ?? false;

@@ -10,10 +10,10 @@ import 'package:appattendance/features/auth/presentation/providers/auth_provider
 import 'package:appattendance/features/leaves/domain/models/leave_model.dart';
 import 'package:appattendance/features/leaves/presentation/providers/leave_provider.dart';
 import 'package:appattendance/features/leaves/presentation/utils/leave_utils.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:csv/csv.dart';
 import 'package:open_file/open_file.dart';
 import 'package:intl/intl.dart';
 
@@ -68,8 +68,8 @@ class LeaveFilterBar extends ConsumerWidget {
                           selected: isSelected,
                           isDark: isDark,
                           onTap: () =>
-                              ref.read(leaveFilterProvider.notifier).state =
-                                  f.filter,
+                          ref.read(leaveFilterProvider.notifier).state =
+                              f.filter,
                         ),
                       );
                     }).toList(),
@@ -176,9 +176,9 @@ class LeaveFilterBar extends ConsumerWidget {
   }
 
   Future<void> _exportToCsv(
-    BuildContext context,
-    List<LeaveModel> leaves,
-  ) async {
+      BuildContext context,
+      List<LeaveModel> leaves,
+      ) async {
     if (leaves.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -197,7 +197,7 @@ class LeaveFilterBar extends ConsumerWidget {
         'Justification',
       ],
       ...leaves.map(
-        (l) => [
+            (l) => [
           l.leaveId,
           l.empId,
           DateFormat('dd-MM-yyyy').format(l.leaveFromDate),

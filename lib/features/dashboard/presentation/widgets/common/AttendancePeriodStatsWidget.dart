@@ -38,14 +38,36 @@ class AttendancePeriodStatsWidget extends ConsumerWidget {
 
     return dashboardAsync.when(
       data: (state) {
-        // TODO: Real data from DB or notifier (this is placeholder)
-        // In real app, calculate based on period (daily = today, monthly = current month)
-        final totalDays = 30; // Dummy - real mein period ke hisaab se days
-        final present = 22; // Dummy
-        final leave = 4;
+        final filteredAttendance =
+        _filterByPeriod(state.allAttendance, period);
+
+// Unique working days
+        final totalDays = filteredAttendance
+            .map((e) => e['att_timestamp'].toString().substring(0, 10))
+            .toSet()
+            .length;
+
+        final present = filteredAttendance
+            .where((e) => e['att_status'] == 'checkin')
+            .map((e) => e['att_timestamp'].toString().substring(0, 10))
+            .toSet()
+            .length;
+
+        final leave = filteredAttendance
+            .where((e) => e['att_status'] == 'leave')
+            .length;
+
         final absent = totalDays - present - leave;
-        final onTime = 18;
+
+// On-time vs late (simple rule)
+        final onTime = filteredAttendance.where((e) {
+          if (e['att_status'] != 'checkin') return false;
+          final time = DateTime.parse(e['att_timestamp']);
+          return time.hour < 10; // before 10 AM
+        }).length;
+
         final late = present - onTime;
+
 
         final attendancePercentage = totalDays > 0
             ? (present / totalDays) * 100
@@ -147,7 +169,48 @@ class AttendancePeriodStatsWidget extends ConsumerWidget {
       ],
     );
   }
+
+  List<Map<String, dynamic>> _filterByPeriod(
+      List<Map<String, dynamic>> allAttendance,
+      AttendancePeriod period,
+      ) {
+    final now = DateTime.now();
+
+    return allAttendance.where((att) {
+      final ts = DateTime.parse(att['att_timestamp']);
+
+      switch (period) {
+        case AttendancePeriod.daily:
+          return ts.year == now.year &&
+              ts.month == now.month &&
+              ts.day == now.day;
+
+        case AttendancePeriod.weekly:
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          return ts.isAfter(startOfWeek);
+
+        case AttendancePeriod.monthly:
+          return ts.year == now.year && ts.month == now.month;
+
+        case AttendancePeriod.quarterly:
+          final quarter = ((now.month - 1) ~/ 3) + 1;
+          final startMonth = (quarter - 1) * 3 + 1;
+          final endMonth = startMonth + 2;
+          return ts.year == now.year &&
+              ts.month >= startMonth &&
+              ts.month <= endMonth;
+      }
+    }).toList();
+  }
+
 }
+
+
+
+
+
+
+
 
 /**********************************
  * 
