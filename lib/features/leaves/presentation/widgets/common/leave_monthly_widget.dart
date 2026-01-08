@@ -9,7 +9,7 @@ import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class MonthlyOverviewWidget extends StatelessWidget {
+class LeaveMonthlyOverviewWidget extends StatelessWidget {
   final int total;
   final int pending;
   final int approved;
@@ -18,7 +18,7 @@ class MonthlyOverviewWidget extends StatelessWidget {
   final int totalDays; // working days with leave
   final bool isManager;
 
-  const MonthlyOverviewWidget({
+  const LeaveMonthlyOverviewWidget({
     super.key,
     required this.total,
     required this.pending,
@@ -35,20 +35,18 @@ class MonthlyOverviewWidget extends StatelessWidget {
     final currentMonthYear = DateFormat('MMMM yyyy').format(DateTime.now());
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      padding: const EdgeInsets.all(20),
+      // margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.grey.shade800.withOpacity(0.7)
-            : Colors.white.withOpacity(0.85),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+        //     blurRadius: 12,
+        //     offset: const Offset(0, 6),
+        //   ),
+        // ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +93,7 @@ class MonthlyOverviewWidget extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
 
           // Role-based Stats
           if (isManager)
@@ -132,53 +130,60 @@ class MonthlyOverviewWidget extends StatelessWidget {
             Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildStatItem(
-                      'Avg Shortfall',
-                      '${avgShortfall.toStringAsFixed(1)}h',
-                      Colors.red,
-                      isDark,
+                    Expanded(
+                      child: _buildStatItem(
+                        'Avg Shortfall',
+                        '${avgShortfall.toStringAsFixed(1)}h',
+                        Colors.red,
+                        isDark,
+                      ),
                     ),
                     _buildVerticalDivider(isDark),
-                    _buildStatItem(
-                      'Total Days',
-                      totalDays.toString(),
-                      Colors.purple,
-                      isDark,
+                    Expanded(
+                      child: _buildStatItem(
+                        'Total Days',
+                        totalDays.toString(),
+                        Colors.purple,
+                        isDark,
+                      ),
                     ),
                     _buildVerticalDivider(isDark),
-                    _buildStatItem(
-                      'Applied',
-                      total.toString(),
-                      Colors.blue,
-                      isDark,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatItem(
-                      'Pending',
-                      pending.toString(),
-                      Colors.orange,
-                      isDark,
+                    Expanded(
+                      child: _buildStatItem(
+                        'Applied',
+                        total.toString(),
+                        Colors.blue,
+                        isDark,
+                      ),
                     ),
                     _buildVerticalDivider(isDark),
-                    _buildStatItem(
-                      'Approved',
-                      approved.toString(),
-                      Colors.green,
-                      isDark,
+                    Expanded(
+                      child: _buildStatItem(
+                        'Pending',
+                        pending.toString(),
+                        Colors.orange,
+                        isDark,
+                      ),
                     ),
                     _buildVerticalDivider(isDark),
-                    _buildStatItem(
-                      'Rejected',
-                      rejected.toString(),
-                      Colors.red,
-                      isDark,
+                    Expanded(
+                      child: _buildStatItem(
+                        'Approved',
+                        approved.toString(),
+                        Colors.green,
+                        isDark,
+                      ),
+                    ),
+                    _buildVerticalDivider(isDark),
+                    Expanded(
+                      child: _buildStatItem(
+                        'Rejected',
+                        rejected.toString(),
+                        Colors.red,
+                        isDark,
+                      ),
                     ),
                   ],
                 ),
@@ -193,23 +198,25 @@ class MonthlyOverviewWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: color,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: color,
+            ),
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
+            fontWeight: FontWeight.w700,
             color: isDark ? Colors.grey[400] : Colors.grey[700],
-            fontWeight: FontWeight.w600,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -217,10 +224,10 @@ class MonthlyOverviewWidget extends StatelessWidget {
 
   Widget _buildVerticalDivider(bool isDark) {
     return Container(
-      width: 1,
-      height: 50,
+      width: 2,
+      height: 60,
       color: isDark ? Colors.grey[700] : Colors.grey[300],
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.symmetric(horizontal: 2),
     );
   }
 }

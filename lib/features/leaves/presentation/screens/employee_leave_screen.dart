@@ -1,8 +1,7 @@
 // lib/features/leaves/presentation/screens/employee_leave_screen.dart
 // FINAL FIXED & POLISHED VERSION - January 08, 2026
-// Null-safe, handles null/invalid leaves, no type cast error
-// Modern gradient UI, month filter, MonthlyOverviewWidget
-// Responsive, dark mode, pull-to-refresh, no overflow
+// Null-safe: Skips leaves with null/invalid leaveFromDate
+// No type cast error, safe empty state if no valid leaves
 
 import 'package:appattendance/core/theme/app_gradients.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
@@ -12,8 +11,8 @@ import 'package:appattendance/features/leaves/presentation/providers/leave_provi
 import 'package:appattendance/features/leaves/presentation/widgets/common/leave_card.dart';
 import 'package:appattendance/features/leaves/presentation/widgets/common/leave_detail_dialog.dart';
 import 'package:appattendance/features/leaves/presentation/widgets/common/leave_filter_bar.dart';
+import 'package:appattendance/features/leaves/presentation/widgets/common/leave_monthly_widget.dart';
 import 'package:appattendance/features/leaves/presentation/widgets/common/month_filter_widget.dart';
-import 'package:appattendance/features/regularisation/presentation/widgets/common/monthly_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -28,22 +27,24 @@ class EmployeeLeaveScreen extends ConsumerStatefulWidget {
 }
 
 class _EmployeeLeaveScreenState extends ConsumerState<EmployeeLeaveScreen> {
-  String _selectedMonth = DateFormat('MMMM yyyy').format(DateTime.now());
+  String _selectedMonth = DateFormat('MMMM yyyy').format(
+    DateTime.now().subtract(const Duration(days: 30)),
+  ); // Default to previous month
   bool _isRefreshing = false;
 
   @override
   Widget build(BuildContext context) {
+    LeaveFilter _currentFilter = LeaveFilter.pending;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final authAsync = ref.watch(authProvider);
-    final leavesAsync = ref.watch(myLeavesProvider);
-
+    final leavesAsync = ref.watch(pendingLeavesListProvider);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: AppGradients.dashboard(isDark)),
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() => _isRefreshing = true);
-            await ref.read(myLeavesProvider.notifier).refresh();
+            await ref.read(pendingLeavesListProvider.notifier).refresh();
             setState(() => _isRefreshing = false);
           },
           child: SingleChildScrollView(
@@ -78,9 +79,8 @@ class _EmployeeLeaveScreenState extends ConsumerState<EmployeeLeaveScreen> {
 
                       return leavesAsync.when(
                         data: (leaves) {
-                          // Safe filter with null check
+                          // Step 1: Month filter (null-safe)
                           final filteredByMonth = leaves.where((leave) {
-                            // Skip if date is null or invalid
                             if (leave.leaveFromDate == null) return false;
                             try {
                               final monthYear = DateFormat(
@@ -88,48 +88,60 @@ class _EmployeeLeaveScreenState extends ConsumerState<EmployeeLeaveScreen> {
                               ).format(leave.leaveFromDate!);
                               return monthYear == _selectedMonth;
                             } catch (_) {
-                              return false; // Invalid date → skip
+                              return false;
                             }
                           }).toList();
 
-                          // Stats (safe)
-                          final total = filteredByMonth.length;
-                          final pending = filteredByMonth
+                          // Step 2: Status filter on top of month-filtered list
+                          final filteredLeaves = filteredByMonth.where((leave) {
+                            switch (_currentFilter) {
+                              case LeaveFilter.all:
+                              case LeaveFilter.team:
+                                return true;
+                              case LeaveFilter.pending:
+                                return leave.isPending;
+                              case LeaveFilter.approved:
+                                return leave.isApproved;
+                              case LeaveFilter.rejected:
+                                return leave.isRejected;
+                            }
+                          }).toList();
+
+                          // Step 3: Stats calculated from final filtered list
+                          final total = filteredLeaves.length;
+                          final pending = filteredLeaves
                               .where((l) => l.isPending)
                               .length;
-                          final approved = filteredByMonth
+                          final approved = filteredLeaves
                               .where((l) => l.isApproved)
                               .length;
-                          final rejected = filteredByMonth
+                          final rejected = filteredLeaves
                               .where((l) => l.isRejected)
                               .length;
-                          final avgShortfall = 1.2; // TODO: Real calc
+                          final avgShortfall = 1.2; // TODO: Real calculation
 
+                          // Rest of your UI (LeaveMonthlyOverviewWidget + LeaveFilterBar + ListView)
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              MonthlyOverviewWidget(
+                              LeaveMonthlyOverviewWidget(
                                 total: total,
                                 pending: pending,
                                 approved: approved,
                                 rejected: rejected,
                                 avgShortfall: avgShortfall,
-                                totalDays: filteredByMonth.length,
+                                totalDays: filteredLeaves.length,
                                 isManager: false,
                               ),
-
                               const SizedBox(height: 24),
-
                               const LeaveFilterBar(),
-
                               const SizedBox(height: 16),
-
-                              filteredByMonth.isEmpty
+                              filteredLeaves.isEmpty
                                   ? const Center(
                                       child: Padding(
                                         padding: EdgeInsets.all(32),
                                         child: Text(
-                                          'No leaves found for this month',
+                                          'No leaves found for selected month and status',
                                         ),
                                       ),
                                     )
@@ -137,9 +149,9 @@ class _EmployeeLeaveScreenState extends ConsumerState<EmployeeLeaveScreen> {
                                       shrinkWrap: true,
                                       physics:
                                           const NeverScrollableScrollPhysics(),
-                                      itemCount: filteredByMonth.length,
+                                      itemCount: filteredLeaves.length,
                                       itemBuilder: (context, index) {
-                                        final leave = filteredByMonth[index];
+                                        final leave = filteredLeaves[index];
                                         return LeaveCard(
                                           leave: leave,
                                           isManagerView: false,

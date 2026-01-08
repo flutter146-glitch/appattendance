@@ -31,6 +31,18 @@ class LeaveRepositoryImpl implements LeaveRepository {
   }
 
   @override
+  Future<List<LeaveModel>> getAllLeavesForManager(String mgrEmpId) async {
+    final db = await DBHelper.instance.database;
+    final rows = await db.query(
+      'employee_leaves',
+      where: 'mgr_emp_id = ?',
+      whereArgs: [mgrEmpId],
+      orderBy: 'created_at DESC',
+    );
+    return rows.map((row) => LeaveModel.fromJson(row)).toList();
+  }
+
+  @override
   Future<void> applyLeave(LeaveModel leave) async {
     final db = await DBHelper.instance.database;
     await db.insert('employee_leaves', {

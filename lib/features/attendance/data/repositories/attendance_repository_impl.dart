@@ -1,10 +1,3 @@
-// lib/features/attendance/data/repositories/attendance_repository_impl.dart
-// FINAL Error-Free Version (01 Jan 2026)
-// Uses SQLite (db_helper.dart + dummy_data.json)
-// Implements ALL methods from AttendanceRepository
-// Supports check-in/out, today attendance, history, today summary, team attendance, offline sync
-// Future API (Dio) commented for easy switch
-
 import 'package:appattendance/core/database/database_provider.dart';
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/attendance/data/repositories/attendance_repository.dart';

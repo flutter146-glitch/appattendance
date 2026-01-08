@@ -141,7 +141,7 @@ class _EmployeeRegularisationScreenState
                     // const SizedBox(height: 24),
 
                     // Monthly Overview
-                    MonthlyOverviewWidget(
+                    RegularizationMonthlyOverviewWidget(
                       total: ownStats.total,
                       pending: ownStats.pending,
                       approved: ownStats.approved,

@@ -145,7 +145,7 @@ class _ManagerRegularisationScreenState
                   // const SizedBox(height: 24),
 
                   // Monthly Overview
-                  MonthlyOverviewWidget(
+                  RegularizationMonthlyOverviewWidget(
                     total: total,
                     pending: pending,
                     approved: approved,

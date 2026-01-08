@@ -3,7 +3,9 @@
 import 'dart:io';
 
 import 'package:appattendance/core/utils/app_colors.dart';
+import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/regularisation/domain/models/regularisation_filter.dart';
+import 'package:appattendance/features/regularisation/presentation/providers/regularisation_filter_provider.dart';
 import 'package:appattendance/features/regularisation/presentation/providers/regularisation_notifier.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
@@ -28,6 +30,10 @@ class RegularisationFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final user = ref.watch(authProvider).value;
+
+    // final isManagerial = user?.isManagerial ?? false;
+    // final selectedFilter = ref.watch(regularisationFilterProvider);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -55,6 +61,14 @@ class RegularisationFilterBar extends StatelessWidget {
                     selected: selectedFilter == RegularisationFilter.all,
                     isDark: isDark,
                   ),
+                  // const SizedBox(width: 8),
+                  // // if (isManagerial)
+                  // _buildFilterChip(
+                  //   label: 'team',
+                  //   filter: RegularisationFilter.pending,
+                  //   selected: selectedFilter == RegularisationFilter.pending,
+                  //   isDark: isDark,
+                  // ),
                   const SizedBox(width: 8),
                   _buildFilterChip(
                     label: 'Pending',

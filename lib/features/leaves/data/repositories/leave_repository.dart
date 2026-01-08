@@ -5,8 +5,13 @@ abstract class LeaveRepository {
   /// Employee ke saare leaves
   Future<List<LeaveModel>> getLeavesByEmployee(String empId);
 
+  // In LeaveRepository (abstract):
+  Future<List<LeaveModel>> getAllLeavesForManager(String mgrEmpId);
+
   /// Manager ke pending leaves
   Future<List<LeaveModel>> getPendingLeavesForManager(String mgrEmpId);
+
+  // Future<List<LeaveModel>> getAllLeavesForManager(String mgrEmpId);
 
   /// Apply new leave
   Future<void> applyLeave(LeaveModel leave);
