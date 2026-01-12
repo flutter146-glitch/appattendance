@@ -24,21 +24,18 @@ mixin _$AnalyticsModel {
   AnalyticsPeriod get period => throw _privateConstructorUsedError;
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate =>
-      throw _privateConstructorUsedError; // Team Stats (top row - from DB aggregation)
+      throw _privateConstructorUsedError; // Team Aggregate Stats (top row cards)
   Map<String, int> get teamStats =>
-      throw _privateConstructorUsedError; // {'team': 50, 'present': 35, 'leave': 5, 'absent': 10, 'onTime': 30, 'late': 5}
+      throw _privateConstructorUsedError; // e.g., {'team':50, 'present':35, ...}
   Map<String, double> get teamPercentages =>
-      throw _privateConstructorUsedError; // {'present': 70.0, 'leave': 10.0, ...}
-  // Individual employee breakdown
-  List<EmployeeAnalytics> get employeeBreakdown =>
-      throw _privateConstructorUsedError; // Graph Data (raw numbers - widget converts to FlSpot)
+      throw _privateConstructorUsedError; // e.g., {'present':70.0, ...}
+  // Graph Data (raw for fl_chart conversion)
   Map<String, List<double>> get graphDataRaw =>
-      throw _privateConstructorUsedError; // e.g., {'network': [4.0, 5.0, ...]}
+      throw _privateConstructorUsedError;
   List<String> get graphLabels =>
-      throw _privateConstructorUsedError; // ['9AM', '11AM', ...]
-  // Dynamic insights
+      throw _privateConstructorUsedError; // Dynamic insights
   List<String> get insights =>
-      throw _privateConstructorUsedError; // Computed / Quick access fields
+      throw _privateConstructorUsedError; // Quick computed / summary fields
   int get totalDays => throw _privateConstructorUsedError;
   int get presentDays => throw _privateConstructorUsedError;
   int get absentDays => throw _privateConstructorUsedError;
@@ -74,7 +71,6 @@ abstract class $AnalyticsModelCopyWith<$Res> {
     DateTime endDate,
     Map<String, int> teamStats,
     Map<String, double> teamPercentages,
-    List<EmployeeAnalytics> employeeBreakdown,
     Map<String, List<double>> graphDataRaw,
     List<String> graphLabels,
     List<String> insights,
@@ -112,7 +108,6 @@ class _$AnalyticsModelCopyWithImpl<$Res, $Val extends AnalyticsModel>
     Object? endDate = null,
     Object? teamStats = null,
     Object? teamPercentages = null,
-    Object? employeeBreakdown = null,
     Object? graphDataRaw = null,
     Object? graphLabels = null,
     Object? insights = null,
@@ -150,10 +145,6 @@ class _$AnalyticsModelCopyWithImpl<$Res, $Val extends AnalyticsModel>
                 ? _value.teamPercentages
                 : teamPercentages // ignore: cast_nullable_to_non_nullable
                       as Map<String, double>,
-            employeeBreakdown: null == employeeBreakdown
-                ? _value.employeeBreakdown
-                : employeeBreakdown // ignore: cast_nullable_to_non_nullable
-                      as List<EmployeeAnalytics>,
             graphDataRaw: null == graphDataRaw
                 ? _value.graphDataRaw
                 : graphDataRaw // ignore: cast_nullable_to_non_nullable
@@ -231,7 +222,6 @@ abstract class _$$AnalyticsModelImplCopyWith<$Res>
     DateTime endDate,
     Map<String, int> teamStats,
     Map<String, double> teamPercentages,
-    List<EmployeeAnalytics> employeeBreakdown,
     Map<String, List<double>> graphDataRaw,
     List<String> graphLabels,
     List<String> insights,
@@ -268,7 +258,6 @@ class __$$AnalyticsModelImplCopyWithImpl<$Res>
     Object? endDate = null,
     Object? teamStats = null,
     Object? teamPercentages = null,
-    Object? employeeBreakdown = null,
     Object? graphDataRaw = null,
     Object? graphLabels = null,
     Object? insights = null,
@@ -306,10 +295,6 @@ class __$$AnalyticsModelImplCopyWithImpl<$Res>
             ? _value._teamPercentages
             : teamPercentages // ignore: cast_nullable_to_non_nullable
                   as Map<String, double>,
-        employeeBreakdown: null == employeeBreakdown
-            ? _value._employeeBreakdown
-            : employeeBreakdown // ignore: cast_nullable_to_non_nullable
-                  as List<EmployeeAnalytics>,
         graphDataRaw: null == graphDataRaw
             ? _value._graphDataRaw
             : graphDataRaw // ignore: cast_nullable_to_non_nullable
@@ -380,7 +365,6 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     required this.endDate,
     final Map<String, int> teamStats = const {},
     final Map<String, double> teamPercentages = const {},
-    final List<EmployeeAnalytics> employeeBreakdown = const [],
     final Map<String, List<double>> graphDataRaw = const {},
     final List<String> graphLabels = const [],
     final List<String> insights = const [],
@@ -397,7 +381,6 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     this.periodTitle,
   }) : _teamStats = teamStats,
        _teamPercentages = teamPercentages,
-       _employeeBreakdown = employeeBreakdown,
        _graphDataRaw = graphDataRaw,
        _graphLabels = graphLabels,
        _insights = insights,
@@ -412,9 +395,9 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
   final DateTime startDate;
   @override
   final DateTime endDate;
-  // Team Stats (top row - from DB aggregation)
+  // Team Aggregate Stats (top row cards)
   final Map<String, int> _teamStats;
-  // Team Stats (top row - from DB aggregation)
+  // Team Aggregate Stats (top row cards)
   @override
   @JsonKey()
   Map<String, int> get teamStats {
@@ -423,9 +406,9 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     return EqualUnmodifiableMapView(_teamStats);
   }
 
-  // {'team': 50, 'present': 35, 'leave': 5, 'absent': 10, 'onTime': 30, 'late': 5}
+  // e.g., {'team':50, 'present':35, ...}
   final Map<String, double> _teamPercentages;
-  // {'team': 50, 'present': 35, 'leave': 5, 'absent': 10, 'onTime': 30, 'late': 5}
+  // e.g., {'team':50, 'present':35, ...}
   @override
   @JsonKey()
   Map<String, double> get teamPercentages {
@@ -434,23 +417,11 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     return EqualUnmodifiableMapView(_teamPercentages);
   }
 
-  // {'present': 70.0, 'leave': 10.0, ...}
-  // Individual employee breakdown
-  final List<EmployeeAnalytics> _employeeBreakdown;
-  // {'present': 70.0, 'leave': 10.0, ...}
-  // Individual employee breakdown
-  @override
-  @JsonKey()
-  List<EmployeeAnalytics> get employeeBreakdown {
-    if (_employeeBreakdown is EqualUnmodifiableListView)
-      return _employeeBreakdown;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_employeeBreakdown);
-  }
-
-  // Graph Data (raw numbers - widget converts to FlSpot)
+  // e.g., {'present':70.0, ...}
+  // Graph Data (raw for fl_chart conversion)
   final Map<String, List<double>> _graphDataRaw;
-  // Graph Data (raw numbers - widget converts to FlSpot)
+  // e.g., {'present':70.0, ...}
+  // Graph Data (raw for fl_chart conversion)
   @override
   @JsonKey()
   Map<String, List<double>> get graphDataRaw {
@@ -459,9 +430,7 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     return EqualUnmodifiableMapView(_graphDataRaw);
   }
 
-  // e.g., {'network': [4.0, 5.0, ...]}
   final List<String> _graphLabels;
-  // e.g., {'network': [4.0, 5.0, ...]}
   @override
   @JsonKey()
   List<String> get graphLabels {
@@ -470,10 +439,8 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     return EqualUnmodifiableListView(_graphLabels);
   }
 
-  // ['9AM', '11AM', ...]
   // Dynamic insights
   final List<String> _insights;
-  // ['9AM', '11AM', ...]
   // Dynamic insights
   @override
   @JsonKey()
@@ -483,7 +450,7 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     return EqualUnmodifiableListView(_insights);
   }
 
-  // Computed / Quick access fields
+  // Quick computed / summary fields
   @override
   @JsonKey()
   final int totalDays;
@@ -519,7 +486,7 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
 
   @override
   String toString() {
-    return 'AnalyticsModel(period: $period, startDate: $startDate, endDate: $endDate, teamStats: $teamStats, teamPercentages: $teamPercentages, employeeBreakdown: $employeeBreakdown, graphDataRaw: $graphDataRaw, graphLabels: $graphLabels, insights: $insights, totalDays: $totalDays, presentDays: $presentDays, absentDays: $absentDays, leaveDays: $leaveDays, lateDays: $lateDays, onTimeDays: $onTimeDays, dailyAvgHours: $dailyAvgHours, monthlyAvgHours: $monthlyAvgHours, pendingRegularisations: $pendingRegularisations, pendingLeaves: $pendingLeaves, periodTitle: $periodTitle)';
+    return 'AnalyticsModel(period: $period, startDate: $startDate, endDate: $endDate, teamStats: $teamStats, teamPercentages: $teamPercentages, graphDataRaw: $graphDataRaw, graphLabels: $graphLabels, insights: $insights, totalDays: $totalDays, presentDays: $presentDays, absentDays: $absentDays, leaveDays: $leaveDays, lateDays: $lateDays, onTimeDays: $onTimeDays, dailyAvgHours: $dailyAvgHours, monthlyAvgHours: $monthlyAvgHours, pendingRegularisations: $pendingRegularisations, pendingLeaves: $pendingLeaves, periodTitle: $periodTitle)';
   }
 
   @override
@@ -538,10 +505,6 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
             const DeepCollectionEquality().equals(
               other._teamPercentages,
               _teamPercentages,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._employeeBreakdown,
-              _employeeBreakdown,
             ) &&
             const DeepCollectionEquality().equals(
               other._graphDataRaw,
@@ -585,7 +548,6 @@ class _$AnalyticsModelImpl extends _AnalyticsModel {
     endDate,
     const DeepCollectionEquality().hash(_teamStats),
     const DeepCollectionEquality().hash(_teamPercentages),
-    const DeepCollectionEquality().hash(_employeeBreakdown),
     const DeepCollectionEquality().hash(_graphDataRaw),
     const DeepCollectionEquality().hash(_graphLabels),
     const DeepCollectionEquality().hash(_insights),
@@ -626,7 +588,6 @@ abstract class _AnalyticsModel extends AnalyticsModel {
     required final DateTime endDate,
     final Map<String, int> teamStats,
     final Map<String, double> teamPercentages,
-    final List<EmployeeAnalytics> employeeBreakdown,
     final Map<String, List<double>> graphDataRaw,
     final List<String> graphLabels,
     final List<String> insights,
@@ -652,21 +613,18 @@ abstract class _AnalyticsModel extends AnalyticsModel {
   @override
   DateTime get startDate;
   @override
-  DateTime get endDate; // Team Stats (top row - from DB aggregation)
+  DateTime get endDate; // Team Aggregate Stats (top row cards)
   @override
-  Map<String, int> get teamStats; // {'team': 50, 'present': 35, 'leave': 5, 'absent': 10, 'onTime': 30, 'late': 5}
+  Map<String, int> get teamStats; // e.g., {'team':50, 'present':35, ...}
   @override
-  Map<String, double> get teamPercentages; // {'present': 70.0, 'leave': 10.0, ...}
-  // Individual employee breakdown
+  Map<String, double> get teamPercentages; // e.g., {'present':70.0, ...}
+  // Graph Data (raw for fl_chart conversion)
   @override
-  List<EmployeeAnalytics> get employeeBreakdown; // Graph Data (raw numbers - widget converts to FlSpot)
+  Map<String, List<double>> get graphDataRaw;
   @override
-  Map<String, List<double>> get graphDataRaw; // e.g., {'network': [4.0, 5.0, ...]}
+  List<String> get graphLabels; // Dynamic insights
   @override
-  List<String> get graphLabels; // ['9AM', '11AM', ...]
-  // Dynamic insights
-  @override
-  List<String> get insights; // Computed / Quick access fields
+  List<String> get insights; // Quick computed / summary fields
   @override
   int get totalDays;
   @override
@@ -695,315 +653,5 @@ abstract class _AnalyticsModel extends AnalyticsModel {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AnalyticsModelImplCopyWith<_$AnalyticsModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-EmployeeAnalytics _$EmployeeAnalyticsFromJson(Map<String, dynamic> json) {
-  return _EmployeeAnalytics.fromJson(json);
-}
-
-/// @nodoc
-mixin _$EmployeeAnalytics {
-  String get empId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get designation => throw _privateConstructorUsedError;
-  String get status =>
-      throw _privateConstructorUsedError; // 'Present', 'Late', 'Absent', etc.
-  String get checkInTime => throw _privateConstructorUsedError;
-  List<String> get projects =>
-      throw _privateConstructorUsedError; // project names/ids
-  int get projectCount => throw _privateConstructorUsedError;
-
-  /// Serializes this EmployeeAnalytics to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of EmployeeAnalytics
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $EmployeeAnalyticsCopyWith<EmployeeAnalytics> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $EmployeeAnalyticsCopyWith<$Res> {
-  factory $EmployeeAnalyticsCopyWith(
-    EmployeeAnalytics value,
-    $Res Function(EmployeeAnalytics) then,
-  ) = _$EmployeeAnalyticsCopyWithImpl<$Res, EmployeeAnalytics>;
-  @useResult
-  $Res call({
-    String empId,
-    String name,
-    String designation,
-    String status,
-    String checkInTime,
-    List<String> projects,
-    int projectCount,
-  });
-}
-
-/// @nodoc
-class _$EmployeeAnalyticsCopyWithImpl<$Res, $Val extends EmployeeAnalytics>
-    implements $EmployeeAnalyticsCopyWith<$Res> {
-  _$EmployeeAnalyticsCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of EmployeeAnalytics
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? empId = null,
-    Object? name = null,
-    Object? designation = null,
-    Object? status = null,
-    Object? checkInTime = null,
-    Object? projects = null,
-    Object? projectCount = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            empId: null == empId
-                ? _value.empId
-                : empId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-            designation: null == designation
-                ? _value.designation
-                : designation // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String,
-            checkInTime: null == checkInTime
-                ? _value.checkInTime
-                : checkInTime // ignore: cast_nullable_to_non_nullable
-                      as String,
-            projects: null == projects
-                ? _value.projects
-                : projects // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
-            projectCount: null == projectCount
-                ? _value.projectCount
-                : projectCount // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$EmployeeAnalyticsImplCopyWith<$Res>
-    implements $EmployeeAnalyticsCopyWith<$Res> {
-  factory _$$EmployeeAnalyticsImplCopyWith(
-    _$EmployeeAnalyticsImpl value,
-    $Res Function(_$EmployeeAnalyticsImpl) then,
-  ) = __$$EmployeeAnalyticsImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    String empId,
-    String name,
-    String designation,
-    String status,
-    String checkInTime,
-    List<String> projects,
-    int projectCount,
-  });
-}
-
-/// @nodoc
-class __$$EmployeeAnalyticsImplCopyWithImpl<$Res>
-    extends _$EmployeeAnalyticsCopyWithImpl<$Res, _$EmployeeAnalyticsImpl>
-    implements _$$EmployeeAnalyticsImplCopyWith<$Res> {
-  __$$EmployeeAnalyticsImplCopyWithImpl(
-    _$EmployeeAnalyticsImpl _value,
-    $Res Function(_$EmployeeAnalyticsImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of EmployeeAnalytics
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? empId = null,
-    Object? name = null,
-    Object? designation = null,
-    Object? status = null,
-    Object? checkInTime = null,
-    Object? projects = null,
-    Object? projectCount = null,
-  }) {
-    return _then(
-      _$EmployeeAnalyticsImpl(
-        empId: null == empId
-            ? _value.empId
-            : empId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-        designation: null == designation
-            ? _value.designation
-            : designation // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String,
-        checkInTime: null == checkInTime
-            ? _value.checkInTime
-            : checkInTime // ignore: cast_nullable_to_non_nullable
-                  as String,
-        projects: null == projects
-            ? _value._projects
-            : projects // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
-        projectCount: null == projectCount
-            ? _value.projectCount
-            : projectCount // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$EmployeeAnalyticsImpl implements _EmployeeAnalytics {
-  const _$EmployeeAnalyticsImpl({
-    required this.empId,
-    required this.name,
-    required this.designation,
-    required this.status,
-    required this.checkInTime,
-    final List<String> projects = const [],
-    this.projectCount = 0,
-  }) : _projects = projects;
-
-  factory _$EmployeeAnalyticsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EmployeeAnalyticsImplFromJson(json);
-
-  @override
-  final String empId;
-  @override
-  final String name;
-  @override
-  final String designation;
-  @override
-  final String status;
-  // 'Present', 'Late', 'Absent', etc.
-  @override
-  final String checkInTime;
-  final List<String> _projects;
-  @override
-  @JsonKey()
-  List<String> get projects {
-    if (_projects is EqualUnmodifiableListView) return _projects;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_projects);
-  }
-
-  // project names/ids
-  @override
-  @JsonKey()
-  final int projectCount;
-
-  @override
-  String toString() {
-    return 'EmployeeAnalytics(empId: $empId, name: $name, designation: $designation, status: $status, checkInTime: $checkInTime, projects: $projects, projectCount: $projectCount)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$EmployeeAnalyticsImpl &&
-            (identical(other.empId, empId) || other.empId == empId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.designation, designation) ||
-                other.designation == designation) &&
-            (identical(other.status, status) || other.status == status) &&
-            (identical(other.checkInTime, checkInTime) ||
-                other.checkInTime == checkInTime) &&
-            const DeepCollectionEquality().equals(other._projects, _projects) &&
-            (identical(other.projectCount, projectCount) ||
-                other.projectCount == projectCount));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    empId,
-    name,
-    designation,
-    status,
-    checkInTime,
-    const DeepCollectionEquality().hash(_projects),
-    projectCount,
-  );
-
-  /// Create a copy of EmployeeAnalytics
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$EmployeeAnalyticsImplCopyWith<_$EmployeeAnalyticsImpl> get copyWith =>
-      __$$EmployeeAnalyticsImplCopyWithImpl<_$EmployeeAnalyticsImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EmployeeAnalyticsImplToJson(this);
-  }
-}
-
-abstract class _EmployeeAnalytics implements EmployeeAnalytics {
-  const factory _EmployeeAnalytics({
-    required final String empId,
-    required final String name,
-    required final String designation,
-    required final String status,
-    required final String checkInTime,
-    final List<String> projects,
-    final int projectCount,
-  }) = _$EmployeeAnalyticsImpl;
-
-  factory _EmployeeAnalytics.fromJson(Map<String, dynamic> json) =
-      _$EmployeeAnalyticsImpl.fromJson;
-
-  @override
-  String get empId;
-  @override
-  String get name;
-  @override
-  String get designation;
-  @override
-  String get status; // 'Present', 'Late', 'Absent', etc.
-  @override
-  String get checkInTime;
-  @override
-  List<String> get projects; // project names/ids
-  @override
-  int get projectCount;
-
-  /// Create a copy of EmployeeAnalytics
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EmployeeAnalyticsImplCopyWith<_$EmployeeAnalyticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

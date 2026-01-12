@@ -5,7 +5,7 @@ import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/core/services/biometric_service.dart';
 import 'package:appattendance/features/auth/data/repositories/auth_repository.dart';
 import 'package:appattendance/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

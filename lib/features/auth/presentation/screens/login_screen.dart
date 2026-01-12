@@ -9,8 +9,7 @@ import 'dart:async';
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/core/services/biometric_service.dart';
-import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:appattendance/features/dashboard/presentation/screens/dashboard_screen.dart';

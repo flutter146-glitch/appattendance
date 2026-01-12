@@ -5,10 +5,8 @@
 import 'dart:io';
 
 import 'package:appattendance/core/utils/app_colors.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_role.dart';
-import 'package:appattendance/features/auth/domain/models/user_db_mapper.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/leaves/domain/models/leave_model.dart';
 import 'package:appattendance/features/leaves/presentation/providers/leave_provider.dart';

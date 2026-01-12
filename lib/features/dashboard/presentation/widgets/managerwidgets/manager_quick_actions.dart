@@ -6,10 +6,8 @@
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/attendance/presentation/screens/attendance_screen.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
-import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_role.dart';
-import 'package:appattendance/features/auth/domain/models/user_db_mapper.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
+import 'package:appattendance/features/team/presentation/screens/team_member_list_screen.dart.dart';
 import 'package:flutter/material.dart';
 
 class ManagerQuickActions extends StatelessWidget {
@@ -52,10 +50,10 @@ class ManagerQuickActions extends StatelessWidget {
         'icon': Icons.people_alt_rounded,
         'color': Colors.cyan,
         'onTap': () {
-          // TODO: Navigate to Team Members Screen
-          ScaffoldMessenger.of(
+          Navigator.pushReplacement(
             context,
-          ).showSnackBar(const SnackBar(content: Text("Team Members clicked")));
+            MaterialPageRoute(builder: (_) => const TeamMemberListScreen()),
+          );
         },
       });
     }

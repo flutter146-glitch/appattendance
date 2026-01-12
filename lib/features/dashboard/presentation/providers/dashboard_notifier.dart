@@ -5,10 +5,8 @@
 // Error handling, loading, refresh support
 
 import 'package:appattendance/core/database/db_helper.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_role.dart';
-import 'package:appattendance/features/auth/domain/models/user_db_mapper.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
 import 'package:appattendance/features/regularisation/presentation/providers/view_mode_provider.dart';

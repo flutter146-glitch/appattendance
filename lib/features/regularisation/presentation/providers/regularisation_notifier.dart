@@ -7,7 +7,7 @@
 
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';

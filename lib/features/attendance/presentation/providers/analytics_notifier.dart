@@ -1,41 +1,85 @@
 // lib/features/attendance/presentation/providers/analytics_notifier.dart
-// Notifier - Loads analytics from repository
+// ULTIMATE & BEST PRACTICE VERSION - January 09, 2026
 
+import 'dart:async';
+
+import 'package:appattendance/core/database/database_provider.dart';
 import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
+import 'package:appattendance/features/attendance/data/repositories/analytics_repository_impl.dart';
 import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
 import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
+import 'package:appattendance/features/auth/domain/models/user_extension.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
-  final AttendanceAnalyticsRepository repository;
-  final Ref ref;
+final analyticsRepositoryProvider = Provider<AttendanceAnalyticsRepository>((
+  ref,
+) {
+  return AttendanceAnalyticsRepositoryImpl(ref.watch(dbHelperProvider));
+});
 
-  AnalyticsNotifier(this.repository, this.ref) : super(const AsyncLoading());
+final analyticsProvider =
+    StateNotifierProvider.autoDispose<
+      AnalyticsNotifier,
+      AsyncValue<AnalyticsModel>
+    >((ref) => AnalyticsNotifier(ref));
+
+class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
+  final Ref ref;
+  Timer? _debounceTimer;
+
+  AnalyticsNotifier(this.ref) : super(const AsyncLoading()) {
+    loadAnalytics();
+  }
 
   Future<void> loadAnalytics() async {
+    if (state.isLoading) return;
+
     state = const AsyncLoading();
 
-    final user = ref.read(authProvider).value!;
-    final period = ref.read(analyticsPeriodProvider);
+    try {
+      final user = ref.read(authProvider).value;
+      if (user == null) {
+        state = AsyncError(
+          'Please login to view analytics',
+          StackTrace.current,
+        );
+        return;
+      }
 
-    final analytics = await repository.getAnalytics(
-      period: period,
-      empId: user.empId,
-    );
+      final period = ref.read(analyticsPeriodProvider);
+      final isManager = user.isManagerial;
 
-    state = AsyncData(analytics);
+      final repo = ref.read(analyticsRepositoryProvider);
+      final analytics = await repo.getAnalytics(
+        period: period,
+        empId: user.empId,
+        includeTeamBreakdown: isManager, // Manager ko team breakdown
+        limit: isManager ? 50 : null,
+      );
+
+      state = AsyncData(analytics);
+    } catch (e, stack) {
+      state = AsyncError('Unable to load analytics. Please try again.', stack);
+    }
   }
 
-  // Refresh current period
   Future<void> refresh() async {
-    await loadAnalytics();
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 400), () async {
+      await loadAnalytics();
+    });
   }
 
-  // Change period & reload
   void changePeriod(AnalyticsPeriod newPeriod) {
     ref.read(analyticsPeriodProvider.notifier).state = newPeriod;
-    loadAnalytics();
+    refresh();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }
 

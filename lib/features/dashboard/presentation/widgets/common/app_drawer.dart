@@ -6,10 +6,7 @@
 
 import 'package:appattendance/core/providers/view_mode_provider.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
-import 'package:appattendance/features/auth/domain/models/user_extension.dart';
-import 'package:appattendance/features/auth/domain/models/user_role.dart';
-import 'package:appattendance/features/auth/domain/models/user_db_mapper.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/dashboard/presentation/providers/dashboard_notifier.dart';
 import 'package:flutter/material.dart';

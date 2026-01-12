@@ -43,34 +43,6 @@ class _ManagerLeaveScreenState extends ConsumerState<ManagerLeaveScreen> {
     final pendingCountAsync = ref.watch(pendingLeavesCountProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Team Leave Requests'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: _isRefreshing
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 3,
-                    ),
-                  )
-                : const Icon(Icons.refresh),
-            onPressed: _isRefreshing
-                ? null
-                : () async {
-                    setState(() => _isRefreshing = true);
-                    await ref.read(teamLeavesProvider.notifier).refresh();
-                    setState(() => _isRefreshing = false);
-                  },
-          ),
-        ],
-      ),
       body: Container(
         decoration: BoxDecoration(gradient: AppGradients.dashboard(isDark)),
         child: RefreshIndicator(
@@ -85,47 +57,6 @@ class _ManagerLeaveScreenState extends ConsumerState<ManagerLeaveScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Quick Pending Count Card (nice UX)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: pendingCountAsync.when(
-                    data: (count) => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Pending Requests',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          count.toString(),
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const Text(
-                      'Error loading count',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
                 authAsync.when(
                   data: (user) {
                     if (user == null || !user.isManagerial) {

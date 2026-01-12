@@ -21,27 +21,32 @@ AttendanceModel _$AttendanceModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AttendanceModel {
-  String get attId => throw _privateConstructorUsedError; // att_id (PK)
-  String get empId => throw _privateConstructorUsedError; // emp_id (FK)
-  DateTime get timestamp => throw _privateConstructorUsedError; // att_timestamp
+  // Core identifiers
+  String get attId => throw _privateConstructorUsedError; // PK
+  String get empId => throw _privateConstructorUsedError; // FK
+  // Timestamps (both required for daily logic)
   DateTime get attendanceDate =>
-      throw _privateConstructorUsedError; // NEW: att_date (separate for daily grouping)
-  DateTime? get checkInTime =>
-      throw _privateConstructorUsedError; // NEW: check_in_time (for accurate late/duration)
-  DateTime? get checkOutTime =>
-      throw _privateConstructorUsedError; // NEW: check_out_time
+      throw _privateConstructorUsedError; // att_date (daily grouping)
+  DateTime get timestamp =>
+      throw _privateConstructorUsedError; // att_timestamp (full record time)
+  // Check-in / Check-out
+  DateTime? get checkInTime => throw _privateConstructorUsedError;
+  DateTime? get checkOutTime => throw _privateConstructorUsedError;
+  double? get workedHours =>
+      throw _privateConstructorUsedError; // Location & Verification
   double? get latitude => throw _privateConstructorUsedError;
   double? get longitude => throw _privateConstructorUsedError;
   String? get geofenceName => throw _privateConstructorUsedError;
-  String? get projectId => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError;
-  AttendanceStatus get status => throw _privateConstructorUsedError;
   VerificationType? get verificationType => throw _privateConstructorUsedError;
-  bool get isVerified => throw _privateConstructorUsedError;
+  bool get isVerified => throw _privateConstructorUsedError; // Project & Notes
+  String? get projectId => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError; // Leave & Status
   String? get leaveType =>
-      throw _privateConstructorUsedError; // NEW: 'casual', 'sick', null if no leave
-  String? get photoProofPath =>
-      throw _privateConstructorUsedError; // Optional future field
+      throw _privateConstructorUsedError; // 'casual', 'sick', 'earned', etc.
+  AttendanceStatus get status => throw _privateConstructorUsedError;
+  DailyAttendanceStatus get dailyStatus =>
+      throw _privateConstructorUsedError; // Proof & Audit
+  String? get photoProofPath => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -65,19 +70,21 @@ abstract class $AttendanceModelCopyWith<$Res> {
   $Res call({
     String attId,
     String empId,
-    DateTime timestamp,
     DateTime attendanceDate,
+    DateTime timestamp,
     DateTime? checkInTime,
     DateTime? checkOutTime,
+    double? workedHours,
     double? latitude,
     double? longitude,
     String? geofenceName,
-    String? projectId,
-    String? notes,
-    AttendanceStatus status,
     VerificationType? verificationType,
     bool isVerified,
+    String? projectId,
+    String? notes,
     String? leaveType,
+    AttendanceStatus status,
+    DailyAttendanceStatus dailyStatus,
     String? photoProofPath,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -101,19 +108,21 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
   $Res call({
     Object? attId = null,
     Object? empId = null,
-    Object? timestamp = null,
     Object? attendanceDate = null,
+    Object? timestamp = null,
     Object? checkInTime = freezed,
     Object? checkOutTime = freezed,
+    Object? workedHours = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? geofenceName = freezed,
-    Object? projectId = freezed,
-    Object? notes = freezed,
-    Object? status = null,
     Object? verificationType = freezed,
     Object? isVerified = null,
+    Object? projectId = freezed,
+    Object? notes = freezed,
     Object? leaveType = freezed,
+    Object? status = null,
+    Object? dailyStatus = null,
     Object? photoProofPath = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -128,13 +137,13 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
                 ? _value.empId
                 : empId // ignore: cast_nullable_to_non_nullable
                       as String,
-            timestamp: null == timestamp
-                ? _value.timestamp
-                : timestamp // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
             attendanceDate: null == attendanceDate
                 ? _value.attendanceDate
                 : attendanceDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            timestamp: null == timestamp
+                ? _value.timestamp
+                : timestamp // ignore: cast_nullable_to_non_nullable
                       as DateTime,
             checkInTime: freezed == checkInTime
                 ? _value.checkInTime
@@ -144,6 +153,10 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
                 ? _value.checkOutTime
                 : checkOutTime // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            workedHours: freezed == workedHours
+                ? _value.workedHours
+                : workedHours // ignore: cast_nullable_to_non_nullable
+                      as double?,
             latitude: freezed == latitude
                 ? _value.latitude
                 : latitude // ignore: cast_nullable_to_non_nullable
@@ -156,18 +169,6 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
                 ? _value.geofenceName
                 : geofenceName // ignore: cast_nullable_to_non_nullable
                       as String?,
-            projectId: freezed == projectId
-                ? _value.projectId
-                : projectId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            notes: freezed == notes
-                ? _value.notes
-                : notes // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as AttendanceStatus,
             verificationType: freezed == verificationType
                 ? _value.verificationType
                 : verificationType // ignore: cast_nullable_to_non_nullable
@@ -176,10 +177,26 @@ class _$AttendanceModelCopyWithImpl<$Res, $Val extends AttendanceModel>
                 ? _value.isVerified
                 : isVerified // ignore: cast_nullable_to_non_nullable
                       as bool,
+            projectId: freezed == projectId
+                ? _value.projectId
+                : projectId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            notes: freezed == notes
+                ? _value.notes
+                : notes // ignore: cast_nullable_to_non_nullable
+                      as String?,
             leaveType: freezed == leaveType
                 ? _value.leaveType
                 : leaveType // ignore: cast_nullable_to_non_nullable
                       as String?,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as AttendanceStatus,
+            dailyStatus: null == dailyStatus
+                ? _value.dailyStatus
+                : dailyStatus // ignore: cast_nullable_to_non_nullable
+                      as DailyAttendanceStatus,
             photoProofPath: freezed == photoProofPath
                 ? _value.photoProofPath
                 : photoProofPath // ignore: cast_nullable_to_non_nullable
@@ -210,19 +227,21 @@ abstract class _$$AttendanceModelImplCopyWith<$Res>
   $Res call({
     String attId,
     String empId,
-    DateTime timestamp,
     DateTime attendanceDate,
+    DateTime timestamp,
     DateTime? checkInTime,
     DateTime? checkOutTime,
+    double? workedHours,
     double? latitude,
     double? longitude,
     String? geofenceName,
-    String? projectId,
-    String? notes,
-    AttendanceStatus status,
     VerificationType? verificationType,
     bool isVerified,
+    String? projectId,
+    String? notes,
     String? leaveType,
+    AttendanceStatus status,
+    DailyAttendanceStatus dailyStatus,
     String? photoProofPath,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -245,19 +264,21 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
   $Res call({
     Object? attId = null,
     Object? empId = null,
-    Object? timestamp = null,
     Object? attendanceDate = null,
+    Object? timestamp = null,
     Object? checkInTime = freezed,
     Object? checkOutTime = freezed,
+    Object? workedHours = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? geofenceName = freezed,
-    Object? projectId = freezed,
-    Object? notes = freezed,
-    Object? status = null,
     Object? verificationType = freezed,
     Object? isVerified = null,
+    Object? projectId = freezed,
+    Object? notes = freezed,
     Object? leaveType = freezed,
+    Object? status = null,
+    Object? dailyStatus = null,
     Object? photoProofPath = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -272,13 +293,13 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
             ? _value.empId
             : empId // ignore: cast_nullable_to_non_nullable
                   as String,
-        timestamp: null == timestamp
-            ? _value.timestamp
-            : timestamp // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
         attendanceDate: null == attendanceDate
             ? _value.attendanceDate
             : attendanceDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        timestamp: null == timestamp
+            ? _value.timestamp
+            : timestamp // ignore: cast_nullable_to_non_nullable
                   as DateTime,
         checkInTime: freezed == checkInTime
             ? _value.checkInTime
@@ -288,6 +309,10 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
             ? _value.checkOutTime
             : checkOutTime // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        workedHours: freezed == workedHours
+            ? _value.workedHours
+            : workedHours // ignore: cast_nullable_to_non_nullable
+                  as double?,
         latitude: freezed == latitude
             ? _value.latitude
             : latitude // ignore: cast_nullable_to_non_nullable
@@ -300,18 +325,6 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
             ? _value.geofenceName
             : geofenceName // ignore: cast_nullable_to_non_nullable
                   as String?,
-        projectId: freezed == projectId
-            ? _value.projectId
-            : projectId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        notes: freezed == notes
-            ? _value.notes
-            : notes // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as AttendanceStatus,
         verificationType: freezed == verificationType
             ? _value.verificationType
             : verificationType // ignore: cast_nullable_to_non_nullable
@@ -320,10 +333,26 @@ class __$$AttendanceModelImplCopyWithImpl<$Res>
             ? _value.isVerified
             : isVerified // ignore: cast_nullable_to_non_nullable
                   as bool,
+        projectId: freezed == projectId
+            ? _value.projectId
+            : projectId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        notes: freezed == notes
+            ? _value.notes
+            : notes // ignore: cast_nullable_to_non_nullable
+                  as String?,
         leaveType: freezed == leaveType
             ? _value.leaveType
             : leaveType // ignore: cast_nullable_to_non_nullable
                   as String?,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as AttendanceStatus,
+        dailyStatus: null == dailyStatus
+            ? _value.dailyStatus
+            : dailyStatus // ignore: cast_nullable_to_non_nullable
+                  as DailyAttendanceStatus,
         photoProofPath: freezed == photoProofPath
             ? _value.photoProofPath
             : photoProofPath // ignore: cast_nullable_to_non_nullable
@@ -347,19 +376,21 @@ class _$AttendanceModelImpl extends _AttendanceModel {
   const _$AttendanceModelImpl({
     required this.attId,
     required this.empId,
-    required this.timestamp,
     required this.attendanceDate,
+    required this.timestamp,
     this.checkInTime,
     this.checkOutTime,
+    this.workedHours,
     this.latitude,
     this.longitude,
     this.geofenceName,
-    this.projectId,
-    this.notes,
-    required this.status,
     this.verificationType,
     this.isVerified = false,
+    this.projectId,
+    this.notes,
     this.leaveType,
+    this.status = AttendanceStatus.checkIn,
+    this.dailyStatus = DailyAttendanceStatus.present,
     this.photoProofPath,
     this.createdAt,
     this.updatedAt,
@@ -368,24 +399,28 @@ class _$AttendanceModelImpl extends _AttendanceModel {
   factory _$AttendanceModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AttendanceModelImplFromJson(json);
 
+  // Core identifiers
   @override
   final String attId;
-  // att_id (PK)
+  // PK
   @override
   final String empId;
-  // emp_id (FK)
-  @override
-  final DateTime timestamp;
-  // att_timestamp
+  // FK
+  // Timestamps (both required for daily logic)
   @override
   final DateTime attendanceDate;
-  // NEW: att_date (separate for daily grouping)
+  // att_date (daily grouping)
+  @override
+  final DateTime timestamp;
+  // att_timestamp (full record time)
+  // Check-in / Check-out
   @override
   final DateTime? checkInTime;
-  // NEW: check_in_time (for accurate late/duration)
   @override
   final DateTime? checkOutTime;
-  // NEW: check_out_time
+  @override
+  final double? workedHours;
+  // Location & Verification
   @override
   final double? latitude;
   @override
@@ -393,22 +428,28 @@ class _$AttendanceModelImpl extends _AttendanceModel {
   @override
   final String? geofenceName;
   @override
-  final String? projectId;
-  @override
-  final String? notes;
-  @override
-  final AttendanceStatus status;
-  @override
   final VerificationType? verificationType;
   @override
   @JsonKey()
   final bool isVerified;
+  // Project & Notes
+  @override
+  final String? projectId;
+  @override
+  final String? notes;
+  // Leave & Status
   @override
   final String? leaveType;
-  // NEW: 'casual', 'sick', null if no leave
+  // 'casual', 'sick', 'earned', etc.
+  @override
+  @JsonKey()
+  final AttendanceStatus status;
+  @override
+  @JsonKey()
+  final DailyAttendanceStatus dailyStatus;
+  // Proof & Audit
   @override
   final String? photoProofPath;
-  // Optional future field
   @override
   final DateTime? createdAt;
   @override
@@ -416,7 +457,7 @@ class _$AttendanceModelImpl extends _AttendanceModel {
 
   @override
   String toString() {
-    return 'AttendanceModel(attId: $attId, empId: $empId, timestamp: $timestamp, attendanceDate: $attendanceDate, checkInTime: $checkInTime, checkOutTime: $checkOutTime, latitude: $latitude, longitude: $longitude, geofenceName: $geofenceName, projectId: $projectId, notes: $notes, status: $status, verificationType: $verificationType, isVerified: $isVerified, leaveType: $leaveType, photoProofPath: $photoProofPath, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'AttendanceModel(attId: $attId, empId: $empId, attendanceDate: $attendanceDate, timestamp: $timestamp, checkInTime: $checkInTime, checkOutTime: $checkOutTime, workedHours: $workedHours, latitude: $latitude, longitude: $longitude, geofenceName: $geofenceName, verificationType: $verificationType, isVerified: $isVerified, projectId: $projectId, notes: $notes, leaveType: $leaveType, status: $status, dailyStatus: $dailyStatus, photoProofPath: $photoProofPath, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -426,30 +467,34 @@ class _$AttendanceModelImpl extends _AttendanceModel {
             other is _$AttendanceModelImpl &&
             (identical(other.attId, attId) || other.attId == attId) &&
             (identical(other.empId, empId) || other.empId == empId) &&
-            (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp) &&
             (identical(other.attendanceDate, attendanceDate) ||
                 other.attendanceDate == attendanceDate) &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp) &&
             (identical(other.checkInTime, checkInTime) ||
                 other.checkInTime == checkInTime) &&
             (identical(other.checkOutTime, checkOutTime) ||
                 other.checkOutTime == checkOutTime) &&
+            (identical(other.workedHours, workedHours) ||
+                other.workedHours == workedHours) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
             (identical(other.geofenceName, geofenceName) ||
                 other.geofenceName == geofenceName) &&
-            (identical(other.projectId, projectId) ||
-                other.projectId == projectId) &&
-            (identical(other.notes, notes) || other.notes == notes) &&
-            (identical(other.status, status) || other.status == status) &&
             (identical(other.verificationType, verificationType) ||
                 other.verificationType == verificationType) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.projectId, projectId) ||
+                other.projectId == projectId) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.leaveType, leaveType) ||
                 other.leaveType == leaveType) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.dailyStatus, dailyStatus) ||
+                other.dailyStatus == dailyStatus) &&
             (identical(other.photoProofPath, photoProofPath) ||
                 other.photoProofPath == photoProofPath) &&
             (identical(other.createdAt, createdAt) ||
@@ -460,27 +505,29 @@ class _$AttendanceModelImpl extends _AttendanceModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     attId,
     empId,
-    timestamp,
     attendanceDate,
+    timestamp,
     checkInTime,
     checkOutTime,
+    workedHours,
     latitude,
     longitude,
     geofenceName,
-    projectId,
-    notes,
-    status,
     verificationType,
     isVerified,
+    projectId,
+    notes,
     leaveType,
+    status,
+    dailyStatus,
     photoProofPath,
     createdAt,
     updatedAt,
-  );
+  ]);
 
   /// Create a copy of AttendanceModel
   /// with the given fields replaced by the non-null parameter values.
@@ -503,19 +550,21 @@ abstract class _AttendanceModel extends AttendanceModel {
   const factory _AttendanceModel({
     required final String attId,
     required final String empId,
-    required final DateTime timestamp,
     required final DateTime attendanceDate,
+    required final DateTime timestamp,
     final DateTime? checkInTime,
     final DateTime? checkOutTime,
+    final double? workedHours,
     final double? latitude,
     final double? longitude,
     final String? geofenceName,
-    final String? projectId,
-    final String? notes,
-    required final AttendanceStatus status,
     final VerificationType? verificationType,
     final bool isVerified,
+    final String? projectId,
+    final String? notes,
     final String? leaveType,
+    final AttendanceStatus status,
+    final DailyAttendanceStatus dailyStatus,
     final String? photoProofPath,
     final DateTime? createdAt,
     final DateTime? updatedAt,
@@ -525,18 +574,23 @@ abstract class _AttendanceModel extends AttendanceModel {
   factory _AttendanceModel.fromJson(Map<String, dynamic> json) =
       _$AttendanceModelImpl.fromJson;
 
+  // Core identifiers
   @override
-  String get attId; // att_id (PK)
+  String get attId; // PK
   @override
-  String get empId; // emp_id (FK)
+  String get empId; // FK
+  // Timestamps (both required for daily logic)
   @override
-  DateTime get timestamp; // att_timestamp
+  DateTime get attendanceDate; // att_date (daily grouping)
   @override
-  DateTime get attendanceDate; // NEW: att_date (separate for daily grouping)
+  DateTime get timestamp; // att_timestamp (full record time)
+  // Check-in / Check-out
   @override
-  DateTime? get checkInTime; // NEW: check_in_time (for accurate late/duration)
+  DateTime? get checkInTime;
   @override
-  DateTime? get checkOutTime; // NEW: check_out_time
+  DateTime? get checkOutTime;
+  @override
+  double? get workedHours; // Location & Verification
   @override
   double? get latitude;
   @override
@@ -544,19 +598,21 @@ abstract class _AttendanceModel extends AttendanceModel {
   @override
   String? get geofenceName;
   @override
+  VerificationType? get verificationType;
+  @override
+  bool get isVerified; // Project & Notes
+  @override
   String? get projectId;
   @override
-  String? get notes;
+  String? get notes; // Leave & Status
+  @override
+  String? get leaveType; // 'casual', 'sick', 'earned', etc.
   @override
   AttendanceStatus get status;
   @override
-  VerificationType? get verificationType;
+  DailyAttendanceStatus get dailyStatus; // Proof & Audit
   @override
-  bool get isVerified;
-  @override
-  String? get leaveType; // NEW: 'casual', 'sick', null if no leave
-  @override
-  String? get photoProofPath; // Optional future field
+  String? get photoProofPath;
   @override
   DateTime? get createdAt;
   @override

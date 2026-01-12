@@ -1,170 +1,152 @@
-// lib/features/project/data/repositories/project_repository_impl.dart
-// FINAL UPGRADED & PRODUCTION-READY VERSION - January 07, 2026
-// Now fetches real team member names using emp_id join with employee_master
-// Efficient, null-safe, active mappings only, optimized performance
-// Local DB only (SQLite), future API branch commented
-// Clean, no debug prints
-
 import 'package:appattendance/core/database/db_helper.dart';
-import 'package:appattendance/features/auth/domain/models/user_model.dart';
+import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/projects/data/repository/project_repository.dart';
 import 'package:appattendance/features/projects/domain/models/project_model.dart';
-import 'package:appattendance/features/team/domain/models/team_model.dart';
+import 'package:appattendance/features/team/domain/models/team_member.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ProjectRepositoryImpl implements ProjectRepository {
+  final DBHelper _dbHelper;
+
+  ProjectRepositoryImpl(this._dbHelper);
+
   @override
   Future<List<MappedProject>> getMappedProjects(String empId) async {
-    final db = await DBHelper.instance.database;
+    try {
+      final db = await _dbHelper.database;
 
-    final mappedRows = await db.query(
-      'employee_mapped_projects',
-      where: 'emp_id = ? AND mapping_status = ?',
-      whereArgs: [empId, 'active'],
-    );
+      final mappedRows = await db.query(
+        'employee_mapped_projects',
+        where: 'emp_id = ? AND mapping_status = ?',
+        whereArgs: [empId, 'active'],
+      );
 
-    final List<MappedProject> result = [];
+      final List<MappedProject> result = [];
 
-    for (var mapped in mappedRows) {
-      final projectId = mapped['project_id'] as String? ?? '';
-      if (projectId.isEmpty) continue;
+      for (var mapped in mappedRows) {
+        final projectId = mapped['project_id'] as String?;
+        if (projectId == null || projectId.isEmpty) continue;
 
-      final project = await _getProjectWithTeam(projectId, db);
-      if (project != null) {
-        result.add(
-          MappedProject(
-            empId: empId,
-            projectId: projectId,
-            mappingStatus: mapped['mapping_status'] as String? ?? 'active',
-            project: project,
-            createdAt: _parseDate(mapped['created_at'] as String?),
-            updatedAt: _parseDate(mapped['updated_at'] as String?),
-          ),
-        );
+        final project = await _getProjectById(projectId, db);
+        if (project != null) {
+          result.add(
+            MappedProject(
+              empId: empId,
+              projectId: projectId,
+              mappingStatus: mapped['mapping_status'] as String? ?? 'active',
+              project: project,
+              createdAt: _parseDate(mapped['created_at'] as String?),
+              updatedAt: _parseDate(mapped['updated_at'] as String?),
+            ),
+          );
+        }
       }
-    }
 
-    return result;
+      return result;
+    } catch (e) {
+      // TODO: Use proper logger in production
+      print('Error fetching mapped projects for empId $empId: $e');
+      return [];
+    }
   }
 
   @override
   Future<List<ProjectModel>> getTeamProjects(String mgrEmpId) async {
-    final db = await DBHelper.instance.database;
+    try {
+      final db = await _dbHelper.database;
 
-    // Manager ke team ke employees
-    final teamMembers = await db.query(
-      'employee_master',
-      where: 'reporting_manager_id = ?',
-      whereArgs: [mgrEmpId],
-    );
+      // Get all team members under this manager
+      final teamMembers = await db.query(
+        'employee_master',
+        columns: ['emp_id'],
+        where: 'reporting_manager_id = ?',
+        whereArgs: [mgrEmpId],
+      );
 
-    if (teamMembers.isEmpty) return [];
+      if (teamMembers.isEmpty) return [];
 
-    final empIds = teamMembers
-        .map((m) => m['emp_id'] as String?)
-        .whereType<String>()
-        .toList();
+      final empIds = teamMembers
+          .map((m) => m['emp_id'] as String?)
+          .whereType<String>()
+          .toList();
 
-    if (empIds.isEmpty) return [];
+      if (empIds.isEmpty) return [];
 
-    final placeholders = List.filled(empIds.length, '?').join(',');
+      final placeholders = List.filled(empIds.length, '?').join(',');
 
-    // Unique active project_ids from team members
-    final mappedRows = await db.rawQuery('''
-      SELECT DISTINCT project_id
-      FROM employee_mapped_projects
-      WHERE emp_id IN ($placeholders) AND mapping_status = 'active'
+      // Get unique active projects for the team
+      final mappedRows = await db.rawQuery('''
+        SELECT DISTINCT project_id
+        FROM employee_mapped_projects
+        WHERE emp_id IN ($placeholders) AND mapping_status = 'active'
       ''', empIds);
 
-    final projectIds = mappedRows
-        .map((row) => row['project_id'] as String?)
-        .whereType<String>()
-        .toList();
+      final projectIds = mappedRows
+          .map((row) => row['project_id'] as String?)
+          .whereType<String>()
+          .toList();
 
-    if (projectIds.isEmpty) return [];
+      if (projectIds.isEmpty) return [];
 
-    final List<ProjectModel> projects = [];
-    for (final pid in projectIds) {
-      final project = await _getProjectWithTeam(pid, db);
-      if (project != null) {
-        projects.add(project);
+      final List<ProjectModel> projects = [];
+      for (final pid in projectIds) {
+        final project = await _getProjectById(pid, db);
+        if (project != null) {
+          projects.add(project);
+        }
       }
+
+      // Sort by created_at DESC (latest first)
+      projects.sort((a, b) {
+        final aDate = a.createdAt ?? DateTime(2000);
+        final bDate = b.createdAt ?? DateTime(2000);
+        return bDate.compareTo(aDate);
+      });
+
+      return projects;
+    } catch (e) {
+      print('Error fetching team projects for mgr $mgrEmpId: $e');
+      return [];
     }
-
-    // Sort by created_at DESC (latest first)
-    projects.sort((a, b) {
-      final aDate = a.createdAt ?? DateTime(2000);
-      final bDate = b.createdAt ?? DateTime(2000);
-      return bDate.compareTo(aDate);
-    });
-
-    return projects;
   }
 
   @override
   Future<ProjectModel?> getProjectById(String projectId) async {
-    final db = await DBHelper.instance.database;
-    return await _getProjectWithTeam(projectId, db);
+    try {
+      final db = await _dbHelper.database;
+      return await _getProjectById(projectId, db);
+    } catch (e) {
+      print('Error fetching project $projectId: $e');
+      return null;
+    }
   }
 
-  // Centralized helper: Fetch project + real team member names
-  Future<ProjectModel?> _getProjectWithTeam(
-    String projectId,
-    dynamic db,
-  ) async {
+  // Centralized & Optimized: Fetch single project + team size
+  Future<ProjectModel?> _getProjectById(String projectId, Database db) async {
     final projectRows = await db.query(
       'project_master',
       where: 'project_id = ?',
       whereArgs: [projectId],
+      limit: 1,
     );
 
     if (projectRows.isEmpty) return null;
 
     final row = projectRows.first;
-    final count =
-        Sqflite.firstIntValue(
-          await db.rawQuery(
-            'SELECT COUNT(*) FROM employee_mapped_projects WHERE project_id = ? AND mapping_status = ?',
-            [projectId, 'active'],
-          ),
-        ) ??
-        0;
-    print('Active mappings for project $projectId: $count');
 
-    // Fetch active team member names
-    final teamRows = await db.rawQuery(
-      '''
-    SELECT 
-      em.emp_id,
-      em.emp_name AS name,
-      em.designation,
-      em.emp_email AS email,
-      em.emp_phone AS phone
-    FROM employee_mapped_projects emp
-    JOIN employee_master em ON emp.emp_id = em.emp_id
-    WHERE emp.project_id = ? 
-      AND emp.mapping_status = 'active'
-    ORDER BY em.emp_name ASC
-  ''',
-      [projectId],
+    // Count active team members (efficient COUNT query)
+    final teamSizeResult = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM employee_mapped_projects WHERE project_id = ? AND mapping_status = ?',
+      [projectId, 'active'],
     );
 
-    final teamMembers = teamRows
-        .map(
-          (r) => TeamMemberAnalytics(
-            empId: r['emp_id'] as String? ?? '',
-            name: r['name'] as String? ?? 'Unknown',
-            designation: r['designation'] as String?,
-            email: r['email'] as String?,
-            phone: r['phone'] as String?,
-          ),
-        )
-        .toList();
+    final teamSize = Sqflite.firstIntValue(teamSizeResult) ?? 0;
 
     return ProjectModel(
       projectId: row['project_id'] as String? ?? '',
       orgShortName: row['org_short_name'] as String? ?? 'NUTANTEK',
       projectName: row['project_name'] as String? ?? 'Unnamed Project',
+      projectDescription: row['project_description'] as String?,
       projectSite: row['project_site'] as String?,
       clientName: row['client_name'] as String?,
       clientLocation: row['client_location'] as String?,
@@ -172,31 +154,24 @@ class ProjectRepositoryImpl implements ProjectRepository {
       mngName: row['mng_name'] as String?,
       mngEmail: row['mng_email'] as String?,
       mngContact: row['mng_contact'] as String?,
-      projectDescription: row['project_description'] as String?,
-      projectTechstack: row['project_techstack'] as String?,
-      projectAssignedDate: row['project_assigned_date'] as String?,
-      estdStartDate: row['estd_start_date'] as String?,
-      estdEndDate: row['estd_end_date'] as String?,
-      estdEffort: row['estd_effort'] as String?,
-      estdCost: row['estd_cost'] as String?,
-      status: _mapProjectStatus(row['project_status'] as String? ?? 'active'),
-      priority: _mapProjectPriority(
-        row['project_priority'] as String? ?? 'HIGH',
-      ),
+      techStack: row['project_techstack'] as String?,
       progress: (row['progress'] as num?)?.toDouble() ?? 0.0,
-      teamSize: row['team_size'] as int? ?? 0,
       totalTasks: row['total_tasks'] as int? ?? 0,
       completedTasks: row['completed_tasks'] as int? ?? 0,
-      daysLeft: row['days_left'] as int? ?? 0,
-      // teamMemberIds: teamRows.map((r) => r['emp_id'] as String? ?? '').toList(),
-      // teamMemberNames: teamMembers.map((m) => m.name).toList(),
+      teamSize: teamSize,
+      status: _mapProjectStatus(row['project_status'] as String? ?? 'active'),
+      priority: _mapProjectPriority(
+        row['project_priority'] as String? ?? 'medium',
+      ),
       startDate: _parseDate(row['start_date'] as String?),
       endDate: _parseDate(row['end_date'] as String?),
+      assignedDate: _parseDate(row['assigned_date'] as String?),
       createdAt: _parseDate(row['created_at'] as String?),
       updatedAt: _parseDate(row['updated_at'] as String?),
     );
   }
 
+  // ── Helper Mappers ──────────────────────────────────────────────────────────
   ProjectStatus _mapProjectStatus(String? status) {
     final lower = (status ?? '').toLowerCase();
     return switch (lower) {
@@ -212,29 +187,20 @@ class ProjectRepositoryImpl implements ProjectRepository {
     final lower = (priority ?? '').toLowerCase();
     return switch (lower) {
       'urgent' => ProjectPriority.urgent,
-      'medium' => ProjectPriority.medium,
+      'high' => ProjectPriority.high,
       'low' => ProjectPriority.low,
-      _ => ProjectPriority.high,
+      _ => ProjectPriority.medium,
     };
   }
 
   DateTime? _parseDate(String? dateStr) {
-    if (dateStr == null) return null;
+    if (dateStr == null || dateStr.isEmpty) return null;
     try {
       return DateTime.parse(dateStr);
     } catch (_) {
       return null;
     }
   }
-
-  // Future: API mode (uncomment when backend ready)
-  /*
-  Future<List<ProjectModel>> getTeamProjectsApi(String mgrEmpId) async {
-    if (dio == null) throw Exception('Dio not initialized');
-    final response = await dio!.get('/projects/team', queryParameters: {'mgrId': mgrEmpId});
-    return (response.data as List).map((json) => ProjectModel.fromJson(json)).toList();
-  }
-  */
 }
 
 // // lib/features/project/data/repositories/project_repository_impl.dart
