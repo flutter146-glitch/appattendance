@@ -1,8 +1,8 @@
 // lib/features/attendance/data/repositories/attendance_analytics_repository_impl.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026 (Fully Fixed & Upgraded)
-// Fixes: Implements clearCache() method to satisfy the abstract interface
-// Now 100% compatible with upgraded AttendanceAnalyticsRepository
-// Features: Real DB aggregation, error handling, optional team breakdown, cache clear
+// UPDATED VERSION - January 15, 2026
+// Fixed: Properly implements AttendanceAnalyticsRepository interface
+// Fixed: Removes references to removed EmployeeAnalytics model
+// Fixed: Period calculation for 1-year limit
 
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
@@ -20,14 +20,13 @@ class AttendanceAnalyticsRepositoryImpl
   Future<AnalyticsModel> getAnalytics({
     required AnalyticsPeriod period,
     required String empId,
-    bool includeTeamBreakdown =
-        false, // If true → fetch per-employee stats (manager only)
-    int? limit, // Optional: limit breakdown records
+    bool includeTeamBreakdown = false,
+    int? limit,
   }) async {
     try {
       final db = await dbHelper.database;
 
-      // Calculate period dates (max 6 months limit)
+      // Calculate period dates (1 year limit as per requirement)
       DateTime end = DateTime.now();
       DateTime start = switch (period) {
         AnalyticsPeriod.daily => end,
@@ -40,13 +39,13 @@ class AttendanceAnalyticsRepositoryImpl
         ),
       };
 
-      final sixMonthsAgo = end.subtract(const Duration(days: 180));
-      start = start.isBefore(sixMonthsAgo) ? sixMonthsAgo : start;
+      // Limit to 1 year maximum (as per requirement #7)
+      final oneYearAgo = end.subtract(const Duration(days: 365));
+      start = start.isBefore(oneYearAgo) ? oneYearAgo : start;
 
-      // Fetch raw attendance records (aggregated for speed)
+      // Fetch attendance analytics data
       final rawAttendance = await db.query(
         'attendance_analytics',
-        columns: ['att_type', 'on_time', 'late'],
         where: 'emp_id = ? AND att_date BETWEEN ? AND ?',
         whereArgs: [
           empId,
@@ -55,21 +54,21 @@ class AttendanceAnalyticsRepositoryImpl
         ],
       );
 
-      // Team size (real count from employee_master)
+      // Team size for manager (if manager)
       final teamCountResult = await db.rawQuery(
         'SELECT COUNT(*) as count FROM employee_master WHERE reporting_manager_id = ?',
         [empId],
       );
       final teamSize = Sqflite.firstIntValue(teamCountResult) ?? 0;
 
-      // Pending counts (real DB)
+      // Pending counts
       final pendingLeaves = await _getPendingLeavesCount(db, empId);
       final pendingRegularisations = await _getPendingRegularisationsCount(
         db,
         empId,
       );
 
-      // Aggregate team stats
+      // Aggregate stats
       Map<String, int> teamStats = {
         'team': teamSize,
         'present': 0,
@@ -110,25 +109,17 @@ class AttendanceAnalyticsRepositoryImpl
       for (var record in rawAttendance) {
         final checkIn = record['first_checkin'] as String?;
         if (checkIn != null) {
-          final hour = int.tryParse(checkIn.split(':')[0]) ?? 9;
-          final index = ((hour - 9) ~/ 2).clamp(0, 5);
-          graphDataRaw['network']![index] += 1;
+          try {
+            final hour = int.tryParse(checkIn.split(':')[0]) ?? 9;
+            final index = ((hour - 9) ~/ 2).clamp(0, 5);
+            graphDataRaw['network']![index] += 1;
+          } catch (_) {
+            // Skip invalid time format
+          }
         }
       }
 
-      // Insights (dynamic generation)
-      List<String> insights = [];
-      final presentPct = teamPercentages['present'] ?? 0.0;
-      if (presentPct < 70)
-        insights.add('Low attendance (${presentPct.toStringAsFixed(1)}%)');
-      if ((teamStats['late'] ?? 0) > 5)
-        insights.add('High late arrivals (${teamStats['late']})');
-      if ((teamStats['absent'] ?? 0) > 3)
-        insights.add('Multiple absences (${teamStats['absent']})');
-      if (pendingLeaves > 3) insights.add('$pendingLeaves pending leaves');
-      if (pendingRegularisations > 2)
-        insights.add('$pendingRegularisations pending regularizations');
-
+      // Create analytics model
       return AnalyticsModel(
         period: period,
         startDate: start,
@@ -137,21 +128,26 @@ class AttendanceAnalyticsRepositoryImpl
         teamPercentages: teamPercentages,
         graphDataRaw: graphDataRaw,
         graphLabels: graphLabels,
-        insights: insights,
+        insights: _generateInsights(
+          teamStats,
+          teamPercentages,
+          pendingLeaves,
+          pendingRegularisations,
+        ),
         totalDays: end.difference(start).inDays + 1,
         presentDays: teamStats['present']!,
         absentDays: teamStats['absent']!,
         leaveDays: teamStats['leave']!,
         lateDays: teamStats['late']!,
         onTimeDays: teamStats['onTime']!,
-        dailyAvgHours: 8.0, // TODO: Real avg from worked_hours
+        dailyAvgHours: 8.0, // TODO: Calculate from worked_hrs
         monthlyAvgHours: 160.0,
         pendingRegularisations: pendingRegularisations,
         pendingLeaves: pendingLeaves,
       );
     } catch (e, stack) {
-      print('Analytics fetch error for empId $empId: $e');
-      // Fallback to minimal valid model
+      print('Analytics fetch error for empId $empId: $e\n$stack');
+      // Return minimal valid model with error
       return AnalyticsModel(
         period: period,
         startDate: DateTime.now(),
@@ -160,7 +156,7 @@ class AttendanceAnalyticsRepositoryImpl
         teamPercentages: {},
         graphDataRaw: {},
         graphLabels: [],
-        insights: ['Error loading data'],
+        insights: ['Error loading analytics data'],
         totalDays: 0,
         presentDays: 0,
         absentDays: 0,
@@ -175,28 +171,23 @@ class AttendanceAnalyticsRepositoryImpl
     }
   }
 
-  /// Clears any cached analytics data
-  /// Call this on logout, data reset, or when user switches accounts
   @override
   Future<void> clearCache() async {
     try {
       final db = await dbHelper.database;
-      // Clear any cached analytics tables or temp views
-      await db.execute(
-        'DELETE FROM temp_analytics_cache',
-      ); // If you have a cache table
-      // Or just reset any in-memory cache if you implement one
+      // Clear any cached tables if they exist
+      await db.execute('DELETE FROM temp_analytics_cache');
       print('Analytics cache cleared successfully');
     } catch (e) {
       print('Error clearing analytics cache: $e');
     }
   }
 
-  // Helper: Pending leaves count
+  // Helper methods
   Future<int> _getPendingLeavesCount(Database db, String empId) async {
     try {
       final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM leave_requests WHERE emp_id = ? AND status = ?',
+        'SELECT COUNT(*) as count FROM employee_leaves WHERE emp_id = ? AND leave_approval_status = ?',
         [empId, 'pending'],
       );
       return Sqflite.firstIntValue(result) ?? 0;
@@ -205,11 +196,10 @@ class AttendanceAnalyticsRepositoryImpl
     }
   }
 
-  // Helper: Pending regularizations count
   Future<int> _getPendingRegularisationsCount(Database db, String empId) async {
     try {
       final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM regularisation_requests WHERE emp_id = ? AND status = ?',
+        'SELECT COUNT(*) as count FROM employee_regularization WHERE emp_id = ? AND reg_approval_status = ?',
         [empId, 'pending'],
       );
       return Sqflite.firstIntValue(result) ?? 0;
@@ -217,8 +207,40 @@ class AttendanceAnalyticsRepositoryImpl
       return 0;
     }
   }
-}
 
+  List<String> _generateInsights(
+    Map<String, int> teamStats,
+    Map<String, double> teamPercentages,
+    int pendingLeaves,
+    int pendingRegularisations,
+  ) {
+    final List<String> insights = [];
+    final presentPct = teamPercentages['present'] ?? 0.0;
+
+    if (presentPct < 70) {
+      insights.add(
+        'Low attendance (${presentPct.toStringAsFixed(1)}%) - needs improvement',
+      );
+    }
+    if ((teamStats['late'] ?? 0) > 5) {
+      insights.add('High late arrivals (${teamStats['late']} cases)');
+    }
+    if ((teamStats['absent'] ?? 0) > 3) {
+      insights.add('Multiple absences detected (${teamStats['absent']})');
+    }
+    if (pendingLeaves > 3) {
+      insights.add('$pendingLeaves pending leaves require attention');
+    }
+    if (pendingRegularisations > 2) {
+      insights.add('$pendingRegularisations regularization requests pending');
+    }
+    if (presentPct >= 90) {
+      insights.add('Excellent attendance performance!');
+    }
+
+    return insights;
+  }
+}
 // import 'package:appattendance/core/database/db_helper.dart';
 // import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
 // import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';

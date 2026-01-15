@@ -39,7 +39,7 @@ mixin _$TeamMember {
   // Relationships
   List<String> get projectIds => throw _privateConstructorUsedError;
   List<String> get projectNames =>
-      throw _privateConstructorUsedError; // Attendance history (last 30 days or so)
+      throw _privateConstructorUsedError; // Attendance history (last 30 days or so) ← this field must exist
   List<AttendanceModel> get recentAttendanceHistory =>
       throw _privateConstructorUsedError; // Optional analytics
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -374,9 +374,9 @@ class _$TeamMemberImpl extends _TeamMember {
     return EqualUnmodifiableListView(_projectNames);
   }
 
-  // Attendance history (last 30 days or so)
+  // Attendance history (last 30 days or so) ← this field must exist
   final List<AttendanceModel> _recentAttendanceHistory;
-  // Attendance history (last 30 days or so)
+  // Attendance history (last 30 days or so) ← this field must exist
   @override
   @JsonKey()
   List<AttendanceModel> get recentAttendanceHistory {
@@ -518,7 +518,7 @@ abstract class _TeamMember extends TeamMember {
   @override
   List<String> get projectIds;
   @override
-  List<String> get projectNames; // Attendance history (last 30 days or so)
+  List<String> get projectNames; // Attendance history (last 30 days or so) ← this field must exist
   @override
   List<AttendanceModel> get recentAttendanceHistory; // Optional analytics
   @override

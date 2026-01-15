@@ -53,7 +53,7 @@ class MappedProjectsWidget extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                showTeamProjects ? 'Team Projects' : 'My Projects',
+                showTeamProjects ? 'Mapped Projects' : 'My Projects',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

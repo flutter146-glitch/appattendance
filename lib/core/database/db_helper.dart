@@ -234,6 +234,36 @@ class DBHelper {
 
     // Seed ALL dummy data
     await _seedDummyData(db);
+
+    if (kDebugMode) {
+      final userCount =
+          Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM user'),
+          ) ??
+          0;
+      print('Seeded $userCount users');
+
+      final empCount =
+          Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM employee_master'),
+          ) ??
+          0;
+      print('Seeded $empCount employees');
+
+      final projectCount =
+          Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM project_master'),
+          ) ??
+          0;
+      print('Seeded $projectCount projects');
+
+      final attCount =
+          Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM employee_attendance'),
+          ) ??
+          0;
+      print('Seeded $attCount attendance records');
+    }
   }
 
   Future<void> _seedDummyData(Database db) async {

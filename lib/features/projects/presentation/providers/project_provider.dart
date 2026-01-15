@@ -41,32 +41,53 @@ class MappedProjectsNotifier
   MappedProjectsNotifier(this.ref) : super(const AsyncLoading()) {
     loadMappedProjects();
   }
-
   Future<void> loadMappedProjects() async {
-    if (state.isLoading) return; // Prevent duplicate calls
-
     state = const AsyncLoading();
+    print('Mapped projects loading started...');
 
     try {
       final user = ref.read(authProvider).value;
       if (user == null) {
-        state = AsyncError(
-          'Please login to view your projects',
-          StackTrace.current,
-        );
+        state = AsyncError('Login required', StackTrace.current);
+        print('No user');
         return;
       }
 
       final repo = ref.read(projectRepositoryProvider);
       final projects = await repo.getMappedProjects(user.empId);
+      print('Loaded ${projects.length} mapped projects');
       state = AsyncData(projects);
     } catch (e, stack) {
-      state = AsyncError(
-        'Unable to load your assigned projects. Please try again.',
-        stack,
-      );
+      print('Mapped projects error: $e');
+      state = AsyncError('Failed to load projects', stack);
     }
   }
+
+  // Future<void> loadMappedProjects() async {
+  //   if (state.isLoading) return; // Prevent duplicate calls
+
+  //   state = const AsyncLoading();
+
+  //   try {
+  //     final user = ref.read(authProvider).value;
+  //     if (user == null) {
+  //       state = AsyncError(
+  //         'Please login to view your projects',
+  //         StackTrace.current,
+  //       );
+  //       return;
+  //     }
+
+  //     final repo = ref.read(projectRepositoryProvider);
+  //     final projects = await repo.getMappedProjects(user.empId);
+  //     state = AsyncData(projects);
+  //   } catch (e, stack) {
+  //     state = AsyncError(
+  //       'Unable to load your assigned projects. Please try again.',
+  //       stack,
+  //     );
+  //   }
+  // }
 
   /// Pull-to-refresh / manual refresh with debounce
   Future<void> refresh() async {

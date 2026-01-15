@@ -1,28 +1,13 @@
 // lib/features/attendance/presentation/providers/analytics_notifier.dart
-// ULTIMATE & BEST PRACTICE VERSION - January 09, 2026
+// Notifier only - contains business logic
 
 import 'dart:async';
 
-import 'package:appattendance/core/database/database_provider.dart';
-import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
-import 'package:appattendance/features/attendance/data/repositories/analytics_repository_impl.dart';
 import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
 import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final analyticsRepositoryProvider = Provider<AttendanceAnalyticsRepository>((
-  ref,
-) {
-  return AttendanceAnalyticsRepositoryImpl(ref.watch(dbHelperProvider));
-});
-
-final analyticsProvider =
-    StateNotifierProvider.autoDispose<
-      AnalyticsNotifier,
-      AsyncValue<AnalyticsModel>
-    >((ref) => AnalyticsNotifier(ref));
 
 class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
   final Ref ref;
@@ -48,32 +33,73 @@ class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
       }
 
       final period = ref.read(analyticsPeriodProvider);
+      final selectedDate = ref.read(selectedDateProvider);
       final isManager = user.isManagerial;
 
-      final repo = ref.read(analyticsRepositoryProvider);
+      // Calculate date range based on period and selected date
+      DateTime startDate, endDate;
+
+      switch (period) {
+        case AnalyticsPeriod.daily:
+          startDate = selectedDate;
+          endDate = selectedDate;
+          break;
+        case AnalyticsPeriod.weekly:
+          startDate = selectedDate.subtract(const Duration(days: 6));
+          endDate = selectedDate;
+          break;
+        case AnalyticsPeriod.monthly:
+          startDate = DateTime(selectedDate.year, selectedDate.month, 1);
+          endDate = DateTime(selectedDate.year, selectedDate.month + 1, 0);
+          break;
+        case AnalyticsPeriod.quarterly:
+          final quarterStartMonth = ((selectedDate.month - 1) ~/ 3) * 3 + 1;
+          startDate = DateTime(selectedDate.year, quarterStartMonth, 1);
+          endDate = DateTime(selectedDate.year, quarterStartMonth + 3, 0);
+          break;
+      }
+
+      // Ensure we don't go beyond 1 year limit
+      final oneYearAgo = DateTime.now().subtract(const Duration(days: 365));
+      if (startDate.isBefore(oneYearAgo)) {
+        startDate = oneYearAgo;
+      }
+
+      final repo = ref.read(attendanceAnalyticsRepositoryProvider);
       final analytics = await repo.getAnalytics(
         period: period,
         empId: user.empId,
-        includeTeamBreakdown: isManager, // Manager ko team breakdown
+        includeTeamBreakdown: isManager,
         limit: isManager ? 50 : null,
       );
 
-      state = AsyncData(analytics);
+      // Update with calculated dates
+      state = AsyncData(
+        analytics.copyWith(startDate: startDate, endDate: endDate),
+      );
     } catch (e, stack) {
-      state = AsyncError('Unable to load analytics. Please try again.', stack);
+      state = AsyncError('Unable to load analytics: ${e.toString()}', stack);
     }
   }
 
+  /// Change period & reload
+  void changePeriod(AnalyticsPeriod newPeriod) {
+    ref.read(analyticsPeriodProvider.notifier).state = newPeriod;
+    refresh();
+  }
+
+  /// Change selected date & reload
+  void changeDate(DateTime newDate) {
+    ref.read(selectedDateProvider.notifier).state = newDate;
+    refresh();
+  }
+
+  /// Pull-to-refresh with debounce
   Future<void> refresh() async {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 400), () async {
       await loadAnalytics();
     });
-  }
-
-  void changePeriod(AnalyticsPeriod newPeriod) {
-    ref.read(analyticsPeriodProvider.notifier).state = newPeriod;
-    refresh();
   }
 
   @override
@@ -82,6 +108,91 @@ class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
     super.dispose();
   }
 }
+
+// // lib/features/attendance/presentation/providers/analytics_notifier.dart
+// // ULTIMATE & BEST PRACTICE VERSION - January 09, 2026
+
+// import 'dart:async';
+
+// import 'package:appattendance/core/database/database_provider.dart';
+// import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
+// import 'package:appattendance/features/attendance/data/repositories/analytics_repository_impl.dart';
+// import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
+// import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
+// import 'package:appattendance/features/auth/domain/models/user_extension.dart';
+// import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// final analyticsRepositoryProvider = Provider<AttendanceAnalyticsRepository>((
+//   ref,
+// ) {
+//   return AttendanceAnalyticsRepositoryImpl(ref.watch(dbHelperProvider));
+// });
+
+// final analyticsProvider =
+//     StateNotifierProvider.autoDispose<
+//       AnalyticsNotifier,
+//       AsyncValue<AnalyticsModel>
+//     >((ref) => AnalyticsNotifier(ref));
+
+// class AnalyticsNotifier extends StateNotifier<AsyncValue<AnalyticsModel>> {
+//   final Ref ref;
+//   Timer? _debounceTimer;
+
+//   AnalyticsNotifier(this.ref) : super(const AsyncLoading()) {
+//     loadAnalytics();
+//   }
+
+//   Future<void> loadAnalytics() async {
+//     if (state.isLoading) return;
+
+//     state = const AsyncLoading();
+
+//     try {
+//       final user = ref.read(authProvider).value;
+//       if (user == null) {
+//         state = AsyncError(
+//           'Please login to view analytics',
+//           StackTrace.current,
+//         );
+//         return;
+//       }
+
+//       final period = ref.read(analyticsPeriodProvider);
+//       final isManager = user.isManagerial;
+
+//       final repo = ref.read(analyticsRepositoryProvider);
+//       final analytics = await repo.getAnalytics(
+//         period: period,
+//         empId: user.empId,
+//         includeTeamBreakdown: isManager, // Manager ko team breakdown
+//         limit: isManager ? 50 : null,
+//       );
+
+//       state = AsyncData(analytics);
+//     } catch (e, stack) {
+//       state = AsyncError('Unable to load analytics. Please try again.', stack);
+//     }
+//   }
+
+//   Future<void> refresh() async {
+//     _debounceTimer?.cancel();
+//     _debounceTimer = Timer(const Duration(milliseconds: 400), () async {
+//       await loadAnalytics();
+//     });
+//   }
+
+//   void changePeriod(AnalyticsPeriod newPeriod) {
+//     ref.read(analyticsPeriodProvider.notifier).state = newPeriod;
+//     refresh();
+//   }
+
+//   @override
+//   void dispose() {
+//     _debounceTimer?.cancel();
+//     super.dispose();
+//   }
+// }
 
 // // lib/features/attendance/presentation/providers/analytics_notifier.dart
 // // Notifier - Loads analytics from repository

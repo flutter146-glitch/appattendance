@@ -21,31 +21,23 @@ AttendanceModel _$AttendanceModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AttendanceModel {
-  // Core identifiers
-  String get attId => throw _privateConstructorUsedError; // PK
-  String get empId => throw _privateConstructorUsedError; // FK
-  // Timestamps (both required for daily logic)
-  DateTime get attendanceDate =>
-      throw _privateConstructorUsedError; // att_date (daily grouping)
-  DateTime get timestamp =>
-      throw _privateConstructorUsedError; // att_timestamp (full record time)
-  // Check-in / Check-out
+  String get attId => throw _privateConstructorUsedError;
+  String get empId => throw _privateConstructorUsedError;
+  DateTime get attendanceDate => throw _privateConstructorUsedError;
+  DateTime get timestamp => throw _privateConstructorUsedError;
   DateTime? get checkInTime => throw _privateConstructorUsedError;
   DateTime? get checkOutTime => throw _privateConstructorUsedError;
-  double? get workedHours =>
-      throw _privateConstructorUsedError; // Location & Verification
+  double? get workedHours => throw _privateConstructorUsedError;
   double? get latitude => throw _privateConstructorUsedError;
   double? get longitude => throw _privateConstructorUsedError;
   String? get geofenceName => throw _privateConstructorUsedError;
   VerificationType? get verificationType => throw _privateConstructorUsedError;
-  bool get isVerified => throw _privateConstructorUsedError; // Project & Notes
+  bool get isVerified => throw _privateConstructorUsedError;
   String? get projectId => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError; // Leave & Status
-  String? get leaveType =>
-      throw _privateConstructorUsedError; // 'casual', 'sick', 'earned', etc.
+  String? get notes => throw _privateConstructorUsedError;
+  String? get leaveType => throw _privateConstructorUsedError;
   AttendanceStatus get status => throw _privateConstructorUsedError;
-  DailyAttendanceStatus get dailyStatus =>
-      throw _privateConstructorUsedError; // Proof & Audit
+  DailyAttendanceStatus get dailyStatus => throw _privateConstructorUsedError;
   String? get photoProofPath => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
@@ -399,28 +391,20 @@ class _$AttendanceModelImpl extends _AttendanceModel {
   factory _$AttendanceModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AttendanceModelImplFromJson(json);
 
-  // Core identifiers
   @override
   final String attId;
-  // PK
   @override
   final String empId;
-  // FK
-  // Timestamps (both required for daily logic)
   @override
   final DateTime attendanceDate;
-  // att_date (daily grouping)
   @override
   final DateTime timestamp;
-  // att_timestamp (full record time)
-  // Check-in / Check-out
   @override
   final DateTime? checkInTime;
   @override
   final DateTime? checkOutTime;
   @override
   final double? workedHours;
-  // Location & Verification
   @override
   final double? latitude;
   @override
@@ -432,22 +416,18 @@ class _$AttendanceModelImpl extends _AttendanceModel {
   @override
   @JsonKey()
   final bool isVerified;
-  // Project & Notes
   @override
   final String? projectId;
   @override
   final String? notes;
-  // Leave & Status
   @override
   final String? leaveType;
-  // 'casual', 'sick', 'earned', etc.
   @override
   @JsonKey()
   final AttendanceStatus status;
   @override
   @JsonKey()
   final DailyAttendanceStatus dailyStatus;
-  // Proof & Audit
   @override
   final String? photoProofPath;
   @override
@@ -574,23 +554,20 @@ abstract class _AttendanceModel extends AttendanceModel {
   factory _AttendanceModel.fromJson(Map<String, dynamic> json) =
       _$AttendanceModelImpl.fromJson;
 
-  // Core identifiers
   @override
-  String get attId; // PK
+  String get attId;
   @override
-  String get empId; // FK
-  // Timestamps (both required for daily logic)
+  String get empId;
   @override
-  DateTime get attendanceDate; // att_date (daily grouping)
+  DateTime get attendanceDate;
   @override
-  DateTime get timestamp; // att_timestamp (full record time)
-  // Check-in / Check-out
+  DateTime get timestamp;
   @override
   DateTime? get checkInTime;
   @override
   DateTime? get checkOutTime;
   @override
-  double? get workedHours; // Location & Verification
+  double? get workedHours;
   @override
   double? get latitude;
   @override
@@ -600,17 +577,17 @@ abstract class _AttendanceModel extends AttendanceModel {
   @override
   VerificationType? get verificationType;
   @override
-  bool get isVerified; // Project & Notes
+  bool get isVerified;
   @override
   String? get projectId;
   @override
-  String? get notes; // Leave & Status
+  String? get notes;
   @override
-  String? get leaveType; // 'casual', 'sick', 'earned', etc.
+  String? get leaveType;
   @override
   AttendanceStatus get status;
   @override
-  DailyAttendanceStatus get dailyStatus; // Proof & Audit
+  DailyAttendanceStatus get dailyStatus;
   @override
   String? get photoProofPath;
   @override

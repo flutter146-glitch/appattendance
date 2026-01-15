@@ -2,6 +2,7 @@
 import 'package:appattendance/core/providers/view_mode_provider.dart';
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
+import 'package:appattendance/features/attendance/presentation/screens/attendance_screen.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';
 import 'package:appattendance/features/dashboard/presentation/providers/dashboard_notifier.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +111,22 @@ class PresentDashboardCardSection extends ConsumerWidget {
                       color: isDark ? Colors.white70 : Colors.grey[700],
                     ),
                   ),
+                  if (!showManagerView)
+                    IconButton(
+                      icon: Icon(
+                        Icons.calendar_today_rounded,
+                        color: isDark ? Colors.white70 : Colors.grey[700],
+                        size: 24,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AttendanceScreen(),
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 20),

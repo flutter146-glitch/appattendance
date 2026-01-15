@@ -24,6 +24,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserModel> login(String email, String password) async {
+    // final token = "dummy_token";
     // Trim & normalize email
     final normalizedEmail = email.trim().toLowerCase();
 
