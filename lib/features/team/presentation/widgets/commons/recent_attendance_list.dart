@@ -1,15 +1,3 @@
-// lib/features/team/presentation/widgets/recent_attendance_list.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026 (Fully Upgraded)
-// Key Upgrades:
-// - Interactive Filter Chips (All/Present/Absent/Late) with real filtering
-// - Shimmer loading placeholder
-// - Modern card design with dark/light mode contrast
-// - Hero animation ready for detail navigation (if needed later)
-// - Better status colors & icons using AttendanceModel helpers
-// - Empty state with icon
-// - Responsive & accessible layout
-// - Smooth list with proper spacing
-
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

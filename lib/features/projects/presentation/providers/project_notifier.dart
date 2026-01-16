@@ -1,14 +1,4 @@
 // lib/features/projects/presentation/providers/project_notifier.dart
-// ULTIMATE & BEST PRACTICE VERSION - January 09, 2026 (Upgraded)
-// Improvements:
-// - AutoDispose everywhere for memory efficiency
-// - Better error handling with user-friendly messages
-// - Refresh + retry logic added
-// - Loading state with timeout handling
-// - Family support for single project details (used in detail screen)
-// - Manager/Employee separation clear & robust
-// - Null checks + fallback states
-// - Optional: Debounce on refresh (for pull-to-refresh spam prevention)
 
 import 'dart:async';
 

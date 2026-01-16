@@ -1,6 +1,4 @@
 // lib/features/leaves/presentation/screens/manager_leave_screen.dart
-// FINAL CLEAN & PRODUCTION-READY - January 08, 2026
-// Full team leaves + month + status filter + quick pending count card
 
 import 'package:appattendance/core/theme/app_gradients.dart';
 import 'package:appattendance/core/utils/app_colors.dart';

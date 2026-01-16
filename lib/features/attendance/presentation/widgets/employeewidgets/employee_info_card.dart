@@ -1,4 +1,4 @@
-// lib/features/attendance/presentation/widgets/employee_info_card.dart
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
 import 'package:flutter/material.dart';
 
@@ -9,38 +9,75 @@ class EmployeeInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeColors(context);
+
     return Card(
-      elevation: 4,
+      elevation: theme.isDark ? 2 : 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: theme.surface,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Designation row
             Row(
               children: [
-                Icon(Icons.work, color: Colors.blue, size: 20),
+                Icon(
+                  Icons.work_outline_rounded,
+                  color: theme.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   employee.designation ?? 'Employee',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: theme.textPrimary,
                   ),
                 ),
               ],
             ),
+
+            const SizedBox(height: 16),
+
+            // Email
+            _buildInfoRow(
+              icon: Icons.email_outlined,
+              value: employee.email ?? 'Not provided',
+              iconColor: theme.textSecondary,
+              theme: theme,
+            ),
+
             const SizedBox(height: 12),
-            _buildInfoRow(Icons.email, employee.email ?? 'Not provided'),
-            _buildInfoRow(Icons.phone, employee.phone ?? 'Not provided'),
+
+            // Phone
+            _buildInfoRow(
+              icon: Icons.phone_outlined,
+              value: employee.phone ?? 'Not provided',
+              iconColor: theme.textSecondary,
+              theme: theme,
+            ),
+
+            const SizedBox(height: 12),
+
+            // Status with dot
             Row(
               children: [
-                const Icon(Icons.circle, size: 12, color: Colors.green),
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: employee.statusColor(theme),
+                    shape: BoxShape.circle,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Status: ${employee.status.name}',
                   style: TextStyle(
-                    color: employee.statusColor,
+                    color: employee.statusColor(theme),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -53,16 +90,23 @@ class EmployeeInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Colors.grey[700]),
-          const SizedBox(width: 12),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
-        ],
-      ),
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String value,
+    required Color iconColor,
+    required ThemeColors theme,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 14, color: theme.textPrimary),
+          ),
+        ),
+      ],
     );
   }
 }

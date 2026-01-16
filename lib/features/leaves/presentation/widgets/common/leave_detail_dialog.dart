@@ -1,6 +1,4 @@
 // lib/features/leaves/presentation/widgets/leave_detail_dialog.dart
-// Final upgraded version: Riverpod integration + LeaveModel freezed + real approve/reject
-// Dec 30, 2025 - Production-ready, loading state, error handling, dark mode
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/leaves/domain/models/leave_model.dart';

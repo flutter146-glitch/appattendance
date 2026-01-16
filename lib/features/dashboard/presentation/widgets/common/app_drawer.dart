@@ -1,8 +1,4 @@
 // lib/features/dashboard/presentation/widgets/common/app_drawer.dart
-// Upgraded: Now uses UserModel (freezed) instead of Map
-// Role-based UI using isManagerial extension (R01-R08 privileges)
-// Null-safe, clean, beautiful gradient + glow effect
-// Logout integrated with authProvider
 
 import 'package:appattendance/core/providers/view_mode_provider.dart';
 import 'package:appattendance/core/utils/app_colors.dart';

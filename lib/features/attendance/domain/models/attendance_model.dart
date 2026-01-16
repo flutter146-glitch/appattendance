@@ -101,6 +101,11 @@ extension AttendanceModelExtension on AttendanceModel {
     return checkInTime!.isAfter(officeStart);
   }
 
+  bool get isOnLeave => leaveType != null && leaveType!.isNotEmpty;
+
+  /// Absent: no check-in and not on leave
+  bool get isAbsent => !isPresent && !isOnLeave && checkInTime == null;
+
   // Formatted display
   String get formattedDate => DateFormat('dd MMM yyyy').format(attendanceDate);
   String get formattedDay => DateFormat('EEE').format(attendanceDate);

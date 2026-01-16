@@ -1,10 +1,8 @@
 // lib/features/attendance/presentation/screens/employee_individual_details_screen.dart
-// LIGHTWEIGHT & PRODUCTION-READY - January 15, 2026
-// Refactored: heavy parts moved to separate widgets
-// Real data only (TeamMember + individualAnalyticsProvider)
 
 import 'dart:io';
 
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
 import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
 import 'package:appattendance/features/attendance/presentation/widgets/analytics/period_selector_widget.dart';
@@ -27,26 +25,27 @@ class EmployeeIndividualDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Real analytics for this employee
+    final theme = ThemeColors(context);
     final analyticsAsync = ref.watch(
       individualAnalyticsProvider(employee.empId),
     );
 
     return Scaffold(
+      backgroundColor: theme.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.white,
+            color: theme.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_rounded, color: Colors.white),
+            icon: Icon(Icons.download_rounded, color: theme.primary),
             onPressed: () => _exportEmployeeData(
               context,
               ref,
@@ -69,17 +68,17 @@ class EmployeeIndividualDetailsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   PeriodSelectorWidget(),
-                  // 2. Employee Info Card (designation, email, phone, status)
-                  EmployeeInfoCard(employee: employee),
+                  const SizedBox(height: 24),
 
+                  // 2. Employee Info Card
+                  EmployeeInfoCard(employee: employee),
                   const SizedBox(height: 24),
 
                   // 3. Daily Attendance Overview Card
                   DailyAttendanceOverviewCard(analyticsAsync: analyticsAsync),
-
                   const SizedBox(height: 32),
 
-                  // 4. Attendance History (separate widget)
+                  // 4. Attendance History
                   AttendanceHistoryWidget(employee: employee),
                 ],
               ),
@@ -90,16 +89,24 @@ class EmployeeIndividualDetailsScreen extends ConsumerWidget {
     );
   }
 
-  // Real XLSX export (no dummy)
+  // Real XLSX export (theme-aware SnackBar)
   Future<void> _exportEmployeeData(
     BuildContext context,
     WidgetRef ref,
     TeamMember employee,
     AnalyticsModel? analytics,
   ) async {
+    final theme = ThemeColors(context);
+
     if (analytics == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No analytics data available')),
+        SnackBar(
+          content: Text(
+            'No analytics data available',
+            style: TextStyle(color: theme.onPrimary),
+          ),
+          backgroundColor: theme.error,
+        ),
       );
       return;
     }
@@ -147,15 +154,27 @@ class EmployeeIndividualDetailsScreen extends ConsumerWidget {
       await OpenFilex.open(path);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Exported: $timestamp.xlsx')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Exported: $timestamp.xlsx',
+              style: TextStyle(color: theme.onPrimary),
+            ),
+            backgroundColor: theme.success,
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Export failed: $e',
+              style: TextStyle(color: theme.onPrimary),
+            ),
+            backgroundColor: theme.error,
+          ),
+        );
       }
     }
   }

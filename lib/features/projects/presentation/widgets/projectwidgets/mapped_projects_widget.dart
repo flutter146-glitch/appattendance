@@ -1,14 +1,4 @@
 // lib/features/projects/presentation/widgets/projectwidgets/mapped_projects_widget.dart
-// ULTIMATE & FIXED VERSION - January 09, 2026 (Shimmer Removed)
-// Key Changes:
-// - Shimmer loading completely removed (as requested)
-// - Simple CircularProgressIndicator + empty state
-// - Better error handling with retry button
-// - Dark/light mode contrast improved
-// - Hero animation + smooth navigation
-// - Real data from dummy_data via providers
-// - Responsive horizontal cards, no overflow
-// - Pull-to-refresh ready (if wrapped in RefreshIndicator)
 
 import 'package:appattendance/core/providers/view_mode_provider.dart';
 import 'package:appattendance/core/utils/app_colors.dart';

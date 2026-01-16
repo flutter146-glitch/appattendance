@@ -1,6 +1,4 @@
 // lib/features/regularisation/domain/models/regularisation_model.dart
-// FINAL Polished Version (31 Dec 2025) - Production-Ready + Screenshot Compatible
-// Minor upgrades: fromTime/toTime (half-day), statusColor, duration, overdue check
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

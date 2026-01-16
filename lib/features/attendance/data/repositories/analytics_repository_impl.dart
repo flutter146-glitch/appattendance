@@ -1,9 +1,3 @@
-// lib/features/attendance/data/repositories/attendance_analytics_repository_impl.dart
-// UPDATED VERSION - January 15, 2026
-// Fixed: Properly implements AttendanceAnalyticsRepository interface
-// Fixed: Removes references to removed EmployeeAnalytics model
-// Fixed: Period calculation for 1-year limit
-
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/attendance/data/repositories/analytics_repository.dart';
 import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';

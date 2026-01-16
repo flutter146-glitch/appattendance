@@ -1,6 +1,4 @@
-// lib/features/attendance/presentation/screens/attendance_analytics_screen.dart
-// FIXED ROLE-BASED + TOGGLE WORKING - January 15, 2026
-
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
 import 'package:appattendance/features/attendance/presentation/widgets/analytics/active_projects.dart';
 import 'package:appattendance/features/attendance/presentation/widgets/analytics/employee_overview_widget.dart';
@@ -20,13 +18,15 @@ class AttendanceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ThemeColors(context);
     final userAsync = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.background,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.primary,
+        foregroundColor: theme.onPrimary,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
@@ -45,7 +45,12 @@ class AttendanceScreen extends ConsumerWidget {
       body: userAsync.when(
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('Please login first'));
+            return Center(
+              child: Text(
+                'Please login first',
+                style: TextStyle(color: theme.textPrimary),
+              ),
+            );
           }
 
           final isManager = user.isManagerial;
@@ -65,26 +70,36 @@ class AttendanceScreen extends ConsumerWidget {
 
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
 
                       // Stats Cards → Only Manager
-                      if (isManager) const StatsCardsWidget(),
+                      if (isManager)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: const StatsCardsWidget(),
+                        ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
                       // Toggle → 3 for manager, 2 for employee
-                      ToggleWidget(ref: ref, isManager: isManager),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ToggleWidget(ref: ref, isManager: isManager),
+                      ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
                       // Dynamic Content → Toggle se connected
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _buildDynamicContent(ref, isManager),
+                        child: _buildDynamicContent(ref, isManager, theme),
                       ),
+
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -92,24 +107,29 @@ class AttendanceScreen extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: theme.primary)),
         error: (err, stk) => Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 80,
-                  color: Colors.red[400],
-                ),
+                Icon(Icons.error_outline_rounded, size: 80, color: theme.error),
                 const SizedBox(height: 16),
-                Text('Error loading user: $err', textAlign: TextAlign.center),
+                Text(
+                  'Error loading user: $err',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: theme.textPrimary),
+                ),
                 const SizedBox(height: 24),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.primary,
+                    side: BorderSide(color: theme.primary),
+                  ),
                   onPressed: () => ref.invalidate(authProvider),
                 ),
               ],
@@ -120,7 +140,11 @@ class AttendanceScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDynamicContent(WidgetRef ref, bool isManager) {
+  Widget _buildDynamicContent(
+    WidgetRef ref,
+    bool isManager,
+    ThemeColors theme,
+  ) {
     final view = ref.watch(analyticsViewProvider);
 
     // Employee ko Merge Graph nahi dikhana
@@ -134,7 +158,7 @@ class AttendanceScreen extends ConsumerWidget {
           data: (analytics) {
             switch (view) {
               case AnalyticsView.mergeGraph:
-                return MergedGraphWidget();
+                return const MergedGraphWidget();
 
               case AnalyticsView.employeeOverview:
                 return isManager
@@ -145,12 +169,13 @@ class AttendanceScreen extends ConsumerWidget {
                 return const ActiveProjectsWidget(); // Active projects cards
             }
           },
-
           loading: () => SizedBox(
             height: 400,
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: theme.isDark ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: theme.isDark
+                  ? Colors.grey[700]!
+                  : Colors.grey[100]!,
               child: ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 3,
@@ -158,14 +183,13 @@ class AttendanceScreen extends ConsumerWidget {
                   height: 180,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
             ),
           ),
-
           error: (err, stack) => Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
@@ -175,14 +199,22 @@ class AttendanceScreen extends ConsumerWidget {
                   Icon(
                     Icons.error_outline_rounded,
                     size: 60,
-                    color: Colors.red[400],
+                    color: theme.error,
                   ),
                   const SizedBox(height: 16),
-                  Text('Failed to load: $err', textAlign: TextAlign.center),
+                  Text(
+                    'Failed to load: $err',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: theme.textPrimary),
+                  ),
                   const SizedBox(height: 24),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.primary,
+                      side: BorderSide(color: theme.primary),
+                    ),
                     onPressed: () =>
                         ref.read(analyticsProvider.notifier).refresh(),
                   ),

@@ -1,9 +1,4 @@
 // lib/features/dashboard/presentation/widgets/employeewidgets/check_in_out.dart
-// FINAL UPDATED VERSION - January 05, 2026
-// Short, transparent card
-// Real geofence check using geofenceProvider
-// Role-based: Employee sees personal, Manager sees quick team status
-// No overflow, dark mode, real-time status from attendanceProvider
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';

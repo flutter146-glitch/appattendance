@@ -1,9 +1,4 @@
 // lib/features/leaves/presentation/widgets/monthly_overview_widget.dart
-// FINAL UPGRADED VERSION - January 06, 2026
-// Modern card UI with gradient, icons, clean spacing
-// Null-safe, dark mode support, responsive (no overflow)
-// Only current + previous month shown (live, no dummy)
-// UI/UX same (layout, colors, stats items) but polished
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';

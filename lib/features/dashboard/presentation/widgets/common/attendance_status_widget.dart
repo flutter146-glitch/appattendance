@@ -1,14 +1,4 @@
 // lib/features/dashboard/presentation/widgets/common/attendance_status_widget.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026 (Upgraded)
-// Improvements:
-// - Better null-safety & fallback handling
-// - Shimmer loading effect for smooth UX
-// - Role-based display (employee vs manager subtle differences)
-// - Live clock for check-in time (if ongoing)
-// - Accessibility (Semantics)
-// - Error state with retry button
-// - Dark/light mode enhanced contrast
-// - Clean, modern card design with subtle animation
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';

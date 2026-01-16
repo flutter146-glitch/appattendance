@@ -1,14 +1,9 @@
-// lib/features/attendance/presentation/widgets/attendance_history_widget.dart
-// PRODUCTION-READY - Exact screenshot match for employee attendance history
-// Columns: Date (with day), Status chip, Check In, Check Out, Hours
-// Filter tabs: All / Present / Absent / Late
-
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 
 class AttendanceHistoryWidget extends ConsumerWidget {
   final TeamMember employee;
@@ -17,7 +12,7 @@ class AttendanceHistoryWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Filter state (shared across app or per screen - here local for simplicity)
+    final theme = ThemeColors(context);
     final selectedFilter = ref.watch(_historyFilterProvider);
     final filteredHistory = _filterHistory(
       employee.recentAttendanceHistory,
@@ -28,19 +23,23 @@ class AttendanceHistoryWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
             'Recent Attendance',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: theme.textPrimary,
+            ),
           ),
         ),
 
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Attendance History',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 14, color: theme.textSecondary),
           ),
         ),
 
@@ -52,13 +51,20 @@ class AttendanceHistoryWidget extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              _buildFilterTab(ref, 'All', HistoryFilter.all, selectedFilter),
+              _buildFilterTab(
+                ref,
+                'All',
+                HistoryFilter.all,
+                selectedFilter,
+                theme,
+              ),
               const SizedBox(width: 8),
               _buildFilterTab(
                 ref,
                 'Present',
                 HistoryFilter.present,
                 selectedFilter,
+                theme,
               ),
               const SizedBox(width: 8),
               _buildFilterTab(
@@ -66,9 +72,16 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                 'Absent',
                 HistoryFilter.absent,
                 selectedFilter,
+                theme,
               ),
               const SizedBox(width: 8),
-              _buildFilterTab(ref, 'Late', HistoryFilter.late, selectedFilter),
+              _buildFilterTab(
+                ref,
+                'Late',
+                HistoryFilter.late,
+                selectedFilter,
+                theme,
+              ),
             ],
           ),
         ),
@@ -82,7 +95,7 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     'No attendance records found',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 16, color: theme.textSecondary),
                   ),
                 ),
               )
@@ -92,11 +105,11 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                 itemCount: filteredHistory.length,
                 itemBuilder: (context, index) {
                   final att = filteredHistory[index];
+                  final statusColor = att.statusColor;
+
                   return Container(
                     decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey.shade200),
-                      ),
+                      border: Border(bottom: BorderSide(color: theme.divider)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -115,15 +128,16 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                                   DateFormat(
                                     'dd/MM/yyyy',
                                   ).format(att.attendanceDate),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w500,
+                                    color: theme.textPrimary,
                                   ),
                                 ),
                                 Text(
                                   DateFormat('EEE').format(att.attendanceDate),
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey[600],
+                                    color: theme.textSecondary,
                                   ),
                                 ),
                               ],
@@ -145,7 +159,7 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                               child: Text(
                                 att.status.name.toUpperCase(),
                                 style: TextStyle(
-                                  color: att.statusColor,
+                                  color: statusColor,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -161,7 +175,10 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                               att.checkInTime != null
                                   ? DateFormat('HH:mm').format(att.checkInTime!)
                                   : '--:--',
-                              style: const TextStyle(fontSize: 13),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: theme.textPrimary,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -175,7 +192,10 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                                       'HH:mm',
                                     ).format(att.checkOutTime!)
                                   : '--:--',
-                              style: const TextStyle(fontSize: 13),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: theme.textPrimary,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -191,8 +211,10 @@ class AttendanceHistoryWidget extends ConsumerWidget {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: att.isPresent
-                                    ? Colors.green
-                                    : Colors.grey,
+                                    ? theme.success
+                                    : att.isLate
+                                    ? theme.warning
+                                    : theme.error,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -212,6 +234,7 @@ class AttendanceHistoryWidget extends ConsumerWidget {
     String label,
     HistoryFilter filter,
     HistoryFilter selected,
+    ThemeColors theme,
   ) {
     final isActive = selected == filter;
 
@@ -220,14 +243,15 @@ class AttendanceHistoryWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? Colors.blue : Colors.grey[200],
+          color: isActive ? theme.primary : theme.surfaceVariant,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : Colors.black87,
+            color: isActive ? theme.onPrimary : theme.textSecondary,
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 13,
           ),
         ),
       ),

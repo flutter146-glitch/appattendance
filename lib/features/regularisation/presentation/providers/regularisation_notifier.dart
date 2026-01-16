@@ -1,9 +1,4 @@
 // lib/features/regularisation/presentation/providers/regularisation_notifier.dart
-// FINAL UPGRADED VERSION - January 06, 2026
-// Uses local DB + dummy data (no http/Dio)
-// Role-based: Manager sees team requests, Employee sees own
-// Null-safe, loading/error states, real DB fetch & update
-// approve/reject with remarks + refresh
 
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';

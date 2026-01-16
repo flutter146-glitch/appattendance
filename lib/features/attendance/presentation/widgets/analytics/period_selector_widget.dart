@@ -1,7 +1,3 @@
-// lib/features/attendance/presentation/widgets/period_selector_widget.dart
-// PRODUCTION-READY - 1-YEAR LIMITED + CONTEXTUAL CALENDARS
-// Exact UX like your shared AttendanceApp code: chips + modal pickers + quick last options
-
 import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
 import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
 import 'package:flutter/material.dart';

@@ -1,8 +1,4 @@
 // lib/features/dashboard/presentation/providers/dashboard_notifier.dart
-// FINAL FIXED & ROLE-BASED VERSION - January 05, 2026
-// Table name fixed: attendance_master → employee_attendance
-// Role-based data loading (personal for employee, team for manager)
-// Error handling, loading, refresh support
 
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/auth/domain/models/user_model_import.dart';

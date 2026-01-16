@@ -1,10 +1,3 @@
-// lib/features/regularisation/presentation/widgets/month_filter_widget.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-clean, minimal look: subtle chips, tight spacing
-// Only current month + previous month (real-time, no year selector)
-// Responsive horizontal scroll, dark/light mode sync, no overflow
-// Smooth selection, fast & intuitive
-
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

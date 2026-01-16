@@ -1,9 +1,7 @@
-// lib/features/attendance/presentation/widgets/analytics/employee_overview_widget.dart
-// FINAL VERSION - Real data + Navigation to Details Screen on Tap
-
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
 import 'package:appattendance/features/team/presentation/providers/team_provider.dart';
-import 'package:appattendance/features/attendance/presentation/screens/employee_individual_details_screen.dart'; // ← Yeh import add karo
+import 'package:appattendance/features/attendance/presentation/screens/employee_individual_details_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,11 +18,37 @@ class EmployeeOverviewWidget extends ConsumerStatefulWidget {
 
 class _EmployeeOverviewWidgetState
     extends ConsumerState<EmployeeOverviewWidget> {
-  // Track expanded state per employee (pie chart visible)
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _sortOrder = 'A-Z'; // 'A-Z' or 'Z-A'
+
   final Map<String, bool> _expandedCards = {};
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<TeamMember> _filteredAndSorted(List<TeamMember> members) {
+    var filtered = members.where((m) {
+      final q = _searchQuery.toLowerCase();
+      return m.name.toLowerCase().contains(q) ||
+          (m.designation ?? '').toLowerCase().contains(q);
+    }).toList();
+
+    if (_sortOrder == 'A-Z') {
+      filtered.sort((a, b) => a.name.compareTo(b.name));
+    } else {
+      filtered.sort((a, b) => b.name.compareTo(a.name));
+    }
+
+    return filtered;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = ThemeColors(context);
     final teamAsync = ref.watch(teamMembersProvider);
 
     return Padding(
@@ -32,28 +56,59 @@ class _EmployeeOverviewWidgetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Fancy Header with period + date + count
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.08),
+              color: theme.surface,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.isDark
+                      ? Colors.black.withOpacity(0.3)
+                      : Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.people, color: Colors.blue, size: 24),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Employee Overview - Daily',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.primary.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.people_alt_rounded,
+                    color: theme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Employee Overview - Daily',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.textPrimary,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'Date: ${DateFormat('dd MMM yyyy').format(DateTime.now())}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: theme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -61,13 +116,14 @@ class _EmployeeOverviewWidgetState
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
+                    color: theme.primary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '${teamAsync.value?.length ?? 0} Employees',
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -76,32 +132,91 @@ class _EmployeeOverviewWidgetState
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-          // Date
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              'Date: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            ),
+          // Search + Sort
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: theme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (v) => setState(() => _searchQuery = v),
+                    decoration: InputDecoration(
+                      hintText: 'Search employees...',
+                      hintStyle: TextStyle(
+                        color: theme.textSecondary.withOpacity(0.7),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: theme.textSecondary,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    ),
+                    style: TextStyle(color: theme.textPrimary, fontSize: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => setState(() {
+                  _sortOrder = _sortOrder == 'A-Z' ? 'Z-A' : 'A-Z';
+                }),
+                child: Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: theme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _sortOrder,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _sortOrder == 'A-Z'
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 16,
+                        color: theme.textSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
 
           teamAsync.when(
-            data: (members) {
-              if (members.isEmpty) {
-                return const Center(
+            data: (allMembers) {
+              if (allMembers.isEmpty) {
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: Text(
                       "No team members found",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(color: theme.textSecondary),
                     ),
                   ),
                 );
               }
+
+              final members = _filteredAndSorted(allMembers);
 
               return ListView.builder(
                 shrinkWrap: true,
@@ -111,168 +226,187 @@ class _EmployeeOverviewWidgetState
                   final member = members[index];
                   final isExpanded = _expandedCards[member.empId] ?? false;
 
-                  // Real pie chart data
-                  final present = member.presentCount.toDouble();
-                  final late = member.lateCount.toDouble();
-                  final absent = member.absentCount.toDouble();
-                  final total = present + late + absent;
+                  final statusColor = member.statusColor(theme);
 
-                  return Card(
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    decoration: BoxDecoration(
+                      color: theme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.isDark
+                              ? Colors.black.withOpacity(0.25)
+                              : Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    elevation: 3,
                     child: Column(
                       children: [
-                        // Main tappable content
+                        // Main tappable area
                         InkWell(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           onTap: () {
-                            // Navigate to detailed employee screen
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => EmployeeIndividualDetailsScreen(
-                                  employee:
-                                      member, // Pass the real TeamMember object
+                                  employee: member,
                                 ),
                               ),
                             );
                           },
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(16),
-                            leading: CircleAvatar(
-                              radius: 28,
-                              backgroundColor: member.isPresentToday
-                                  ? Colors.green
-                                  : Colors.red,
-                              child: Text(
-                                member.avatarInitial,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            title: Row(
-                              children: [
-                                Text(
-                                  member.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    member.statusBadgeText,
-                                    style: TextStyle(
-                                      color: member.isPresentToday
-                                          ? Colors.green
-                                          : Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            subtitle: Column(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 4),
-                                Text(
-                                  member.designation ?? "—",
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 14,
+                                // Avatar - small & primary tint
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: theme.primary.withOpacity(
+                                    0.15,
+                                  ),
+                                  child: Text(
+                                    member.avatarInitial,
+                                    style: TextStyle(
+                                      color: theme.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(width: 12),
 
-                                // Blue project chips
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 6,
-                                  children: (member.projectNames ?? []).map((
-                                    proj,
-                                  ) {
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
+                                // Name + Status badge (dot + text)
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              member.name,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: theme.textPrimary,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 3,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: statusColor.withOpacity(
+                                                0.12,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  width: 6,
+                                                  height: 6,
+                                                  decoration: BoxDecoration(
+                                                    color: statusColor,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  member.statusBadgeText,
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: statusColor,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        proj,
-                                        style: const TextStyle(
-                                          color: Colors.blue,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        member.designation ?? "—",
+                                        style: TextStyle(
                                           fontSize: 12,
+                                          color: theme.textSecondary,
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
+                                      const SizedBox(height: 8),
 
-                                const SizedBox(height: 8),
-
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.access_time,
-                                      size: 16,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      member.todayCheckInTime,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey[700],
+                                      // Compact chips for time & project count
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 6,
+                                        children: [
+                                          _buildCompactChip(
+                                            Icons.access_time_rounded,
+                                            member.todayCheckInTime,
+                                            theme,
+                                          ),
+                                          _buildCompactChip(
+                                            Icons.work_rounded,
+                                            '${member.projectNames?.length ?? 0} Projects',
+                                            theme,
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      '${member.projectNames?.length ?? 0} Projects • Daily',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
 
-                            // Expand/Collapse icon + "View daily" text (pie chart ke liye)
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isExpanded
-                                      ? Icons.expand_less
-                                      : Icons.expand_more,
-                                  color: Colors.blue,
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  'View daily',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.blue,
+                                const SizedBox(width: 12),
+
+                                // Vertical project list (right side, scrollable)
+                                SizedBox(
+                                  width: 110,
+                                  height: 80,
+                                  child: ListView.builder(
+                                    itemCount: member.projectNames?.length ?? 0,
+                                    itemBuilder: (ctx, i) {
+                                      final proj = member.projectNames![i];
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 4,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: theme.primary.withOpacity(
+                                            0.12,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          proj,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: theme.primary,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
@@ -280,64 +414,108 @@ class _EmployeeOverviewWidgetState
                           ),
                         ),
 
-                        // Expandable Pie Chart (on separate tap/expand)
+                        // Bottom expand button
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(color: theme.divider),
+                            ),
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            title: Text(
+                              'View Daily Attendance Details',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: theme.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: Icon(
+                              isExpanded
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                              color: theme.primary,
+                              size: 20,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _expandedCards[member.empId] = !isExpanded;
+                              });
+                            },
+                          ),
+                        ),
+
+                        // Expanded Pie Chart + legend
                         AnimatedCrossFade(
                           firstChild: const SizedBox.shrink(),
-                          secondChild: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          secondChild: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.surfaceVariant.withOpacity(0.5),
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(12),
+                              ),
+                            ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Divider(),
-                                const SizedBox(height: 12),
-                                const Text(
-                                  'DAILY Attendance Distribution',
+                                Text(
+                                  'Daily Attendance Distribution',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
+                                    color: theme.textPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-
-                                // Real Pie Chart
+                                const SizedBox(height: 12),
                                 SizedBox(
-                                  height: 180,
+                                  height: 160,
                                   child: PieChart(
                                     PieChartData(
                                       sectionsSpace: 2,
-                                      centerSpaceRadius: 40,
+                                      centerSpaceRadius: 35,
                                       sections: [
-                                        if (total > 0) ...[
+                                        if (member.totalAttendance > 0) ...[
                                           PieChartSectionData(
-                                            value: present,
-                                            title:
-                                                '${(present / total * 100).toStringAsFixed(0)}%',
-                                            color: Colors.green,
-                                            radius: 60,
+                                            value: member.presentPercentage,
+                                            title: member.presentPercentage > 5
+                                                ? '${member.presentPercentage.toStringAsFixed(0)}%'
+                                                : '',
+                                            color: theme.success,
+                                            radius: 55,
                                             titleStyle: const TextStyle(
                                               color: Colors.white,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           PieChartSectionData(
-                                            value: late,
-                                            title:
-                                                '${(late / total * 100).toStringAsFixed(0)}%',
-                                            color: Colors.orange,
-                                            radius: 60,
+                                            value: member.latePercentage,
+                                            title: member.latePercentage > 5
+                                                ? '${member.latePercentage.toStringAsFixed(0)}%'
+                                                : '',
+                                            color: theme.warning,
+                                            radius: 55,
                                             titleStyle: const TextStyle(
                                               color: Colors.white,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           PieChartSectionData(
-                                            value: absent,
-                                            title:
-                                                '${(absent / total * 100).toStringAsFixed(0)}%',
-                                            color: Colors.red,
-                                            radius: 60,
+                                            value: member.absentPercentage,
+                                            title: member.absentPercentage > 5
+                                                ? '${member.absentPercentage.toStringAsFixed(0)}%'
+                                                : '',
+                                            color: theme.error,
+                                            radius: 55,
                                             titleStyle: const TextStyle(
                                               color: Colors.white,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -345,32 +523,38 @@ class _EmployeeOverviewWidgetState
                                           PieChartSectionData(
                                             value: 1,
                                             title: 'No Data',
-                                            color: Colors.grey,
-                                            radius: 60,
+                                            color: theme.textDisabled,
+                                            radius: 55,
+                                            titleStyle: TextStyle(
+                                              color: theme.onPrimary,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                       ],
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(height: 12),
-
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     _buildPieLegend(
-                                      Colors.green,
-                                      'Present (${present.toInt()})',
+                                      theme.success,
+                                      'Present (${member.presentCount})',
+                                      theme,
                                     ),
-                                    const SizedBox(width: 16),
+                                    const SizedBox(width: 12),
                                     _buildPieLegend(
-                                      Colors.orange,
-                                      'Late (${late.toInt()})',
+                                      theme.warning,
+                                      'Late (${member.lateCount})',
+                                      theme,
                                     ),
-                                    const SizedBox(width: 16),
+                                    const SizedBox(width: 12),
                                     _buildPieLegend(
-                                      Colors.red,
-                                      'Absent (${absent.toInt()})',
+                                      theme.error,
+                                      'Absent (${member.absentCount})',
+                                      theme,
                                     ),
                                   ],
                                 ),
@@ -389,17 +573,19 @@ class _EmployeeOverviewWidgetState
               );
             },
             loading: () => Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: theme.isDark ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: theme.isDark
+                  ? Colors.grey[700]!
+                  : Colors.grey[100]!,
               child: Column(
                 children: List.generate(
-                  4,
+                  5,
                   (_) => Container(
-                    height: 120,
+                    height: 90,
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: theme.surface,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
@@ -410,7 +596,7 @@ class _EmployeeOverviewWidgetState
                 padding: const EdgeInsets.all(32),
                 child: Text(
                   "Error loading team: $err",
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: theme.error),
                 ),
               ),
             ),
@@ -420,520 +606,39 @@ class _EmployeeOverviewWidgetState
     );
   }
 
-  Widget _buildPieLegend(Color color, String label) {
+  Widget _buildCompactChip(IconData icon, String text, ThemeColors theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.surfaceVariant,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: theme.textSecondary),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(fontSize: 11, color: theme.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPieLegend(Color color, String label, ThemeColors theme) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 13)),
+        Text(label, style: TextStyle(fontSize: 12, color: theme.textSecondary)),
       ],
     );
   }
 }
-
-// // lib/features/attendance/presentation/widgets/analytics/employee_overview_widget.dart
-// import 'package:appattendance/features/team/domain/models/team_member.dart';
-// import 'package:appattendance/features/team/presentation/providers/team_provider.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:shimmer/shimmer.dart';
-
-// class EmployeeOverviewWidget extends ConsumerWidget {
-//   const EmployeeOverviewWidget({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final teamAsync = ref.watch(teamMembersProvider);
-
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 16),
-//       child: teamAsync.when(
-//         data: (members) {
-//           if (members.isEmpty) {
-//             return const Center(
-//               child: Padding(
-//                 padding: EdgeInsets.all(32),
-//                 child: Text(
-//                   "No team members found",
-//                   style: TextStyle(fontSize: 16),
-//                 ),
-//               ),
-//             );
-//           }
-
-//           return ListView.builder(
-//             shrinkWrap: true,
-//             physics: const NeverScrollableScrollPhysics(),
-//             itemCount: members.length,
-//             itemBuilder: (context, index) {
-//               final member = members[index];
-//               return Card(
-//                 margin: const EdgeInsets.only(bottom: 12),
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//                 child: ListTile(
-//                   contentPadding: const EdgeInsets.all(16),
-//                   leading: CircleAvatar(
-//                     radius: 28,
-//                     backgroundColor: member.isPresentToday
-//                         ? Colors.green
-//                         : Colors.red,
-//                     child: Text(
-//                       member.avatarInitial,
-//                       style: const TextStyle(
-//                         color: Colors.white,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-//                   title: Text(
-//                     member.name,
-//                     style: const TextStyle(fontWeight: FontWeight.w600),
-//                   ),
-//                   subtitle: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         member.designation ?? "—",
-//                         style: const TextStyle(color: Colors.grey),
-//                       ),
-//                       const SizedBox(height: 4),
-//                       Text(
-//                         "${member.presentCount} Present • ${member.lateCount} Late • ${member.absentCount} Absent",
-//                         style: const TextStyle(fontSize: 12),
-//                       ),
-//                     ],
-//                   ),
-//                   trailing: SizedBox(
-//                     width: 80,
-//                     height: 80,
-//                     child: PieChart(
-//                       PieChartData(
-//                         sectionsSpace: 0,
-//                         centerSpaceRadius: 18,
-//                         sections: [
-//                           PieChartSectionData(
-//                             value: member.presentCount.toDouble(),
-//                             color: Colors.green,
-//                             radius: 18,
-//                           ),
-//                           PieChartSectionData(
-//                             value: member.lateCount.toDouble(),
-//                             color: Colors.orange,
-//                             radius: 18,
-//                           ),
-//                           PieChartSectionData(
-//                             value: member.absentCount.toDouble(),
-//                             color: Colors.red,
-//                             radius: 18,
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   onTap: () {
-//                     // Navigate to detailed employee view if needed
-//                   },
-//                 ),
-//               );
-//             },
-//           );
-//         },
-//         loading: () => Shimmer.fromColors(
-//           baseColor: Colors.grey[300]!,
-//           highlightColor: Colors.grey[100]!,
-//           child: Column(
-//             children: List.generate(
-//               4,
-//               (_) => Container(
-//                 height: 100,
-//                 margin: const EdgeInsets.only(bottom: 12),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//         error: (err, stk) => Center(child: Text("Error loading team: $err")),
-//       ),
-//     );
-//   }
-// }
-
-// // // lib/features/attendance/presentation/widgets/employee_overview_widget.dart
-// // // ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026 (Upgraded)
-// // // Key Upgrades:
-// // // - Removed EmployeeAnalytics completely – now uses real TeamMember model
-// // // - Real data from teamMembersProvider (dummy_data compatible)
-// // // - Modern dark/light cards with shimmer loading
-// // // - Hero animation + smooth navigation to detail screen
-// // // - Present indicator (green dot) on avatar
-// // // - Status chip with dynamic color (Present/Late/Absent/Leave)
-// // // - Quick stats: attendance % + project count
-// // // - Accessibility & responsive layout
-
-// // import 'package:appattendance/core/utils/app_colors.dart';
-// // import 'package:appattendance/features/attendance/presentation/screens/employee_individual_details_screen.dart';
-// // import 'package:appattendance/features/team/domain/models/team_member.dart';
-// // import 'package:appattendance/features/team/presentation/providers/team_provider.dart';
-// // import 'package:appattendance/features/team/presentation/screens/employee_individual_details_screen.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:flutter_riverpod/flutter_riverpod.dart';
-// // import 'package:shimmer/shimmer.dart';
-
-// // class EmployeeOverviewWidget extends ConsumerWidget {
-// //   const EmployeeOverviewWidget({super.key});
-
-// //   @override
-// //   Widget build(BuildContext context, WidgetRef ref) {
-// //     final isDark = Theme.of(context).brightness == Brightness.dark;
-// //     final teamMembersAsync = ref.watch(teamMembersProvider);
-
-// //     return teamMembersAsync.when(
-// //       data: (members) {
-// //         if (members.isEmpty) {
-// //           return const Center(
-// //             child: Text(
-// //               'No team members found',
-// //               style: TextStyle(fontSize: 16, color: Colors.grey),
-// //             ),
-// //           );
-// //         }
-
-// //         return Column(
-// //           crossAxisAlignment: CrossAxisAlignment.start,
-// //           children: [
-// //             Padding(
-// //               padding: const EdgeInsets.symmetric(horizontal: 16),
-// //               child: Text(
-// //                 'Employee Overview (${members.length} Employees)',
-// //                 style: TextStyle(
-// //                   fontSize: 20,
-// //                   fontWeight: FontWeight.bold,
-// //                   color: isDark ? Colors.white : Colors.black87,
-// //                 ),
-// //               ),
-// //             ),
-// //             const SizedBox(height: 16),
-// //             ListView.builder(
-// //               shrinkWrap: true,
-// //               physics: const NeverScrollableScrollPhysics(),
-// //               itemCount: members.length,
-// //               itemBuilder: (context, index) {
-// //                 final member = members[index];
-
-// //                 return Padding(
-// //                   padding: const EdgeInsets.symmetric(
-// //                     horizontal: 16,
-// //                     vertical: 6,
-// //                   ),
-// //                   child: Hero(
-// //                     tag: 'employee_card_${member.empId}',
-// //                     child: Card(
-// //                       elevation: 4,
-// //                       shadowColor: Colors.black.withOpacity(0.2),
-// //                       shape: RoundedRectangleBorder(
-// //                         borderRadius: BorderRadius.circular(16),
-// //                       ),
-// //                       color: isDark ? const Color(0xFF1E293B) : Colors.white,
-// //                       child: InkWell(
-// //                         borderRadius: BorderRadius.circular(16),
-// //                         onTap: () {
-// //                           Navigator.push(
-// //                             context,
-// //                             MaterialPageRoute(
-// //                               builder: (_) => EmployeeIndividualDetailsScreen(
-// //                                 employee: member,
-// //                               ),
-// //                             ),
-// //                           );
-// //                         },
-// //                         child: Padding(
-// //                           padding: const EdgeInsets.all(16),
-// //                           child: Row(
-// //                             children: [
-// //                               // Avatar with online/present indicator
-// //                               Stack(
-// //                                 children: [
-// //                                   CircleAvatar(
-// //                                     radius: 32,
-// //                                     backgroundColor: Colors.grey[300],
-// //                                     backgroundImage:
-// //                                         member.profilePhotoUrl != null
-// //                                         ? NetworkImage(member.profilePhotoUrl!)
-// //                                         : null,
-// //                                     child: member.profilePhotoUrl == null
-// //                                         ? Text(
-// //                                             member.avatarInitial,
-// //                                             style: const TextStyle(
-// //                                               fontSize: 24,
-// //                                               fontWeight: FontWeight.bold,
-// //                                             ),
-// //                                           )
-// //                                         : null,
-// //                                   ),
-// //                                   if (member.isPresentToday)
-// //                                     Positioned(
-// //                                       right: 0,
-// //                                       bottom: 0,
-// //                                       child: Container(
-// //                                         width: 16,
-// //                                         height: 16,
-// //                                         decoration: BoxDecoration(
-// //                                           color: Colors.green,
-// //                                           shape: BoxShape.circle,
-// //                                           border: Border.all(
-// //                                             color: Colors.white,
-// //                                             width: 2,
-// //                                           ),
-// //                                         ),
-// //                                       ),
-// //                                     ),
-// //                                 ],
-// //                               ),
-// //                               const SizedBox(width: 16),
-
-// //                               // Employee Info
-// //                               Expanded(
-// //                                 child: Column(
-// //                                   crossAxisAlignment: CrossAxisAlignment.start,
-// //                                   children: [
-// //                                     Text(
-// //                                       member.displayNameWithRole,
-// //                                       style: TextStyle(
-// //                                         fontSize: 17,
-// //                                         fontWeight: FontWeight.bold,
-// //                                         color: isDark
-// //                                             ? Colors.white
-// //                                             : Colors.black87,
-// //                                       ),
-// //                                       maxLines: 1,
-// //                                       overflow: TextOverflow.ellipsis,
-// //                                     ),
-// //                                     const SizedBox(height: 4),
-// //                                     Text(
-// //                                       member.email ?? 'No email',
-// //                                       style: TextStyle(
-// //                                         fontSize: 13,
-// //                                         color: isDark
-// //                                             ? Colors.white70
-// //                                             : Colors.grey[700],
-// //                                       ),
-// //                                       maxLines: 1,
-// //                                       overflow: TextOverflow.ellipsis,
-// //                                     ),
-// //                                     const SizedBox(height: 6),
-// //                                     Text(
-// //                                       member.quickStats,
-// //                                       style: const TextStyle(
-// //                                         fontSize: 13,
-// //                                         fontWeight: FontWeight.w600,
-// //                                         color: Colors.blue,
-// //                                       ),
-// //                                     ),
-// //                                   ],
-// //                                 ),
-// //                               ),
-
-// //                               // Status Chip
-// //                               Container(
-// //                                 padding: const EdgeInsets.symmetric(
-// //                                   horizontal: 12,
-// //                                   vertical: 6,
-// //                                 ),
-// //                                 decoration: BoxDecoration(
-// //                                   color: member.statusColor.withOpacity(0.2),
-// //                                   borderRadius: BorderRadius.circular(20),
-// //                                 ),
-// //                                 child: Text(
-// //                                   member.statusBadgeText,
-// //                                   style: TextStyle(
-// //                                     color: member.statusColor,
-// //                                     fontWeight: FontWeight.bold,
-// //                                     fontSize: 12,
-// //                                   ),
-// //                                 ),
-// //                               ),
-// //                             ],
-// //                           ),
-// //                         ),
-// //                       ),
-// //                     ),
-// //                   ),
-// //                 );
-// //               },
-// //             ),
-// //           ],
-// //         );
-// //       },
-// //       loading: () => Column(
-// //         children: List.generate(
-// //           4,
-// //           (_) => Padding(
-// //             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //             child: Shimmer.fromColors(
-// //               baseColor: Colors.grey[300]!,
-// //               highlightColor: Colors.grey[100]!,
-// //               child: Card(
-// //                 shape: RoundedRectangleBorder(
-// //                   borderRadius: BorderRadius.circular(16),
-// //                 ),
-// //                 child: const SizedBox(height: 100),
-// //               ),
-// //             ),
-// //           ),
-// //         ),
-// //       ),
-// //       error: (e, _) => Center(
-// //         child: Column(
-// //           children: [
-// //             Text(
-// //               'Failed to load team members',
-// //               style: TextStyle(color: Colors.red.shade700),
-// //             ),
-// //             TextButton(
-// //               onPressed: () => ref.invalidate(teamMembersProvider),
-// //               child: const Text('Retry'),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
-
-// // import 'package:appattendance/core/utils/app_colors.dart';
-// // import 'package:appattendance/features/attendance/domain/models/analytics_model.dart';
-// // import 'package:appattendance/features/attendance/presentation/providers/analytics_provider.dart';
-// // import 'package:appattendance/features/attendance/presentation/screens/employee_individual_details_screen.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// // class EmployeeOverview extends ConsumerWidget {
-// //   const EmployeeOverview({super.key});
-
-// //   @override
-// //   Widget build(BuildContext context, WidgetRef ref) {
-// //     final analyticsAsync = ref.watch(analyticsProvider);
-
-// //     return analyticsAsync.when(
-// //       data: (analytics) {
-// //         final employees = analytics.employeeBreakdown;
-
-// //         if (employees.isEmpty) {
-// //           return Center(child: Text('No team members found'));
-// //         }
-
-// //         return Column(
-// //           crossAxisAlignment: CrossAxisAlignment.start,
-// //           children: [
-// //             Text(
-// //               'Employee Overview (${employees.length} Employees)',
-// //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// //             ),
-// //             SizedBox(height: 12),
-// //             ListView.builder(
-// //               shrinkWrap: true,
-// //               physics: NeverScrollableScrollPhysics(),
-// //               itemCount: employees.length,
-// //               itemBuilder: (context, index) {
-// //                 final emp = employees[index];
-// //                 return Card(
-// //                   margin: EdgeInsets.only(bottom: 12),
-// //                   elevation: 4,
-// //                   shape: RoundedRectangleBorder(
-// //                     borderRadius: BorderRadius.circular(12),
-// //                   ),
-// //                   child: InkWell(
-// //                     onTap: () {
-// //                       Navigator.push(
-// //                         context,
-// //                         MaterialPageRoute(
-// //                           builder: (_) =>
-// //                               EmployeeIndividualDetailsScreen(employee: emp),
-// //                         ),
-// //                       );
-// //                     },
-// //                     child: Padding(
-// //                       padding: EdgeInsets.all(12),
-// //                       child: Row(
-// //                         children: [
-// //                           // Avatar / Photo
-// //                           CircleAvatar(
-// //                             radius: 30,
-// //                             backgroundImage: NetworkImage(
-// //                               'https://ui-avatars.com/api/?name=${emp.name}&background=random',
-// //                             ),
-// //                             child: emp.status == 'Present'
-// //                                 ? null
-// //                                 : Icon(Icons.error, color: Colors.red),
-// //                           ),
-// //                           SizedBox(width: 16),
-
-// //                           // Employee Info
-// //                           Expanded(
-// //                             child: Column(
-// //                               crossAxisAlignment: CrossAxisAlignment.start,
-// //                               children: [
-// //                                 Text(
-// //                                   emp.name,
-// //                                   style: TextStyle(
-// //                                     fontSize: 16,
-// //                                     fontWeight: FontWeight.bold,
-// //                                   ),
-// //                                   overflow: TextOverflow.ellipsis,
-// //                                 ),
-// //                                 SizedBox(height: 4),
-// //                                 Text(
-// //                                   emp.designation,
-// //                                   style: TextStyle(
-// //                                     fontSize: 14,
-// //                                     color: Colors.grey,
-// //                                   ),
-// //                                   overflow: TextOverflow.ellipsis,
-// //                                 ),
-// //                                 SizedBox(height: 4),
-// //                                 Text(
-// //                                   'Projects: ${emp.projectCount}',
-// //                                   style: TextStyle(
-// //                                     fontSize: 12,
-// //                                     color: Colors.blue,
-// //                                   ),
-// //                                 ),
-// //                               ],
-// //                             ),
-// //                           ),
-
-// //                           // Status Chip
-// //                           Chip(
-// //                             label: Text(
-// //                               emp.status,
-// //                               style: TextStyle(color: Colors.white),
-// //                             ),
-// //                             backgroundColor: emp.status == 'Present'
-// //                                 ? Colors.green
-// //                                 : Colors.red,
-// //                           ),
-// //                         ],
-// //                       ),
-// //                     ),
-// //                   ),
-// //                 );
-// //               },
-// //             ),
-// //           ],
-// //         );
-// //       },
-// //       loading: () => Center(child: CircularProgressIndicator()),
-// //       error: (e, s) => Center(child: Text('Error loading employees')),
-// //     );
-// //   }
-// // }

@@ -1,12 +1,4 @@
 // lib/features/projects/presentation/providers/project_provider.dart
-// FINAL & BEST PRACTICE VERSION - January 09, 2026
-// Features:
-// - AutoDispose for memory efficiency
-// - Separate providers for employee (mapped) & manager (team) views
-// - Single project family provider for detail screens
-// - Refresh + error handling + user-friendly messages
-// - Debounce on refresh to prevent spam
-// - Clear separation of concerns
 
 import 'dart:async';
 

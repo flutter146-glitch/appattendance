@@ -1,6 +1,4 @@
 // // lib/features/dashboard/presentation/widgets/employeewidgets/week_month_stats_widget.dart
-// // Upgraded: Real data from DashboardNotifier + role-based
-// // Shows stats for week/month/quarter + loading/error + dark mode
 
 // import 'package:appattendance/core/utils/app_colors.dart';
 // import 'package:appattendance/features/dashboard/presentation/providers/dashboard_notifier.dart';

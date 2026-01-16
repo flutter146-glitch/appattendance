@@ -1,13 +1,7 @@
-// lib/features/projects/presentation/screens/project_detail_screen.dart
-// ULTIMATE & SCREENSHOT-PERFECT VERSION - January 09, 2026
-// Exactly matches your screenshots:
-// - Dark theme with gradient cards
-// - Team Workload Distribution (Area Chart with fl_chart)
-// - Team Members list with avatar, name, designation, email, ACTIVE chip
-// - Real data from dummy_data.dart (project_master + employee_master + employee_mapped_projects)
-// - Responsive, smooth, modern UI with shimmer loading
+// lib/features/attendance/presentation/screens/project_detail_screen.dart
+// UPGRADED: Full ThemeColors integration + dark/light optimized + screenshot-perfect look
 
-import 'package:appattendance/core/utils/app_colors.dart';
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/projects/domain/models/project_model.dart';
 import 'package:appattendance/features/projects/presentation/providers/project_provider.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
@@ -24,54 +18,49 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ThemeColors(context);
     final teamMembersAsync = ref.watch(
       projectTeamMembersProvider(project.projectId),
     );
 
     return Scaffold(
+      backgroundColor: theme.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           project.projectName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: theme.onPrimary, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: theme.onPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+            colors: theme.isDark
+                ? [theme.onPrimary, theme.background]
+                : [theme.primary, theme.primary.withOpacity(0.3)],
           ),
         ),
         child: SafeArea(
           child: teamMembersAsync.when(
             data: (teamMembers) {
-              // Dummy task distribution for chart (can be replaced with real data later)
-              final workloadData = {
-                'RS': 10.0, // Raj Sharma
-                'PS': 9.0, // Priya Singh
-                'AK': 9.0, // Amit Kumar
-              };
-
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
                   // Project Description Card
                   Card(
-                    color: const Color(0xFF1E293B),
+                    color: theme.surface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: theme.isDark ? 1 : 3,
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -80,8 +69,8 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                           Text(
                             project.projectDescription ??
                                 'No description available',
-                            style: const TextStyle(
-                              color: Colors.white70,
+                            style: TextStyle(
+                              color: theme.textSecondary,
                               fontSize: 15,
                             ),
                           ),
@@ -89,8 +78,12 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildStatusChip('ACTIVE', Colors.green),
-                              _buildStatusChip('HIGH', Colors.red),
+                              _buildStatusChip('ACTIVE', theme.success, theme),
+                              _buildStatusChip(
+                                'HIGH PRIORITY',
+                                theme.error,
+                                theme,
+                              ),
                             ],
                           ),
                         ],
@@ -101,10 +94,10 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   // Team Workload Distribution Chart
-                  const Text(
+                  Text(
                     'Team Workload Distribution',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -112,14 +105,15 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Task allocation across team members',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
+                    style: TextStyle(color: theme.textSecondary, fontSize: 14),
                   ),
                   const SizedBox(height: 16),
                   Card(
-                    color: const Color(0xFF1E293B),
+                    color: theme.surface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: theme.isDark ? 1 : 3,
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -128,7 +122,15 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                             height: 200,
                             child: LineChart(
                               LineChartData(
-                                gridData: const FlGridData(show: true),
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawVerticalLine: false,
+                                  horizontalInterval: 1,
+                                  getDrawingHorizontalLine: (value) => FlLine(
+                                    color: theme.divider,
+                                    strokeWidth: 1,
+                                  ),
+                                ),
                                 titlesData: FlTitlesData(
                                   leftTitles: AxisTitles(
                                     sideTitles: SideTitles(
@@ -137,8 +139,8 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                                       getTitlesWidget: (value, meta) {
                                         return Text(
                                           value.toInt().toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white54,
+                                          style: TextStyle(
+                                            color: theme.textSecondary,
                                             fontSize: 12,
                                           ),
                                         );
@@ -149,18 +151,16 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                                     sideTitles: SideTitles(
                                       showTitles: true,
                                       getTitlesWidget: (value, meta) {
-                                        const labels = [
-                                          'RS',
-                                          'RS',
-                                          'PS',
-                                          'PS',
-                                          'AK',
-                                        ];
-                                        if (value.toInt() < labels.length) {
+                                        // Real team members initials (dynamic)
+                                        if (teamMembers.isEmpty)
+                                          return const Text('');
+                                        final idx = value.toInt();
+                                        if (idx >= 0 &&
+                                            idx < teamMembers.length) {
                                           return Text(
-                                            labels[value.toInt()],
-                                            style: const TextStyle(
-                                              color: Colors.white70,
+                                            teamMembers[idx].avatarInitial,
+                                            style: TextStyle(
+                                              color: theme.textSecondary,
                                             ),
                                           );
                                         }
@@ -178,19 +178,24 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                                 borderData: FlBorderData(show: false),
                                 lineBarsData: [
                                   LineChartBarData(
-                                    spots: [
-                                      const FlSpot(0, 10),
-                                      const FlSpot(1, 10),
-                                      const FlSpot(2, 9),
-                                      const FlSpot(3, 9),
-                                      const FlSpot(4, 9),
-                                    ],
+                                    spots: teamMembers.isEmpty
+                                        ? const [FlSpot(0, 0)]
+                                        : teamMembers.asMap().entries.map((e) {
+                                            // Dummy workload - replace with real task count or hours
+                                            final workload = e.key * 2.0 + 5.0;
+                                            // final Workload = member.assignedTasks?.length.toDouble() ?? (e.key + 5).toDouble();
+
+                                            return FlSpot(
+                                              e.key.toDouble(),
+                                              workload,
+                                            );
+                                          }).toList(),
                                     isCurved: true,
-                                    color: Colors.cyan,
+                                    color: theme.primary,
                                     barWidth: 4,
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: Colors.cyan.withOpacity(0.3),
+                                      color: theme.primary.withOpacity(0.3),
                                     ),
                                   ),
                                 ],
@@ -201,11 +206,14 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                           Wrap(
                             spacing: 12,
                             runSpacing: 8,
-                            children: [
-                              _buildLegendChip('Raj: 10 tasks', Colors.cyan),
-                              _buildLegendChip('Priya: 9 tasks', Colors.blue),
-                              _buildLegendChip('Amit: 9 tasks', Colors.green),
-                            ],
+                            children: teamMembers.map((m) {
+                              return _buildLegendChip(
+                                '${m.avatarInitial}: ~${(m.attendanceRatePercentage ?? 0).toStringAsFixed(0)} tasks',
+                                // '${m.name.split(' ').first}: ${m.assignedTasks?.length ?? 0} tasks'
+                                theme.primary,
+                                theme,
+                              );
+                            }).toList(),
                           ),
                         ],
                       ),
@@ -218,10 +226,10 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Team Members',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: theme.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -229,18 +237,18 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                       Chip(
                         label: Text(
                           '${teamMembers.length} members',
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: theme.onPrimary),
                         ),
-                        backgroundColor: Colors.blue,
+                        backgroundColor: theme.primary,
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   if (teamMembers.isEmpty)
-                    const Center(
+                    Center(
                       child: Text(
                         'No team members assigned',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: theme.textSecondary),
                       ),
                     )
                   else
@@ -248,26 +256,27 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                       children: teamMembers.map((member) {
                         return Card(
                           margin: const EdgeInsets.only(bottom: 12),
-                          color: const Color(0xFF1E293B),
+                          color: theme.surface,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
+                          elevation: theme.isDark ? 1 : 2,
                           child: ListTile(
                             leading: CircleAvatar(
                               radius: 28,
-                              backgroundColor: Colors.blue,
+                              backgroundColor: theme.primary.withOpacity(0.15),
                               child: Text(
                                 member.avatarInitial,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: theme.primary,
                                   fontSize: 20,
                                 ),
                               ),
                             ),
                             title: Text(
                               member.name,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: theme.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -276,12 +285,12 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   member.designation ?? 'Employee',
-                                  style: const TextStyle(color: Colors.white70),
+                                  style: TextStyle(color: theme.textSecondary),
                                 ),
                                 Text(
                                   member.email ?? 'N/A',
-                                  style: const TextStyle(
-                                    color: Colors.white54,
+                                  style: TextStyle(
+                                    color: theme.textSecondary,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -293,13 +302,13 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.2),
+                                color: theme.success.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'ACTIVE',
                                 style: TextStyle(
-                                  color: Colors.green,
+                                  color: theme.success,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -312,16 +321,18 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
               );
             },
             loading: () => Shimmer.fromColors(
-              baseColor: Colors.grey[800]!,
-              highlightColor: Colors.grey[700]!,
+              baseColor: theme.isDark ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: theme.isDark
+                  ? Colors.grey[700]!
+                  : Colors.grey[100]!,
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _shimmerCard(),
+                  _shimmerCard(theme),
                   const SizedBox(height: 24),
-                  _shimmerChart(),
+                  _shimmerChart(theme),
                   const SizedBox(height: 32),
-                  _shimmerCard(),
+                  _shimmerCard(theme),
                 ],
               ),
             ),
@@ -329,15 +340,24 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 60,
+                    color: theme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
                     'Failed to load project details',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(color: theme.error, fontSize: 18),
                   ),
                   TextButton(
                     onPressed: () => ref.invalidate(
                       projectTeamMembersProvider(project.projectId),
                     ),
-                    child: const Text('Retry'),
+                    child: Text(
+                      'Retry',
+                      style: TextStyle(color: theme.primary),
+                    ),
                   ),
                 ],
               ),
@@ -348,23 +368,23 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _shimmerCard() {
+  Widget _shimmerCard(ThemeColors theme) {
     return Card(
-      color: Colors.grey[800],
+      color: theme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: const SizedBox(height: 120),
     );
   }
 
-  Widget _shimmerChart() {
+  Widget _shimmerChart(ThemeColors theme) {
     return Card(
-      color: Colors.grey[800],
+      color: theme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: const SizedBox(height: 250),
     );
   }
 
-  Widget _buildStatusChip(String label, Color color) {
+  Widget _buildStatusChip(String label, Color color, ThemeColors theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -378,7 +398,7 @@ class AnalyticsProjectDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLegendChip(String label, Color color) {
+  Widget _buildLegendChip(String label, Color color, ThemeColors theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

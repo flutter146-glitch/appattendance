@@ -1,9 +1,4 @@
 // lib/features/team/data/repositories/team_repository_impl.dart
-// FIXED & UPGRADED - January 12, 2026
-// Fixes: Queries match dummy_data (reporting_manager_id)
-// Added logging for debug (what's fetched)
-// Safe null handling
-// Team members with attendance & projects joined
 
 import 'package:appattendance/core/database/db_helper.dart';
 import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';

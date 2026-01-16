@@ -1,8 +1,4 @@
 // lib/features/leaves/presentation/widgets/apply_leave_notes_section.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-clean, minimal, premium look: subtle borders, focused textarea
-// Responsive, dark/light mode sync, smooth & intuitive
-// No visual noise, fast & elegant
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';

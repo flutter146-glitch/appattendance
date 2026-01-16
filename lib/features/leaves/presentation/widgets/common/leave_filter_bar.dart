@@ -1,6 +1,4 @@
 // lib/features/leaves/presentation/widgets/leave_filter_bar.dart
-// Final upgraded version: Riverpod sync + role-based dynamic filters + real export/search
-// Dec 30, 2025 - Production-ready, dark mode, privileges safe
 
 import 'dart:io';
 

@@ -1,7 +1,4 @@
 // lib/features/dashboard/presentation/widgets/common/attendance_period_stats_widget.dart
-// Upgraded: Real data from DashboardNotifier + role-based
-// Dynamic stats for daily/weekly/monthly/quarterly + loading/error
-// Current date: December 29, 2025
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/dashboard/presentation/providers/dashboard_notifier.dart';

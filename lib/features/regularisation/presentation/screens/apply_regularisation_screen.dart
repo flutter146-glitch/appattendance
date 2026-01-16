@@ -1,9 +1,4 @@
 // lib/features/Regularization/presentation/screens/apply_Regularization_screen.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Clean, minimal, premium look: subtle cards, perfect spacing
-// Responsive, dark/light mode sync, smooth form flow, no overflow
-// Modularized: Separated widgets into individual files
-// Live validation, loading state, elegant submit button
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';

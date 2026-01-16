@@ -1,4 +1,4 @@
-// lib/features/attendance/presentation/widgets/employee_header_widget.dart
+import 'package:appattendance/core/theme/theme_color.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
 import 'package:flutter/material.dart';
 
@@ -9,48 +9,85 @@ class EmployeeHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeColors(context);
+
     return SliverAppBar(
       expandedHeight: 220,
       floating: false,
       pinned: true,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF2196F3), Color(0xFFBBDEFB)],
+              colors: theme.isDark
+                  ? [theme.onPrimary, theme.surface]
+                  : [theme.primary, theme.primary.withOpacity(0.4)],
             ),
           ),
           child: SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    employee.avatarInitial,
-                    style: const TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2196F3),
+                // Avatar with subtle shadow & border
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                          theme.isDark ? 0.4 : 0.2,
+                        ),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: theme.surface,
+                    child: Text(
+                      employee.avatarInitial,
+                      style: TextStyle(
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: theme.primary,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+
+                // Name
                 Text(
                   employee.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: theme.onPrimary,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
+
+                // Designation
                 Text(
                   employee.designation ?? 'Employee',
-                  style: const TextStyle(fontSize: 16, color: Colors.white70),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: theme.onPrimary.withOpacity(0.85),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

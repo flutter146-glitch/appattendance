@@ -1,7 +1,4 @@
 // lib/features/dashboard/presentation/widgets/managerwidgets/metrics_counter.dart
-// Upgraded: Real data from DashboardNotifier + role-based
-// Shows only for managerial roles + loading/error + dynamic stats
-// Current date: December 29, 2025
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/domain/models/user_model.dart';

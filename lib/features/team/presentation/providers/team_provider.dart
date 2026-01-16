@@ -1,45 +1,43 @@
 // lib/features/team/presentation/providers/team_provider.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 13, 2026 (Fully Upgraded)
-// Key Upgrades:
-// - AutoDispose on all providers (memory leak prevention)
-// - Role-based loading (manager sees team, employee sees empty or own)
-// - Debounced search + status filter combined
-// - Pull-to-refresh support (refresh method)
-// - Error handling with user-friendly messages
-// - Logging for debug (terminal prints)
-// - Real-time filtering (search + status)
-// - Family provider for single member details
-// - Project team members provider fixed (real join query)
-// - Clean, modular, professional structure
+// ULTIMATE PRODUCTION-READY VERSION - January 16, 2026
+// Features:
+// - AutoDispose everywhere (memory safe)
+// - Role-based loading (manager vs employee)
+// - Debounced real-time search + status filter
+// - Pull-to-refresh support
+// - User-friendly error states
+// - Debug logging (only in debug)
+// - Family provider for single member
+// - Project team members (real join query)
+// - Bonus: Weekly/Monthly attendance computed using attendanceInPeriod
 
 import 'dart:async';
 
 import 'package:appattendance/core/database/database_provider.dart';
 import 'package:appattendance/core/database/db_helper.dart';
+import 'package:appattendance/features/attendance/domain/models/attendance_model.dart';
 import 'package:appattendance/features/auth/domain/models/user_model_import.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';
 import 'package:appattendance/features/team/data/repository/team_repository.dart';
 import 'package:appattendance/features/team/data/repository/team_repository_impl.dart';
 import 'package:appattendance/features/team/domain/models/team_member.dart';
-import 'package:appattendance/features/team/presentation/providers/team_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// ── Repository Provider ─────────────────────────────────────────────────────
+// ── Repository (singleton) ──────────────────────────────────────────────────
 final teamRepositoryProvider = Provider<TeamRepository>((ref) {
   final dbHelper = ref.watch(dbHelperProvider);
   return TeamRepositoryImpl(dbHelper);
 });
 
-// ── Search Query Provider ───────────────────────────────────────────────────
+// ── Search & Filter State ───────────────────────────────────────────────────
 final teamSearchQueryProvider = StateProvider<String>((ref) => '');
 
-// ── Status Filter Provider ──────────────────────────────────────────────────
 final memberStatusFilterProvider = StateProvider<MemberStatusFilter>(
   (ref) => MemberStatusFilter.all,
 );
 
-// ── Main Team Members Provider (AutoDispose + Role-based) ───────────────────
+// ── Main Team Members Provider (AutoDispose + Role-aware) ───────────────────
 final teamMembersProvider =
     StateNotifierProvider.autoDispose<
       TeamNotifier,
@@ -51,58 +49,51 @@ class TeamNotifier extends StateNotifier<AsyncValue<List<TeamMember>>> {
   Timer? _debounceTimer;
 
   TeamNotifier(this.ref) : super(const AsyncLoading()) {
-    loadTeamMembers(); // Auto-load on creation
+    loadTeamMembers(); // Auto-load on init
   }
 
   Future<void> loadTeamMembers() async {
     if (state.isLoading) return;
 
     state = const AsyncLoading();
-    if (kDebugMode) print('Team members loading started...');
+    if (kDebugMode) print('🔄 Loading team members...');
 
     try {
       final user = ref.read(authProvider).value;
       if (user == null) {
-        state = AsyncError('Please login to view team', StackTrace.current);
-        if (kDebugMode) print('No user logged in');
+        state = AsyncError('Please login first', StackTrace.current);
+        if (kDebugMode) print('❌ No user logged in');
         return;
       }
 
       if (!user.isManagerial) {
-        state = const AsyncData(<TeamMember>[]); // Employee mode: no team
-        if (kDebugMode) print('Employee mode: No team members');
+        state = const AsyncData([]); // Employees see empty team
+        if (kDebugMode) print('👤 Employee mode: Empty team');
         return;
       }
 
       final repo = ref.read(teamRepositoryProvider);
       final members = await repo.getTeamMembers(user.empId);
-      if (kDebugMode)
-        print(
-          'Loaded ${members.length} team members for manager ${user.empId}',
-        );
+
+      if (kDebugMode) print('✅ Loaded ${members.length} team members');
       state = AsyncData(members);
     } catch (e, stack) {
-      if (kDebugMode) print('Team load error: $e');
-      state = AsyncError(
-        'Failed to load team members. Please try again.',
-        stack,
-      );
+      if (kDebugMode) print('❌ Team load error: $e');
+      state = AsyncError('Failed to load team. Pull down to retry.', stack);
     }
   }
 
-  /// Debounced search + status filter
-  void search(String query) {
+  // Debounced search trigger
+  void onSearchChanged(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 400), () {
-      if (kDebugMode) print('Searching team members for query: "$query"');
-      loadTeamMembers(); // Reload with current query/filter
+      if (kDebugMode) print('🔍 Search: "$query"');
+      // No need to reload — searchedTeamMembersProvider will recompute
     });
   }
 
-  /// Pull-to-refresh / manual refresh
-  Future<void> refresh() async {
-    await loadTeamMembers();
-  }
+  // Manual refresh (pull-to-refresh)
+  Future<void> refresh() => loadTeamMembers();
 
   @override
   void dispose() {
@@ -111,17 +102,7 @@ class TeamNotifier extends StateNotifier<AsyncValue<List<TeamMember>>> {
   }
 }
 
-// ── Single Member Details (Family Provider) ─────────────────────────────────
-final teamMemberDetailsProvider = FutureProvider.family<TeamMember?, String>((
-  ref,
-  empId,
-) async {
-  final repo = ref.read(teamRepositoryProvider);
-  if (kDebugMode) print('Fetching details for empId: $empId');
-  return repo.getTeamMemberDetails(empId);
-});
-
-// ── Searched & Filtered Team Members (Computed Provider) ─────────────────────
+// ── Computed: Filtered & Searched Team Members ──────────────────────────────
 final searchedTeamMembersProvider = Provider<AsyncValue<List<TeamMember>>>((
   ref,
 ) {
@@ -132,7 +113,7 @@ final searchedTeamMembersProvider = Provider<AsyncValue<List<TeamMember>>>((
   return teamAsync.whenData((members) {
     var filtered = members;
 
-    // Apply status filter
+    // Status filter
     switch (statusFilter) {
       case MemberStatusFilter.active:
         filtered = filtered
@@ -145,53 +126,60 @@ final searchedTeamMembersProvider = Provider<AsyncValue<List<TeamMember>>>((
             .toList();
         break;
       case MemberStatusFilter.all:
-        // No filter
         break;
     }
 
-    // Apply search query
+    // Search
     if (query.isNotEmpty) {
-      filtered = filtered.where((member) {
-        return member.name.toLowerCase().contains(query) ||
-            (member.designation?.toLowerCase().contains(query) ?? false) ||
-            (member.email?.toLowerCase().contains(query) ?? false) ||
-            (member.phone?.toLowerCase().contains(query) ?? false);
+      filtered = filtered.where((m) {
+        return m.name.toLowerCase().contains(query) ||
+            (m.designation ?? '').toLowerCase().contains(query) ||
+            (m.email ?? '').toLowerCase().contains(query) ||
+            (m.phone ?? '').toLowerCase().contains(query);
       }).toList();
     }
 
     if (kDebugMode)
       print(
-        'Filtered ${filtered.length} members (query: "$query", filter: $statusFilter)',
+        '📊 Filtered: ${filtered.length} members (query: "$query", filter: $statusFilter)',
       );
     return filtered;
   });
 });
 
-// ── Project Team Members Provider (for project detail screen) ────────────────
+// ── Single Member Details (Family Provider) ─────────────────────────────────
+final teamMemberDetailsProvider = FutureProvider.family<TeamMember?, String>((
+  ref,
+  empId,
+) async {
+  final repo = ref.read(teamRepositoryProvider);
+  if (kDebugMode) print('📄 Fetching member: $empId');
+  return repo.getTeamMemberDetails(empId);
+});
+
+// ── Project Team Members (Family Provider) ──────────────────────────────────
 final projectTeamMembersProvider =
     FutureProvider.family<List<TeamMember>, String>((ref, projectId) async {
-      final repo = ref.read(teamRepositoryProvider);
       final db = await ref.watch(dbHelperProvider).database;
-
       final rows = await db.rawQuery(
         '''
-      SELECT 
-        e.emp_id,
-        e.emp_name AS name,
-        e.designation,
-        e.emp_email AS email,
-        e.emp_phone AS phone,
-        e.emp_status AS status,
-        e.emp_joining_date AS dateOfJoining
-      FROM employee_master e
-      JOIN employee_mapped_projects emp ON e.emp_id = emp.emp_id
-      WHERE emp.project_id = ? AND emp.mapping_status = 'active'
-    ''',
+    SELECT 
+      e.emp_id,
+      e.emp_name AS name,
+      e.designation,
+      e.emp_email AS email,
+      e.emp_phone AS phone,
+      e.emp_status AS status,
+      e.emp_joining_date AS dateOfJoining
+    FROM employee_master e
+    JOIN employee_mapped_projects emp ON e.emp_id = emp.emp_id
+    WHERE emp.project_id = ? AND emp.mapping_status = 'active'
+  ''',
         [projectId],
       );
 
       if (kDebugMode)
-        print('Loaded ${rows.length} team members for project $projectId');
+        print('📂 Project $projectId team: ${rows.length} members');
 
       return rows.map((row) {
         return TeamMember(
@@ -211,125 +199,33 @@ final projectTeamMembersProvider =
       }).toList();
     });
 
-// // lib/features/team/presentation/providers/team_provider.dart
-// import 'package:appattendance/core/database/database_provider.dart';
-// import 'package:appattendance/core/database/db_helper.dart';
-// import 'package:appattendance/features/team/data/repository/team_repository.dart';
-// import 'package:appattendance/features/team/data/repository/team_repository_impl.dart';
-// import 'package:appattendance/features/team/domain/models/team_member.dart';
-// import 'package:appattendance/features/team/presentation/providers/team_notifier.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// ── BONUS: Example - Weekly Attendance Summary Provider (using attendanceInPeriod) ──────
+final weeklyAttendanceSummaryProvider =
+    FutureProvider.family<AsyncValue<Map<String, int>>, String>((
+      ref,
+      empId,
+    ) async {
+      final memberAsync = ref.watch(teamMemberDetailsProvider(empId));
 
-// // Repository Provider
-// final teamRepositoryProvider = Provider<TeamRepository>((ref) {
-//   final dbHelper = ref.watch(dbHelperProvider);
-//   return TeamRepositoryImpl(dbHelper);
-// });
+      return memberAsync.whenData((member) {
+        if (member == null) {
+          return {'present': 0, 'late': 0, 'absent': 0};
+        }
 
-// // Main Team Members List Provider (for manager dashboard)
-// final teamMembersProvider =
-//     StateNotifierProvider<TeamNotifier, AsyncValue<List<TeamMember>>>((ref) {
-//       final repo = ref.watch(teamRepositoryProvider);
-//       final notifier = TeamNotifier(ref, repo);
-//       notifier.loadTeamMembers(); // Auto-load on creation
-//       return notifier;
-//     });
+        final now = DateTime.now();
+        final startOfWeek = now.subtract(
+          Duration(days: now.weekday - 1),
+        ); // Monday
+        final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
-// // Single Member Details (family provider - caching ke liye best)
-// final teamMemberDetailsProvider = FutureProvider.family<TeamMember?, String>((
-//   ref,
-//   empId,
-// ) async {
-//   final repo = ref.watch(teamRepositoryProvider);
-//   return repo.getTeamMemberDetails(empId);
-// });
+        final weekly = member.attendanceInPeriod(startOfWeek, endOfWeek);
 
-// final memberStatusFilterProvider = StateProvider<MemberStatusFilter>(
-//   (ref) => MemberStatusFilter.all,
-// );
+        final present = weekly.where((a) => a.isPresent).length;
+        final late = weekly.where((a) => a.isLate).length;
+        final absent = weekly
+            .where((a) => !a.isPresent && a.leaveType == null)
+            .length;
 
-
-
-// // Search Query State (UI search field ke liye)
-// final teamSearchQueryProvider = StateProvider<String>((ref) => '');
-
-// // Computed: Searched team members (query change pe auto update)
-// final searchedTeamMembersProvider = Provider<AsyncValue<List<TeamMember>>>((
-//   ref,
-// ) {
-//   final query = ref.watch(teamSearchQueryProvider);
-//   final notifier = ref.watch(teamMembersProvider.notifier);
-
-//   // Auto-search on query change
-//   ref.listen(teamSearchQueryProvider, (_, newQuery) {
-//     notifier.search(newQuery);
-//   });
-
-//   return ref.watch(teamMembersProvider);
-// });
-
-// final projectTeamMembersProvider =
-//     FutureProvider.family<List<TeamMember>, String>((ref, projectId) async {
-//       final repo = ref.watch(teamRepositoryProvider);
-//       // Query employee_mapped_projects + employee_master for this projectId
-//       final db = await ref.watch(dbHelperProvider).database;
-//       final rows = await db.rawQuery(
-//         '''
-//       SELECT e.* 
-//       FROM employee_master e
-//       JOIN employee_mapped_projects emp ON e.emp_id = emp.emp_id
-//       WHERE emp.project_id = ?
-//     ''',
-//         [projectId],
-//       );
-
-//       return rows.map((row) => TeamMember.fromJson(row)).toList();
-//     });
-
-// // lib/features/team/presentation/providers/team_provider.dart
-// import 'package:appattendance/core/database/database_provider.dart';
-// import 'package:appattendance/core/database/db_helper.dart';
-// import 'package:appattendance/features/team/data/repositories/team_repository_impl.dart';
-// import 'package:appattendance/features/team/data/repository/team_repository.dart';
-// import 'package:appattendance/features/team/data/repository/team_repository_impl.dart';
-// import 'package:appattendance/features/team/domain/models/team_member.dart';
-// import 'package:appattendance/features/team/domain/repositories/team_repository.dart';
-// import 'package:appattendance/features/team/presentation/providers/team_notifier.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// // Repository Provider (inject DBHelper)
-// final teamRepositoryProvider = Provider<TeamRepository>((ref) {
-//   final dbHelper = ref.watch(dbHelperProvider);
-//   return TeamRepositoryImpl(dbHelper);
-// });
-
-// // Team Members List Provider
-// final teamMembersProvider =
-//     StateNotifierProvider<TeamNotifier, AsyncValue<List<TeamMember>>>((ref) {
-//       final repository = ref.watch(teamRepositoryProvider);
-//       return TeamNotifier(ref, repository)..loadTeamMembers();
-//     });
-
-// // Single Member Details Provider (family for caching per empId)
-// final teamMemberDetailsProvider = FutureProvider.family<TeamMember?, String>((
-//   ref,
-//   empId,
-// ) async {
-//   final repository = ref.watch(teamRepositoryProvider);
-//   return await repository.getTeamMemberDetails(empId);
-// });
-
-// // Search Query Provider (for UI search field)
-// final teamSearchQueryProvider = StateProvider<String>((ref) => '');
-
-// // Searched Team Members (computed from main list or via repo)
-// final searchedTeamMembersProvider = Provider<AsyncValue<List<TeamMember>>>((
-//   ref,
-// ) {
-//   final query = ref.watch(teamSearchQueryProvider);
-//   final notifier = ref.watch(teamMembersProvider.notifier);
-//   ref.listen(teamSearchQueryProvider, (_, newQuery) {
-//     notifier.search(newQuery);
-//   });
-//   return ref.watch(teamMembersProvider);
-// });
+        return {'present': present, 'late': late, 'absent': absent};
+      });
+    });

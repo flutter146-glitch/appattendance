@@ -1,7 +1,4 @@
 // lib/features/projects/presentation/screens/project_detail_screen.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026
-// Features: SliverAppBar, shimmer loading, hero animation, retry on error,
-//           accessibility, share button, dark/light mode, pull-to-refresh
 
 import 'package:appattendance/core/providers/app_state_provider.dart';
 import 'package:appattendance/core/providers/view_mode_provider.dart';

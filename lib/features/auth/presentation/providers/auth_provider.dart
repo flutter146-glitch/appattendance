@@ -1,5 +1,4 @@
 // lib/features/auth/presentation/providers/auth_provider.dart
-// Final production-ready version (Dec 30, 2025)
 // Uses freezed UserModel + Dio switch + computed privileges (R01-R08)
 // Loading/error + real API/local mode
 

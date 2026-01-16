@@ -1,8 +1,4 @@
 // lib/features/leaves/presentation/widgets/apply_leave_type_section.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-clean, minimal, premium look: subtle dropdown, better typography
-// Responsive, dark/light mode sync, smooth & focused selection
-// No visual noise, fast & elegant
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/leaves/domain/models/leave_model.dart';

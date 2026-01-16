@@ -1,7 +1,4 @@
 // lib/features/leaves/presentation/screens/employee_leave_screen.dart
-// FINAL FIXED & POLISHED VERSION - January 08, 2026
-// Null-safe: Skips leaves with null/invalid leaveFromDate
-// No type cast error, safe empty state if no valid leaves
 
 import 'package:appattendance/core/theme/app_gradients.dart';
 import 'package:appattendance/core/utils/app_colors.dart';

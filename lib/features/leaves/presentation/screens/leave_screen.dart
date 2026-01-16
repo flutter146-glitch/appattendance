@@ -1,10 +1,4 @@
 // lib/features/leaves/presentation/screens/leave_screen.dart
-// FINAL UPGRADED & ROLE-BASED VERSION - January 06, 2026
-// Role-based content switch: Employee → EmployeeLeaveScreen, Manager → ManagerLeaveScreen
-// View mode toggle respected (from viewModeProvider)
-// Gradient background, dark mode, responsive, safe navigation, no overflow
-// FAB only for employee/employee view mode
-// Removed RoleConstants - using user.isManagerial instead (same as regularisation screen)
 
 import 'package:appattendance/core/providers/bottom_nav_providers.dart';
 import 'package:appattendance/core/providers/view_mode_provider.dart';

@@ -1,7 +1,4 @@
 // lib/features/project/domain/repositories/project_repository.dart
-// UPGRADED & ROBUST VERSION - January 09, 2026
-// Improvements: DartDoc comments, optional params, better typing, future-proof
-// Still 100% backward compatible - no breaking changes
 
 import 'package:appattendance/features/projects/domain/models/project_model.dart';
 

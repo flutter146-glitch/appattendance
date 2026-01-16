@@ -46,7 +46,9 @@ class ThemeColors {
   // Card & Container
   Color get cardBackground => isDark ? AppColors.grey800 : AppColors.white;
   Color get divider => isDark ? AppColors.grey700 : AppColors.grey300;
+  // Add inside ThemeColors class
 
+  Color get accent => isDark ? AppColors.accentLight : AppColors.accent;
   // Icon Colors
   Color get iconPrimary => isDark ? AppColors.white : AppColors.grey800;
   Color get iconSecondary => isDark ? AppColors.grey400 : AppColors.grey600;

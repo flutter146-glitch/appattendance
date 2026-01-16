@@ -1,8 +1,4 @@
 // lib/features/leaves/presentation/screens/apply_leave_screen.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-clean, minimal, premium look: subtle cards, perfect spacing
-// Responsive, dark/light mode sync, smooth form flow, no overflow
-// Live validation, loading state, elegant submit button
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';

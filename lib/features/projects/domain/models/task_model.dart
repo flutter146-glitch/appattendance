@@ -1,7 +1,4 @@
 // lib/features/projects/domain/models/task_model.dart
-// FINAL Polished Version (31 Dec 2025)
-// Enhanced: assignedTo (empId + name), overdue computed, progress impact
-// No hardcoding - All from DB (task_master table)
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 

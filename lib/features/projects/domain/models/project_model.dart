@@ -1,10 +1,4 @@
 // lib/features/projects/domain/models/project_model.dart
-// ULTIMATE & PRODUCTION-READY VERSION - January 09, 2026 (Fully Updated & Aligned)
-// Strong: Null-safe, rich UI helpers, computed fields, extensible
-// Matches project_master table + employee_mapped_projects exactly
-// Includes MappedProject class (inside same file as requested)
-// All fields from your dummy_data are present (estdStartDate, estdEndDate, estdEffort, estdCost, etc.)
-// teamSize, totalTasks, completedTasks, daysLeft kept as requested (from analytics/DB)
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

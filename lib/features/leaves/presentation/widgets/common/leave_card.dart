@@ -1,9 +1,4 @@
 // lib/features/leaves/presentation/widgets/leave_card.dart
-// FINAL UPGRADED & POLISHED VERSION - January 06, 2026
-// Modern card design, gradient accents, better spacing
-// Null-safe everywhere, dark mode support
-// Approve/Reject buttons only when showActions && pending && privilege
-// Responsive, clean layout, no overflow
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:appattendance/features/auth/presentation/providers/auth_provider.dart';

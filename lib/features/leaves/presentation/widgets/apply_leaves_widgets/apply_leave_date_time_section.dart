@@ -1,8 +1,4 @@
 // lib/features/leaves/presentation/widgets/apply_leave_date_time_section.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-compact, minimal, premium look: tighter spacing, cleaner layout
-// Responsive, dark/light mode sync, smooth & focused date/time pickers
-// Reduced vertical space, better visual balance, no visual noise
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';

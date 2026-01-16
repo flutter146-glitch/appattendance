@@ -1,8 +1,4 @@
 // lib/features/leaves/presentation/widgets/apply_leave_handover_section.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Ultra-clean, minimal, premium look: subtle borders, compact fields
-// Responsive, dark/light mode sync, focused optional section
-// No visual noise, fast & intuitive
 
 import 'package:appattendance/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';

@@ -1,11 +1,4 @@
 // lib/app.dart
-// FINAL SIMPLIFIED & PROFESSIONAL VERSION - January 08, 2026
-// Clean, minimal app startup flow: Splash → Device Verification (first time) → OTP → Password → MPIN → Login
-// Subsequent logins: Splash → Direct Login (device verified)
-// Manager gets Select Role screen after login
-// Role-based Dashboard, session timeout (10 min inactivity + 1 min background)
-// Responsive, overflow-safe error screen, dark/light mode sync
-// No heavy logic in startup, fast & reliable
 
 import 'package:appattendance/core/providers/theme_notifier.dart';
 import 'package:appattendance/features/auth/domain/models/user_extension.dart';

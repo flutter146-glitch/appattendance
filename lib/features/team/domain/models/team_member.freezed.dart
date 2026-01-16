@@ -23,25 +23,22 @@ TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) {
 mixin _$TeamMember {
   // Core identification
   String get empId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError; // from emp_name
-  // Contact & profile
-  String? get email => throw _privateConstructorUsedError; // from emp_email
-  String? get phone => throw _privateConstructorUsedError; // from emp_phone
+  String get name => throw _privateConstructorUsedError; // Contact & profile
+  String? get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
   String? get profilePhotoUrl => throw _privateConstructorUsedError;
   String get avatarFallbackUrl =>
       throw _privateConstructorUsedError; // Professional details
   String? get department => throw _privateConstructorUsedError;
   String? get designation => throw _privateConstructorUsedError;
-  UserStatus get status =>
-      throw _privateConstructorUsedError; // from emp_status
+  UserStatus get status => throw _privateConstructorUsedError;
   DateTime? get dateOfJoining =>
-      throw _privateConstructorUsedError; // from emp_joining_date
-  // Relationships
+      throw _privateConstructorUsedError; // Relationships
   List<String> get projectIds => throw _privateConstructorUsedError;
   List<String> get projectNames =>
-      throw _privateConstructorUsedError; // Attendance history (last 30 days or so) ← this field must exist
+      throw _privateConstructorUsedError; // Attendance history (last 30 days or so)
   List<AttendanceModel> get recentAttendanceHistory =>
-      throw _privateConstructorUsedError; // Optional analytics
+      throw _privateConstructorUsedError; // Optional analytics (from server or computed)
   @JsonKey(includeFromJson: false, includeToJson: false)
   double? get attendanceRatePercentage => throw _privateConstructorUsedError;
 
@@ -328,14 +325,11 @@ class _$TeamMemberImpl extends _TeamMember {
   final String empId;
   @override
   final String name;
-  // from emp_name
   // Contact & profile
   @override
   final String? email;
-  // from emp_email
   @override
   final String? phone;
-  // from emp_phone
   @override
   final String? profilePhotoUrl;
   @override
@@ -349,13 +343,10 @@ class _$TeamMemberImpl extends _TeamMember {
   @override
   @JsonKey()
   final UserStatus status;
-  // from emp_status
   @override
   final DateTime? dateOfJoining;
-  // from emp_joining_date
   // Relationships
   final List<String> _projectIds;
-  // from emp_joining_date
   // Relationships
   @override
   @JsonKey()
@@ -374,9 +365,9 @@ class _$TeamMemberImpl extends _TeamMember {
     return EqualUnmodifiableListView(_projectNames);
   }
 
-  // Attendance history (last 30 days or so) ← this field must exist
+  // Attendance history (last 30 days or so)
   final List<AttendanceModel> _recentAttendanceHistory;
-  // Attendance history (last 30 days or so) ← this field must exist
+  // Attendance history (last 30 days or so)
   @override
   @JsonKey()
   List<AttendanceModel> get recentAttendanceHistory {
@@ -386,7 +377,7 @@ class _$TeamMemberImpl extends _TeamMember {
     return EqualUnmodifiableListView(_recentAttendanceHistory);
   }
 
-  // Optional analytics
+  // Optional analytics (from server or computed)
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   final double? attendanceRatePercentage;
@@ -496,12 +487,11 @@ abstract class _TeamMember extends TeamMember {
   @override
   String get empId;
   @override
-  String get name; // from emp_name
-  // Contact & profile
+  String get name; // Contact & profile
   @override
-  String? get email; // from emp_email
+  String? get email;
   @override
-  String? get phone; // from emp_phone
+  String? get phone;
   @override
   String? get profilePhotoUrl;
   @override
@@ -511,16 +501,15 @@ abstract class _TeamMember extends TeamMember {
   @override
   String? get designation;
   @override
-  UserStatus get status; // from emp_status
+  UserStatus get status;
   @override
-  DateTime? get dateOfJoining; // from emp_joining_date
-  // Relationships
+  DateTime? get dateOfJoining; // Relationships
   @override
   List<String> get projectIds;
   @override
-  List<String> get projectNames; // Attendance history (last 30 days or so) ← this field must exist
+  List<String> get projectNames; // Attendance history (last 30 days or so)
   @override
-  List<AttendanceModel> get recentAttendanceHistory; // Optional analytics
+  List<AttendanceModel> get recentAttendanceHistory; // Optional analytics (from server or computed)
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   double? get attendanceRatePercentage;
